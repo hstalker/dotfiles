@@ -1,0 +1,27 @@
+" Identify platform
+silent function! OSX()
+  return has('macunix')
+endfunction
+silent function! LINUX()
+  return has('unix') && !has('macunix') && !has('win32unix')
+endfunction
+silent function! WINDOWS()
+  return (has('win16') || has('win32') || has('win64'))
+endfunction
+silent function! GUI()
+  return (has('gui_running'))
+endfunction
+
+" Multiplatform compatibility
+if WINDOWS()
+  " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
+  " across (heterogeneous) systems easier.
+  set rtp=/home/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,/home/.vim/after
+endif
+
+source /home/.vim/bundles.vim
+source /home/.vim/settings.vim
+source /home/.vim/map.vim
+source /home/.vim/plugins.vim
+source /home/.vim/functions.vim
+source /home/.vim/autocmd.vim
