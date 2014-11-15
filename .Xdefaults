@@ -1,0 +1,9 @@
+xterm*Background:   black
+xterm*Foreground:   white
+xterm*cursorColor:  LightBlue
+xterm*pointerShape: arrow
+xterm*pointerColor: blue
+xterm*saveLines:    1000
+xterm*faceName:     DejaVu Sans Mono
+xterm*faceSize:     11
+

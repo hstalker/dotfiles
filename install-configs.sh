@@ -13,5 +13,6 @@ sudo cp -rf .vim/vimrc  /etc/vimrc
 sudo chmod -R 777 /home/.vim
 cp .bashrc ~/.bashrc
 cp .xinitrc ~/.xinitrc
+cp .Xdefaults ~/.Xdefaults
 cp .ycm_extra_conf.py ~/.ycm_extra_conf.py
 
