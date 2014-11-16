@@ -1,20 +1,20 @@
 " PLUGINS BUNDLE
-let vundle_readme='/home/.vim/bundle/vundle/README.md'
+let vundle_readme='~/.vim/bundle/vundle/README.md'
 if !filereadable(vundle_readme)
   echo "Installing Plugin.."
   echo ""
-  silent !mkdir -p /home/.vim/bundle
-  silent !git clone https://github.com/gmarik/vundle /home/.vim/bundle/vundle/
+  silent !mkdir -p ~/.vim/bundle
+  silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle/
 endif
 
 " Required:
 if has('vim_starting')
   set nocompatible
-  set runtimepath+=/home/.vim/bundle/vundle/
+  set runtimepath+=~/.vim/bundle/vundle/
   set sessionoptions-=options
 endif
 
-call vundle#rc('/home/.vim/bundle/')
+call vundle#rc('~/.vim/bundle/')
 Plugin 'gmarik/vundle'
 
 " Plugin Groups

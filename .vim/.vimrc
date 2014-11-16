@@ -16,12 +16,12 @@ endfunction
 if WINDOWS()
   " On Windows, also use '.vim' instead of 'vimfiles'; this makes synchronization
   " across (heterogeneous) systems easier.
-  set rtp=/home/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,/home/.vim/after
+  set rtp=~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after
 endif
 
-source /home/.vim/bundles.vim
-source /home/.vim/settings.vim
-source /home/.vim/map.vim
-source /home/.vim/plugins.vim
-source /home/.vim/functions.vim
-source /home/.vim/autocmd.vim
+source ~/.vim/settings/bundles.vim
+source ~/.vim/settings/settings.vim
+source ~/.vim/settings/map.vim
+source ~/.vim/settings/plugins.vim
+source ~/.vim/settings/functions.vim
+source ~/.vim/settings/autocmd.vim
