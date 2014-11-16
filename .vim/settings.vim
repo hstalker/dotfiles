@@ -30,18 +30,18 @@ set vb t_vb=     " disable any beeps or flashes on error
 
 " Configure to primarily use utf8
 if has("multi_byte")
-  if &termencoding == ""|let &termencoding = &encoding|endif
-  set encoding=utf-8
-  setglobal fileencoding=utf-8
+    if &termencoding == ""|let &termencoding = &encoding|endif
+    set encoding=utf-8
+    setglobal fileencoding=utf-8
 endif
 set fileformats=unix,dos,mac "set compatible line endings in order of preference
 
 " Enable mouse
 if has("mouse")
-  set mouse=a
-  set mousehide
-  set mousemodel=popup
-  if has("mouse_sgr")|set ttymouse=sgr|else|set ttymouse=xterm2|endif
+    set mouse=a
+    set mousehide
+    set mousemodel=popup
+    if has("mouse_sgr")|set ttymouse=sgr|else|set ttymouse=xterm2|endif
 endif
 
 " Editor Settings
@@ -77,50 +77,50 @@ set showbreak=↪
 " Appearance Settings
 " switch syntax highlighting on, when the terminal has colors
 if &t_Co > 2 || GUI()
-  syntax enable
+    syntax enable
 endif
 " default colorscheme
 set background=dark
 if GUI()
-  set t_Co=256
-  "colorscheme badwolf
-  "colorscheme gruvbox
-  colorscheme molokai
-  let base16colorspace=256  " Access colors present in 256 colorspace
-  "colorscheme base16-monokai
-  "colorscheme base16-eighties
-  " color fixes
-  hi Comment ctermfg=bg ctermbg=240
-  hi Comment guifg=#585858 guibg=bg
+    set t_Co=256
+    "colorscheme badwolf
+    "colorscheme gruvbox
+    colorscheme molokai
+    let base16colorspace=256  " Access colors present in 256 colorspace
+    "colorscheme base16-monokai
+    "colorscheme base16-eighties
+    " color fixes
+    hi Comment ctermfg=bg ctermbg=240
+    hi Comment guifg=#585858 guibg=bg
 elseif &t_Co >= 256
-  "colorscheme gruvbox
-  colorscheme molokai
-  hi Comment ctermfg=bg ctermbg=240
-  hi Comment guifg=#585858 guibg=bg
+    "colorscheme gruvbox
+    colorscheme molokai
+    hi Comment ctermfg=bg ctermbg=240
+    hi Comment guifg=#585858 guibg=bg
 else
-  "colorscheme gruvbox
-  colorscheme molokai
-  set t_Co=8
-  set t_Sf=^[[3%p1%dm
-  set t_Sb=^[[4%p1%dm
+    "colorscheme gruvbox
+    colorscheme molokai
+    set t_Co=8
+    set t_Sf=^[[3%p1%dm
+    set t_Sb=^[[4%p1%dm
 endif
 
 " GUI options
 if GUI()
-  set guicursor=a:blinkon0 " cursor-blinking off!!
-  set guioptions=ac
-  set guioptions+=p " enable pointer callbacks for X11 (required by some WMs)
-  set guioptions+=h " prevent the cursor jumping to the longest line while scrolling
-  set winaltkeys=no " don't select the menu when pressing the alt-keys
-  " Linux
-  if WINDOWS()
-    set gfn=DejaVu_Sans_Mono_for_Powerline:h10
-  elseif OSX()
-    set gfn=Menlo:h13
-  else
-    set gfn=Liberation\ Mono\ 11
-  endif
-  nmap <F8> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
+    set guicursor=a:blinkon0 " cursor-blinking off!!
+    set guioptions=ac
+    set guioptions+=p " enable pointer callbacks for X11 (required by some WMs)
+    set guioptions+=h " prevent the cursor jumping to the longest line while scrolling
+    set winaltkeys=no " don't select the menu when pressing the alt-keys
+    " Linux
+    if WINDOWS()
+        set gfn=DejaVu_Sans_Mono_for_Powerline:h10
+    elseif OSX()
+        set gfn=Menlo:h13
+    else
+        set gfn=Liberation\ Mono\ 11
+    endif
+    nmap <F8> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
 endif
 
 " Language Settings
@@ -136,13 +136,13 @@ set nowb
 set noswapfile
 " enable persistent undo
 if has('persistent_undo')
-  set undodir=/home/.vim/.undofile
-  set undofile
-  set undolevels=1000  " maximum number of changes that can be undone
-  set undoreload=10000 " maximum number lines to save for undo on a buffer reload
-  if ! isdirectory(&undodir)
-    call mkdir(&undodir, 'p')
-  endif
+    set undodir=~/.vim/.undofile
+    set undofile
+    set undolevels=1000  " maximum number of changes that can be undone
+    set undoreload=10000 " maximum number lines to save for undo on a buffer reload
+    if ! isdirectory(&undodir)
+        call mkdir(&undodir, 'p')
+    endif
 endif
 
 " Wrap

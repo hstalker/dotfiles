@@ -1,9 +1,9 @@
 #!/bin/sh
 
-sudo pacmatic -Syu pacmatic autoconf automake make gcc ghc cabal-install python2 python3 vim nasm yasm i3 rxvt-unicode xorg-xrdb dmenu llvm clang boost
-cp -rf .i3 ~/.i3
-cp .vim/.vimrc ~/.vimrc
-cp -rf .vim/settings ~/.vim/settings
+sudo pacmatic -Syu pacmatic autoconf automake make gcc ghc cabal-install python2 python3 vim nasm yasm i3 rxvt-unicode xorg-xrdb dmenu llvm clang boost cmake
+cp -rf .i3 ~/
+cp .vimrc ~/.vimrc
+cp -rf .vim ~/
 cp .bashrc ~/.bashrc
 cp .xinitrc ~/.xinitrc
 cp .Xresources ~/.Xresources

@@ -19,9 +19,21 @@ if WINDOWS()
   set rtp=~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after
 endif
 
-source ~/.vim/settings/bundles.vim
-source ~/.vim/settings/settings.vim
-source ~/.vim/settings/map.vim
-source ~/.vim/settings/plugins.vim
-source ~/.vim/settings/functions.vim
-source ~/.vim/settings/autocmd.vim
+if !empty(glob('~/.vim/bundles.vim'))
+    source ~/.vim/bundles.vim
+endif
+if !empty(glob('~/.vim/settings.vim'))
+    source ~/.vim/settings.vim
+endif
+if !empty(glob('~/.vim/map.vim'))
+    source ~/.vim/map.vim
+endif
+if !empty(glob('~/.vim/plugins.vim'))
+    source ~/.vim/plugins.vim
+endif
+if !empty(glob('~/.vim/functions.vim'))
+    source ~/.vim/functions.vim
+endif
+if !empty(glob('~/.vim/autocmd.vim'))
+    source ~/.vim/autocmd.vim
+endif
