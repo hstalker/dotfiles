@@ -83,22 +83,11 @@ endif
 set background=dark
 if GUI()
     set t_Co=256
-    "colorscheme badwolf
-    "colorscheme gruvbox
     colorscheme molokai
     let base16colorspace=256  " Access colors present in 256 colorspace
-    "colorscheme base16-monokai
-    "colorscheme base16-eighties
-    " color fixes
-    hi Comment ctermfg=bg ctermbg=240
-    hi Comment guifg=#585858 guibg=bg
 elseif &t_Co >= 256
-    "colorscheme gruvbox
     colorscheme molokai
-    hi Comment ctermfg=bg ctermbg=240
-    hi Comment guifg=#585858 guibg=bg
 else
-    "colorscheme gruvbox
     colorscheme molokai
     set t_Co=8
     set t_Sf=^[[3%p1%dm
@@ -118,7 +107,7 @@ if GUI()
     elseif OSX()
         set gfn=Menlo:h13
     else
-        set gfn=Liberation\ Mono\ 11
+        set gfn=DejaVu\ Sans\ Mono:h10
     endif
     nmap <F8> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
 endif

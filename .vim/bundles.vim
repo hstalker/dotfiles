@@ -70,11 +70,9 @@ if count(g:bundle_groups, 'languages')
     Plugin 'pangloss/vim-javascript'
     Plugin 'othree/javascript-libraries-syntax.vim'
     Plugin 'ap/vim-css-color'
-    Plugin 'burnettk/vim-angular'
     Plugin 'davidhalter/jedi-vim'
     Plugin 'vim-ruby/vim-ruby'
     Plugin 'tikhomirov/vim-glsl'
-    Plugin 'wting/rust.vim'
     Plugin 'lukerandall/haskellmode-vim'
     Plugin 'eagletmt/neco-ghc'
     Plugin 'Valloric/YouCompleteMe'
@@ -82,11 +80,6 @@ endif
 " COLORSCHEME
 if count(g:bundle_groups, 'colorscheme')
     Plugin 'tomasr/molokai'
-    Plugin 'jeffreyiacono/vim-colors-wombat'
-    Plugin 'altercation/vim-colors-solarized'
-    Plugin 'morhetz/gruvbox'
-    Plugin 'sjl/badwolf'
-    Plugin 'chriskempson/base16-vim'
 endif
 
 " automatically load filetype plugins
