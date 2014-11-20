@@ -1,10 +1,11 @@
 [user]
-	email = hstalker0@gmail.com
+    email = hstalker0@gmail.com
     name = Hector Stalker
 [core]
     editor = vim
     whitespace = -indent-with-non-tab,trailing-space
     compression = 9
+    autocrlf = false
 [diff]
     mnemonicprefix = true
 [merge]
@@ -50,4 +51,3 @@
     added = yellow
     changed = green
     untracked = red
-
