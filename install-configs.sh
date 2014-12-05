@@ -18,6 +18,7 @@ cp -rf .config ~/
 cp .gtkrc-2.0 ~/.gtkrc-2.0
 cp .gitconfig ~/.gitconfig
 cp .ycm_extra_conf.py ~/.ycm_extra_conf.py
+cp .astylerc ~/.astylerc
 
 # Build stuff
 vim +PluginInstall +qall
