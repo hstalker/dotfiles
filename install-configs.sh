@@ -1,10 +1,11 @@
 #!/bin/sh
 
 # Grab packages
-sudo pacman -Sy pacmatic
+sudo pacman -Syu pacmatic
 sudo pacmatic -S autoconf automake make gcc ghc cabal-install \
 python2 python3 vim nasm yasm i3 rxvt-unicode xorg-xrdb xorg-xinit dmenu \
-llvm clang boost cmake ttf-dejavu chromium bash-completion vifm
+llvm clang boost cmake ttf-dejavu chromium bash-completion vim astyle \
+texlive-most ghostscript perl ruby
 
 # Copy stuff
 cp -rf .i3 ~/
