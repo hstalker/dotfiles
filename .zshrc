@@ -16,8 +16,8 @@ bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 bindkey '^r' history-incremental-search-backward
-bindkey jj vi-cmd-mode
-export KEYTIMEOUT=1
+bindkey -M viins 'jj' vi-cmd-mode
+#export KEYTIMEOUT=1
 source ~/.opp/opp.zsh
 source ~/.opp/surround.zsh
 source ~/.opp/textobj-between.zsh
