@@ -1,4 +1,4 @@
 # GTK 2.0 config
-gtk-theme-name = "MediterraneanLight"
-gtk-font-name = "Open Sans 8"
-gtk-icon-theme-name = "Faenza-Dark"
+gtk-theme-name = "FlatStudioDark"
+gtk-font-name = "DejaVu Sans Mono 8"
+gtk-icon-theme-name = "Clarity-dark_canus"
