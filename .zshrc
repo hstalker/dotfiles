@@ -2,8 +2,8 @@
 HISTFILE=~/.histfile
 HISTSIZE=2500
 SAVEHIST=2500
-export EDITOR=/usr/bin/vim
-export VISUAL=/usr/bin/vim
+export EDITOR=vim
+export VISUAL=vim
 setopt nomatch
 unsetopt appendhistory autocd beep extendedglob notify
 
@@ -33,7 +33,7 @@ alias e="exit"
 alias pacupg='sudo pacmatic -Syu'   # Synchronize with repositories and then upgrade packages that are out of date on the local system.
 alias pacdl='pacmatic -Sw'          # Download specified package(s) as .tar.xz ball
 alias pacin='sudo pacmatic -S'      # Install specific package(s) from the repositories
-alias pacins='sudo pacmatic -U'     # Install specific package not from the repositories but from a file 
+alias pacins='sudo pacmatic -U'     # Install specific package not from the repositories but from a file
 alias pacre='sudo pacmatic -R'      # Remove the specified package(s), retaining its configuration(s) and required dependencies
 alias pacrem='sudo pacmatic -Rns'   # Remove the specified package(s), its configuration(s) and unneeded dependencies
 alias pacrep='pacmatic -Si'         # Display information about a given package in the repositories
@@ -44,7 +44,7 @@ alias paclo="pacmatic -Qdt"         # List all packages which are orphaned
 alias pacc="sudo pacmatic -Scc"     # Clean cache - delete all not currently installed package files
 alias paclf="pacmatic -Ql"          # List all files installed by a given package
 alias pacown="pacmatic -Qo"         # Show package(s) owning the specified file(s)
-alias pacexpl="pacmatic -D --asexp" # Mark one or more installed packages as explicitly installed 
+alias pacexpl="pacmatic -D --asexp" # Mark one or more installed packages as explicitly installed
 alias pacimpl="pacmatic -D --asdep" # Mark one or more installed packages as non explicitly installed
 
 # Additional pacman alias examples
