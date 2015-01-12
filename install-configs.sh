@@ -23,6 +23,7 @@ echo 'Copying backgrounds...'
 cp -rf backgrounds ~/
 echo 'Copying configuration files...'
 cp -rf .i3 ~/
+sudo chmod u+x ~/.i3/conky-i3.sh
 cp .vimrc ~/.vimrc
 cp -rf .vim ~/
 cp .bashrc ~/.bashrc
