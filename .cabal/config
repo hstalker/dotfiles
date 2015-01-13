@@ -16,11 +16,11 @@ world-file: ~/.cabal/world
 -- with-hc-pkg:
 -- program-prefix:
 -- program-suffix:
--- library-vanilla: True
+library-vanilla: True
 library-profiling: True
 -- shared:
 -- executable-dynamic: False
-profiling: True
+-- profiling: True
 optimization: True
 -- debug-info: False
 -- library-for-ghci:
