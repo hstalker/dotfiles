@@ -193,6 +193,9 @@ autocmd FileType haskell let g:ycm_semantic_triggers = {'haskell' : ['re![_a-zA-
 "let g:ycm_cache_omnifunc = 1
 let g:necoghc_enable_detailed_browse = 1
 let $PATH = $PATH . ':' . expand("~/.cabal/bin")
+" Remap the ctrl-x and ctrl-o autocompletion shortcuts to something easier
+inoremap <C-Space> <C-x><C-o>
+inoremap <C-@> <C-Space>
 
 " YouCompleteMe
 let g:ycm_auto_trigger = 1
