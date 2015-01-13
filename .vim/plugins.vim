@@ -149,12 +149,16 @@ nmap <silent>U :UndotreeToggle<CR>
 " If undotree is opened, it is likely one wants to interact with it.
 let g:undotree_SetFocusWhenToggle=1
 
+
 " neocomplete
+" Disable NeoComplCache for certain filetypes
+autocmd FileType c,cpp,python,haskell NeoCompleteLock
+let g:acp_enableAtStartup = 0
 let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#enable_smart_case = 1
 let g:neocomplete#enable_auto_delimiter = 1
 let g:neocomplete#max_list = 15
-let g:neocomplete#force_overwrite_completefunc = 1
+let g:neocomplete#force_overwrite_completefunc = 0
 
 " Enable heavy omni completion.
 if !exists('g:neocomplete#sources#omni#input_patterns')
@@ -178,27 +182,24 @@ autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
 autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
 autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
 autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 " haskellmode-vim
-au BufEnter *.hs compiler ghc
-let g:haddock_browser="/usr/bin/chromium"
+let g:haddock_browser="chromium"
 autocmd FileType haskell set cmdheight=1
-
-" neco-ghc
+" necoghc
+autocmd FileType haskell let g:ycm_semantic_triggers = {'haskell' : ['re![_a-zA-Z]+[_\w]*\.', '.']}
+"let g:ycm_cache_omnifunc = 1
+let g:necoghc_enable_detailed_browse = 1
 let $PATH = $PATH . ':' . expand("~/.cabal/bin")
 
 " YouCompleteMe
-" Disable NeoComplCache for certain filetypes
-autocmd FileType c,cpp,python NeoCompleteLock
-let g:acp_enableAtStartup = 0
 let g:ycm_auto_trigger = 1
 let g:ycm_min_num_of_chars_for_completion = 3
-set completeopt=menu
+"set completeopt=menu
 let g:ycm_add_preview_to_completeopt = 0
-inoremap <expr><BS> pumvisible()? "\<C-y>\<BS>" : "\<BS>"
+
 
 " DelimitMate
 let delimitMate_matchpairs = "(:),[:],{:}"

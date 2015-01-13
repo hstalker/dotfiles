@@ -48,3 +48,10 @@ echo 'Installing Vim plugins...'
 vim +PluginInstall +qall
 cd ~/.vim/bundle/vimproc.vim && make
 cd ~/.vim/bundle/YouCompleteMe && ./install.sh --clang-completer --system-libclang --system-boost
+
+echo 'Installing extra haskell binaries into path...'
+mkdir ~/.ghc
+cd ~/.ghc
+cabal sandbox init
+cabal update
+cabal install alex happy hlint ghc-mod-5.2.1.2

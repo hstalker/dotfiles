@@ -2,8 +2,9 @@
 HISTFILE=~/.histfile
 HISTSIZE=2500
 SAVEHIST=2500
-export EDITOR=vim
-export VISUAL=vim
+export EDITOR="vim"
+export VISUAL="vim"
+export PATH="$HOME/.ghc/.cabal-sandbox/bin:$PATH"
 setopt nomatch
 unsetopt appendhistory autocd beep extendedglob notify
 
