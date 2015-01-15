@@ -15,7 +15,7 @@ echo 'Grabbing dependencies for this installation...'
 sudo pacmatic -S autoconf automake make gcc ghc cabal-install \
 python2 python3 vim i3 rxvt-unicode xorg-xrdb xorg-xinit dmenu \
 llvm clang boost cmake ttf-dejavu bash-completion astyle git \
-conky yaourt feh acpi
+conky yaourt feh acpi chromium
 yaourt -Sy clarity-icon-theme gtk-theme-flatstudio
 
 # Copy stuff
@@ -55,3 +55,7 @@ cd ~/.ghc
 cabal sandbox init
 cabal update
 cabal install alex happy hlint ghc-mod-5.2.1.2
+echo 'Cleaning up build files...'
+rm -rf ./cabal.sandbox.config ./.cabal-sandbox/add-source-timestamps \
+./.cabal-sandbox/packages ./.cabal-sandbox/share ./.cabal-sandbox/world \
+./.cabal-sandbox/*.conf.d ./.cabal-sandbox/logs ./.cabal-sandbox/lib

@@ -67,11 +67,7 @@ if count(g:bundle_groups, 'devel')
 endif
 " LANGUAGES
 if count(g:bundle_groups, 'languages')
-    Plugin 'pangloss/vim-javascript'
-    Plugin 'othree/javascript-libraries-syntax.vim'
-    Plugin 'ap/vim-css-color'
     Plugin 'davidhalter/jedi-vim'
-    Plugin 'vim-ruby/vim-ruby'
     Plugin 'tikhomirov/vim-glsl'
     Plugin 'lukerandall/haskellmode-vim'
     Plugin 'eagletmt/neco-ghc'

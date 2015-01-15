@@ -7,8 +7,8 @@ let g:airline_enable_branch=1
 let g:airline_detect_modified=1
 let g:airline_detect_paste=1
 let g:airline_inactive_collapse=1
-"let g:bufferline_echo = 0
-"let g:airline#extensions#bufferline#enabled = 1
+let g:bufferline_echo = 0
+let g:airline#extensions#bufferline#enabled = 1
 let g:airline#extensions#syntastic#enabled = 1
 let g:airline#extensions#hunks#enabled = 1
 let g:airline#extensions#ctrlp#show_adjacent_modes = 1
@@ -162,14 +162,11 @@ let g:neocomplete#force_overwrite_completefunc = 1
 
 " Enable heavy omni completion.
 if !exists('g:neocomplete#sources#omni#input_patterns')
-let g:neocomplete#sources#omni#input_patterns = {}
+    let g:neocomplete#sources#omni#input_patterns = {}
 endif
 let g:neocomplete#sources#omni#input_patterns.xml='<[^>]*'
 let g:neocomplete#sources#omni#input_patterns.html='<[^>]*'
 let g:neocomplete#sources#omni#input_patterns.markdown='<[^>]*'
-let g:neocomplete#sources#omni#input_patterns.css='^\s\+\w+\|\w+[):;]?\s\+\|[@!]'
-let g:neocomplete#sources#omni#input_patterns.less='^\s\+\w+\|\w+[):;]?\s\+\|[@!]'
-let g:neocomplete#sources#omni#input_patterns.javascript='[^. \t]\.\%(\h\w*\)\?'
 let g:neocomplete#sources#omni#input_patterns.json='[^. \t]\.\%(\h\w*\)\?'
 let g:neocomplete#sources#omni#input_patterns.ruby='[^. *\t]\.\w*\|\h\w*::'
 let g:neocomplete#sources#omni#input_patterns.php='[^. \t]->\%(\h\w*\)\?\|\h\w*::\%(\h\w*\)\?'
@@ -178,12 +175,7 @@ let g:neocomplete#sources#omni#input_patterns.perl='\h\w*->\h\w*\|\h\w*::'
 let g:neocomplete#sources#omni#input_patterns.java='\%(\h\w*\|)\)\.'
 
 " Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
 autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType ruby setlocal omnifunc=rubycomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 " haskellmode-vim
 let g:haddock_browser="chromium"

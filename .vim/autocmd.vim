@@ -3,11 +3,6 @@ if has("autocmd")
   augroup filetypedetect
     au BufEnter *.markdown,*.mkd,*.md setl wrap tw=79
     au BufEnter *.json setl ft=javascript
-    au BufEnter *.coffee setl sw=4 expandtab
-    au BufEnter *.py setl ts=4 sw=4 sts=4
-    au BufEnter *.php setl ts=4 sw=4 sts=4
-    au BufEnter *.js setl ts=4 sw=4 sts=4
-    au BufEnter *.html setl ts=4 sw=4 sts=4
     au BufEnter *.tex setl wrap tw=79 fo=tcqor
     au BufEnter *.[ch] setl cindent
     au BufEnter *.[ch]pp setl cindent
