@@ -188,9 +188,9 @@ let $PATH = $PATH . ':' . expand("~/.cabal/bin")
 
 " YouCompleteMe
 let g:ycm_auto_trigger = 1
-let g:ycm_min_num_of_chars_for_completion = 3
+let g:ycm_min_num_of_chars_for_completion = 99
 set completeopt=menu
-let g:ycm_add_preview_to_completeopt = 0
+let g:ycm_add_preview_to_completeopt = 1
 
 
 
