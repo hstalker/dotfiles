@@ -198,6 +198,11 @@ let g:ycm_add_preview_to_completeopt = 0
 let delimitMate_matchpairs = "(:),[:],{:}"
 
 " Ultisnips
+let g:UltiSnipsExpandTrigger       = "<tab>"
+let g:UltiSnipsJumpForwardTrigger  = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+"let g:UltiSnipsSnippetDirectories  = ["snips"]
+
 function! g:UltiSnips_Complete()
     call UltiSnips#ExpandSnippet()
     if g:ulti_expand_res == 0
@@ -206,15 +211,12 @@ function! g:UltiSnips_Complete()
         else
             call UltiSnips#JumpForwards()
             if g:ulti_jump_forwards_res == 0
-            return "\<TAB>"
+               return "\<TAB>"
             endif
         endif
     endif
     return ""
 endfunction
 
-au BufEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsListSnippets="<c-e>"
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+au InsertEnter * exec "inoremap <silent> " . g:UltiSnipsExpandTrigger . " <C-R>=g:UltiSnips_Complete()<cr>"
   
