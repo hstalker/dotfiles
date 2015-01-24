@@ -31,7 +31,7 @@ sed "s/enp0s3/$internet_card/g" .conkyrc > ./.conkyrc
 
 # Build stuff
 echo 'Installing Vim plugins...'
-vim +PluginInstall +qall
+vim +NeoBundleCheck +qall
 
 echo 'Installing extra haskell binaries into path...'
 mkdir ./.ghc
