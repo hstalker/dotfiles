@@ -9,11 +9,8 @@ if has('vim_starting')
     set runtimepath+=~/.vim/bundle/neobundle.vim/       " NeoBundle, required
 endif
 
-call neobundle#rc(expand('~/.vim/bundle/'))             " NeoBundle, required
+call neobundle#begin(expand('~/.vim/bundle/'))          " NeoBundle, required
 NeoBundleFetch 'Shougo/neobundle.vim'                   " NeoBundle, required
-
-filetype plugin indent on                               " NeoBundle, required
-NeoBundleCheck                                          " NeoBundle, required
 
 " Plugin Groups
 " List only the plugin groups you will use
@@ -49,7 +46,6 @@ if count(g:bundle_groups, 'devel')
     NeoBundle 'honza/vim-snippets'
     NeoBundle 'AzizLight/TaskList.vim'
     NeoBundle 'Raimondi/delimitMate'
-    NeoBundle 'Yggdroot/indentLine'
     NeoBundle 'godlygeek/tabular'
     NeoBundle 'jbnicolai/rainbow_parentheses.vim'
     NeoBundle 'scrooloose/nerdcommenter'
@@ -66,7 +62,11 @@ if count(g:bundle_groups, 'colorscheme')
     NeoBundle 'tomasr/molokai'
 endif
 
-NeoBundleCheck
+call neobundle#end()
+
+filetype plugin indent on                               " NeoBundle, required
+NeoBundleCheck                                          " NeoBundle, required
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Do settings configurations
@@ -120,10 +120,6 @@ elseif executable('ack')
 else
     let s:ctrlp_fallback = 'find %s -type f'
 endif
-
-" indent guides
-let g:indentLine_char = 'Да'
-let g:indentLine_faster = 1
 
 " NERDCommenter
 nmap ; <Plug>NERDCommenterToggle
