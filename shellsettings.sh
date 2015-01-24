@@ -6,6 +6,9 @@ export EDITOR="vim"
 export VISUAL="vim"
 export PATH="$HOME/.ghc/.cabal-sandbox/bin:$PATH"
 
+# Set prompt
+PS1='\[\033[01m\][ \[\033[01;34m\]\u@\h \[\033[00m\]\[\033[01m\]] \[\033[01;32m\]\w\[\033[00m\]\n\[\033[01;34m\]$\[\033[00m\]> '
+
 # Set aliases
 alias c='clear'
 alias e='exit'
