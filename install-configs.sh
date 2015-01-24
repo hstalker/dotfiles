@@ -15,7 +15,7 @@ echo 'Grabbing dependencies for this installation...'
 sudo pacmatic -S autoconf automake make gcc ghc cabal-install \
 python2 python3 vim emacs i3 rxvt-unicode xorg-xrdb xorg-xinit dmenu \
 llvm clang boost cmake ttf-dejavu bash-completion git \
-conky yaourt feh acpi chromium
+conky yaourt feh acpi chromium zsh
 yaourt -Sy clarity-icon-theme gtk-theme-flatstudio
 
 # Copy stuff
@@ -34,7 +34,7 @@ echo 'Installing Vim plugins...'
 vim +NeoBundleCheck +qall
 
 echo 'Installing extra haskell binaries into path...'
-mkdir ./.ghc
+mkdir -p ./.ghc
 cd ./.ghc
 cabal sandbox init
 cd ../

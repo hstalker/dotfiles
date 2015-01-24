@@ -3,7 +3,7 @@
 ###############################################################################
 autoload -U colors && colors
 
-source ./shellsettings.sh
+source ~/shellsettings.sh
 
 # normal options
 HISTFILE=~/.histfile

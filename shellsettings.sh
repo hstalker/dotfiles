@@ -37,10 +37,7 @@ alias pacinsd='sudo pacmatic -S --asdeps'       # Install given package(s) as de
 alias pacmir='sudo pacmatic -Syy'               # Force refresh of all package lists after updating /etc/pacman.d/mirrorlist
 
 # Misc utility aliases
-get_battery_percentage() {
-    acpi -b | awk "{print $1}" | sed 's/\([^:]*\): \([^,]*\), \([0-9]*\)%.*/\3/'
-}
-alias batt = get_battery_percentage()
+alias battery="acpi -b | awk '{print $1}' | sed 's/\([^:]*\): \([^,]*\), \([0-9]*\)%.*/\3/'"
 
 # Start X if available
 [[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
