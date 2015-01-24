@@ -1,7 +1,7 @@
 " PLUGINS BUNDLE
 if empty(glob('~/.vim/bundle/neobundle.vim/README.md'))
     silent !mkdir -p ~/.vim/bundle
-    silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle/
+    silent !git clone https://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim/
 endif
 
 if has('vim_starting')
