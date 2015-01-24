@@ -9,7 +9,7 @@ HISTFILE=~/.histfile
 HISTSIZE=2500
 SAVEHIST=2500
 
-setopt nomatch
+setopt nomatch correctall
 unsetopt appendhistory autocd beep extendedglob notify
 
 # vim style configuration
@@ -27,9 +27,14 @@ source ~/.opp/opp.zsh
 source ~/.opp/surround.zsh
 source ~/.opp/textobj-between.zsh
 
+# Set prompt
 autoload -U colors && colors
+PS1="%{$fg_bold[brown]%}[ %{$reset_color%}%{$fg_bold[blue]%}%n@%m %{$reset_color%}%{$fg_bold[brown]%}] %{$reset_color%}%{$fg_bold[blue]%}%~
+%{$reset_color%}%{$fg_bold[lblue]%}\$%{$reset_color%}%{$fg_normal[brown]%}> %{$reset_color%}"
 
 zstyle :compinstall filename '~/.zshrc'
 
-autoload -Uz compinit
+autoload -U compinit
 compinit
+zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
+zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
