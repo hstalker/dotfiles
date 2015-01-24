@@ -2,7 +2,6 @@
 " General
 set title                          " change the terminal's title
 set history=1000                   " keep 100 lines of command line history
-set autochdir                      " Change directory to the current buffer when opening files.
 set autoread                       " Set to auto read when a file is changed from the outside
 set autowrite                      " Auto save before commands like next and make
 set diffopt=foldcolumn:0,filler    " Add vertical spaces to keep right and left aligned
@@ -101,20 +100,9 @@ if GUI()
     set guioptions+=p " enable pointer callbacks for X11 (required by some WMs)
     set guioptions+=h " prevent the cursor jumping to the longest line while scrolling
     set winaltkeys=no " don't select the menu when pressing the alt-keys
-    " Linux
-    if WINDOWS()
-        set gfn=DejaVu_Sans_Mono_for_Powerline:h10
-    elseif OSX()
-        set gfn=Menlo:h13
-    else
-        set gfn=DejaVu\ Sans\ Mono:h10
-    endif
-    nmap <F8> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
 endif
 
 " Language Settings
-" Highlight problematic whitespace (spaces before tabs)
-highlight SpellBad term=underline gui=undercurl guisp=Orange
 " highlight clear SignColumn " SignColumn should match background
 " highlight clear LineNr " Current line number row will have same background color in relative mode
 
@@ -136,14 +124,13 @@ endif
 
 " Wrap
 set display=lastline         " don't display @ with long paragraphs
-" set formatoptions=tcroql     " t=text, c=comments, q=format with gq command, o,r=autoinsert comment leader
 set formatoptions=roqnl12    " How automatic formatting is to be done
 set lbr                      " line break
 set nojoinspaces             " Prevents inserting two spaces after punctuation on a join (J)
 set nowrap                   " word wrap
 set splitbelow               " Puts new split windows to the bottom of the current
 set splitright               " Puts new vsplit windows to the right of the current
-set textwidth=0
+set textwidth=80                                        " consider PEP8 by default
 set wrapscan                 " Searches wrap around end of file
 let &sbr = nr2char(8618).' ' " Show ↪ at the beginning of wrapped lines
 
@@ -174,7 +161,6 @@ set foldcolumn=1
 set foldlevel=1           " start out with everything folded
 set foldmethod=marker     " detect triple-{ style fold markers
 set foldopen=block,hor,insert,jump,mark,percent,quickfix,search,tag,undo
-set foldtext=MyFoldText() " Which command trigger auto-unfold
 
 " Session
 set sessionoptions=buffers,curdir,folds,tabpages,winsize

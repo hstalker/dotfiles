@@ -28,9 +28,6 @@ endif
 if !empty(glob('~/.vim/map.vim'))
     source ~/.vim/map.vim
 endif
-if !empty(glob('~/.vim/plugins.vim'))
-    source ~/.vim/plugins.vim
-endif
 if !empty(glob('~/.vim/functions.vim'))
     source ~/.vim/functions.vim
 endif
