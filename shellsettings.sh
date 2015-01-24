@@ -6,9 +6,6 @@ export EDITOR="vim"
 export VISUAL="vim"
 export PATH="$HOME/.ghc/.cabal-sandbox/bin:$PATH"
 
-# Set prompts
-PROMPT="%{$fg_no_bold[green]%}%n%{$reset_color%}@%{$fg_no_bold[magenta]%}%m%{$reset_color%}%1(j. [%j].) %{$fg_bold[white]%}%~%{$reset_color%} %# "
-
 # Set aliases
 alias c='clear'
 alias e='exit'

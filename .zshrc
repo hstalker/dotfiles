@@ -1,7 +1,6 @@
 ###############################################################################
 # .zshrc
 ###############################################################################
-autoload -U colors && colors
 
 source ~/shellsettings.sh
 
@@ -27,6 +26,10 @@ bindkey -M viins 'kj' vi-cmd-mode
 source ~/.opp/opp.zsh
 source ~/.opp/surround.zsh
 source ~/.opp/textobj-between.zsh
+
+# Set prompts
+autoload -U colors && colors
+PROMPT="%{$fg_no_bold[green]%}%n%{$reset_color%}@%{$fg_no_bold[magenta]%}%m%{$reset_color%}%1(j. [%j].) %{$fg_bold[white]%}%~%{$reset_color%} %# "
 
 zstyle :compinstall filename '~/.zshrc'
 
