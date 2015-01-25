@@ -33,13 +33,13 @@ optimization: True
 -- flags:
 -- extra-include-dirs:
 -- extra-lib-dirs:
-extra-prog-path: ~/.cabal/bin
+extra-prog-path: ~/.ghc/.cabal-sandbox/bin
 -- instantiate-with:
-tests: True
+-- tests: False
 -- library-coverage:
 -- coverage: False
 -- exact-configuration: False
-benchmarks: True
+-- benchmarks: False
 -- relocatable: False
 -- cabal-lib-version:
 -- constraint:
