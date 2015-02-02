@@ -26,7 +26,7 @@ echo 'Output of ip addr:'
 ip addr
 echo -n "Enter your working internet providing card's name: "
 read internet_card
-sed "s/enp0s3/$internet_card/g" .conkyrc > ./.conkyrc
+sed -i bak -e "s/enp0s3/$internet_card/g" .conkyrc
 
 
 # Build stuff
