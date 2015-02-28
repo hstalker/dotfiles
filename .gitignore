@@ -1,3 +1,24 @@
+# Unwanted haskell stuff
+.ghc
+
+# Unwanted emacs stuff
+#*#.*
+#*#
+.emacs.d/elpa
+
+# Unwanted vim stuff
+.vim/bundle
+.vim/.ctrlp_cache
+.vim/.undofile
+
+.histfile
+.viminfo
+.bash_history
+.Xauthority
+.gnupg
+.cache
+.dbus
+
 # Python Compiled files
 *.pyc
 

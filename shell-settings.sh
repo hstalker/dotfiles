@@ -2,15 +2,21 @@
 # General settings in an sh module for various compatible shells to source
 ###############################################################################
 # Env. variables
-export EDITOR="vim"
-export VISUAL="vim"
+export EDITOR="emacs"
+export VISUAL="emacs"
 export PATH="$HOME/.ghc/.cabal-sandbox/bin:$PATH"
+
+set -o emacs
 
 # Set aliases
 alias c='clear'
 alias e='exit'
+alias em='emacs'
 alias g='git'
 alias ls='ls --color=auto'
+alias ghc-sandbox="ghc -no-user-package-db -package-db .cabal-sandbox/*-packages.conf.d"
+alias ghci-sandbox="ghci -no-user-package-db -package-db .cabal-sandbox/*-packages.conf.d"
+alias runhaskell-sandbox="runhaskell -no-user-package-db -package-db .cabal-sandbox/*-packages.conf.d"
 alias pacupg='sudo pacmatic -Syu'   # Synchronize with repositories and then upgrade packages that are out of date on the local system.
 alias pacdl='pacmatic -Sw'          # Download specified package(s) as .tar.xz ball
 alias pacin='sudo pacmatic -S'      # Install specific package(s) from the repositories
