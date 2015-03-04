@@ -4,29 +4,29 @@
 ;; setup package management
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
-	("melpa" . "http://melpa.org/packages/")
-	("marmalade" . "http://marmalade-repo.org/packages/")))
+        ("melpa" . "http://melpa.org/packages/")
+        ("marmalade" . "http://marmalade-repo.org/packages/")))
 (package-initialize)
 
 ;; install packages
 (setq required-packages
       '(zenburn-theme
-	yasnippet
-	company
-	company-cabal
-	company-irony
-	company-anaconda
-	autopair
-	rainbow-delimiters
-	flycheck))
+        yasnippet
+        company
+        company-cabal
+        company-irony
+        company-anaconda
+        autopair
+        rainbow-delimiters
+        flycheck))
 
 (when (not package-archive-contents)
   (package-refresh-contents))
 
 (defun packages-installed-p ()
   (loop for p in required-packages
-	when (not (package-installed-p p)) do (return nil)
-	finally (return t)))
+        when (not (package-installed-p p)) do (return nil)
+        finally (return t)))
 
 (defun packages-update ()
   (interactive)
@@ -38,7 +38,7 @@
     ;; install updates
     (dolist (p required-packages)
       (when (not (package-installed-p p))
-	(package-install p)))))
+        (package-install p)))))
 
 (unless (file-exists-p "elpa")
   (packages-update))
@@ -50,7 +50,7 @@
 (yas-global-mode 1)
 (yas-load-directory "~/.emacs.d/snippets")
 (add-hook 'term-mode-hook (lambda()
-			    (setq yas-dont-activate t)))
+                            (setq yas-dont-activate t)))
 
 (company-mode)
 (add-hook 'after-init-hook 'global-company-mode)
@@ -70,8 +70,8 @@
 
 ;; save files on loss of focus
 (add-hook 'focus-out-hook (lambda()
-			    ((interactive)
-			     (save-some-buffers t))))
+                            ((interactive)
+                             (save-some-buffers t))))
 
 ;; get rid of GUI menu stuff
 (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
@@ -90,6 +90,8 @@
 
 ;; set standard indent size
 (setq standard-indent 4)
+;; use spaces instead of tabs
+(setq indent-tabs-mode nil)
 
 ;; disable backups
 (setq make-backup-files nil)

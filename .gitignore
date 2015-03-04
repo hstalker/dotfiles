@@ -1,3 +1,6 @@
+.python_history
+
+
 # Unwanted haskell stuff
 .ghc
 
@@ -5,6 +8,7 @@
 #*#.*
 #*#
 .emacs.d/elpa
+.emacs.d/auto-save-list/*
 
 # Unwanted vim stuff
 .vim/bundle
