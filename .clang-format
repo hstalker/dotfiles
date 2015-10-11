@@ -1,0 +1,9 @@
+BasedOnStyle: Google
+Language: Cpp
+DerivePointerAlignment: false
+PointerAlignment: Left
+Standard: Cpp11
+TabWidth: 4
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 80

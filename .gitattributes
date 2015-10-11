@@ -1,27 +1,9 @@
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
-*.c text eol=lf
-*.h text eol=lf
-*.cpp text eol=lf
-*.hpp text eol=lf
-*.cc text eol=lf
-*.hh text eol=lf
-*.py text eol=lf
-*.txt text eol=lf
-*.yml text eol=lf
-*.xml text eol=lf
-*.ini text eol=lf
-*.md text eol=lf
-*.vim text eol=lf
-*.vimrc text eol=lf
-*.xinitrc text eol=lf
-*.Xresources text eol=lf
-*.bashrc text eol=lf
-*.sh text eol=lf
+*           text=auto whitespace=blank-at-eol,trailing-space,tabwidth=2
 
-# Declare files that will always have CRLF line endings on checkout.
-*.sln text eol=crlf
-*.vcproj text eol=crlf
+*.bat       text eol=crlf
+*.sh        text eol=lf
 
-# Denote all files that are truly binary and should not be modified.
-*.jpg binary
+*.sln       text eol=crlf -whitespace
+*.csproj    text eol=crlf -whitespace merge=union
+*.vcxproj   text eol=crlf -whitespace merge=union
+*.props     text eol=crlf -whitespace merge=union
