@@ -67,7 +67,7 @@ call plug#end()
 " Colors, themes and fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
-syntax enable 
+syntax enable
 
 set background=dark
 let g:solarized_termcolors=256
@@ -84,8 +84,6 @@ if has("gui_running")
     set t_Co=256
     set guitablabel=%M\ %t
     set guifont=DejaVu\ Sans\ Mono\ 10 " Set the font
-else
-    set term=xterm-256color
 endif
 
 " Set utf8 as standard encoding

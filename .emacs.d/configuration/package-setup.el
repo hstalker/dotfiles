@@ -20,7 +20,9 @@
     autopair
     rainbow-delimiters
     flycheck
-    clang-format))
+    clang-format
+    cmake-mode
+    cmake-font-lock))
 
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -85,3 +87,8 @@
 
 ;; Delete trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Enable cmake-mode and cmake-font-lock for highlighting
+(require 'cmake-mode)
+(autoload 'cmake-font-lock-activate "cmake-font-lock" nil t)
+(add-hook 'cmake-mode-hook 'cmake-font-lock-activate)
