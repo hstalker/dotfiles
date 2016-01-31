@@ -105,6 +105,9 @@ set noswapfile
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Map escape to kj for fast return to normal mode
+inoremap kj <ESC>
+
 " Fast saving
 nmap <leader>w :w!<cr>
 " :W sudo saves the file
