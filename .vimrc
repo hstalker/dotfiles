@@ -34,6 +34,8 @@ set noerrorbells
 set novisualbell
 set t_vb=
 set tm=500
+" Recursively upwards search for a ctags file till root
+set tags=./tags,./TAGS,tags;/,TAGS;/
 
 " Ignore compiled files
 set wildignore=*.o,*~,*.pyc,*.obj,*.exe,*.dll,*.so,*.zip,*.tar.gz,*.swp
@@ -59,6 +61,7 @@ Plug 'bling/vim-airline'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'rhysd/vim-clang-format'
 Plug 'kien/rainbow_parentheses.vim'
+Plug 'majutsushi/tagbar'
 
 call plug#end()
 
@@ -152,6 +155,12 @@ if has("mac") || has("macunix")
   vmap <D-j> <M-j>
   vmap <D-k> <M-k>
 endif
+
+" Generate recursive downwards ctags in cur. dir
+map <silent><leader>ct :exe ':silent !ctags -R -f ./tags . &'<cr>:redraw!<cr>
+
+" Toggle tagbar
+map <silent><leader>tb :TagbarToggle<cr>
 
 " Delete trailing white space on save
 func! DeleteTrailingWS()
