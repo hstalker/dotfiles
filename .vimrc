@@ -138,12 +138,6 @@ map <C-k> <C-W>k
 map <C-h> <C-W>h
 map <C-l> <C-W>l
 
-" Close the current buffer
-map <leader>bd :Bclose<cr>
-
-" Close all the buffers
-map <leader>ba :bufdo bd<cr>
-
 " Move a line of text using Meta+[jk]
 nmap <M-j> mz:m+<cr>`z
 nmap <M-k> mz:m-2<cr>`z
@@ -170,6 +164,8 @@ func! DeleteTrailingWS()
 endfunc
 autocmd BufWrite * :call DeleteTrailingWS()
 
+" Use tabs instead of spaces in makefiles
+autocmd FileType make setlocal noexpandtab
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rainbow Parentheses configuration
