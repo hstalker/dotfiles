@@ -5,7 +5,10 @@
 " Enable filetype plugins
 filetype plugin on
 filetype indent on
-set number " Show line numbers
+" Set to use hybrid line mode - absolute for current line, relative for all
+" others
+set relativenumber
+set number
 set linebreak " Break lines at word (requires Wrap lines)
 set showbreak=~~~ " Wrap-broken line prefix
 set textwidth=80 " Line wrap (number of cols)
