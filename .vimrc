@@ -78,21 +78,20 @@ call plug#end()
 syntax enable
 
 set background=dark
-let g:solarized_termcolors=256
-
-try
-    colorscheme solarized
-catch
-endtry
+let g:solarized_termcolors=16
 
 " Set extra options when running in GUI mode
 if has("gui_running")
     set guioptions-=T " no toolbar
     set guioptions-=e
-    set t_Co=256
     set guitablabel=%M\ %t
     set guifont=DejaVu\ Sans\ Mono\ 10 " Set the font
 endif
+
+try
+    colorscheme solarized
+catch
+endtry
 
 " Set utf8 as standard encoding
 set encoding=utf8
