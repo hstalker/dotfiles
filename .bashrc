@@ -2,12 +2,6 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -16,8 +10,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=10000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -136,3 +130,6 @@ echo -ne  '\eP\e]4;6;#2AA198\a'  # cyan         -> cyan
 echo -ne '\eP\e]4;14;#93A1A1\a'  # bold cyan    -> base1 *
 echo -ne  '\eP\e]4;7;#EEE8D5\a'  # white        -> Base2
 echo -ne '\eP\e]4;15;#FDF6E3\a'  # bold white   -> Base3
+
+# hack to fix garbage output before prompt
+clear
