@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,misc-*,modernize-*,performance-*,readability-*'
+Checks:          '-*,clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-vararg,misc-*,-misc-noexcept-move-constructor,-misc-definitions-in-headers,-misc-macro-parentheses,modernize-*,performance-*,readability-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 User:            Hector
