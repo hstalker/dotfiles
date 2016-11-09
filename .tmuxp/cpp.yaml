@@ -1,0 +1,13 @@
+session_name: cpp
+start_directory: ~/
+shell_command_before: clear
+windows:
+  - window_name: vim+shell
+    focus: true
+    panes:
+    - pane_name: vim
+      layout: main-horizontal
+      shell_command:
+            - vim
+    - pane_name: dev-shell
+      layout: main-horizontal
