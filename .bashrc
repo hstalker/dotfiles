@@ -3,9 +3,9 @@
 # for examples
 
 # Hack to fix colour support in xfce terminals
-#if [ "$COLORTERM" == "xfce4-terminal" ] ; then
-#    export TERM=xterm-256color
-#fi
+if [ "$COLORTERM" == "xfce4-terminal" ] ; then
+    export TERM=xterm-256color
+fi
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
