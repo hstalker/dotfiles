@@ -134,3 +134,9 @@ echo -ne '\e]PD6c71c4'
 echo -ne '\e]PE93a1a1'
 echo -ne '\e]PFfdf6e3'
 clear
+
+# set editor
+export ALTERNATE_EDITOR=""
+export EDITOR='emacsclient -a "" -t'
+export VISUAL='emacsclient -a "" -t'
+alias emacs='emacsclient -a "" -t'
