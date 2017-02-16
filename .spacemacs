@@ -10,8 +10,11 @@
  '(
    helm
    (auto-completion :variables
-                    auto-completion-return-key-behaviour nil
-                    auto-completion-tab-key-behavior 'complete)
+                    auto-completion-return-key-behaviour 'complete
+                    auto-completion-tab-key-behavior 'cycle
+                    auto-completion-enable-snippets-in-popup t
+                    auto-completion-private-snippets-directory nil
+                    auto-completion-complete-with-key-sequence nil)
    emacs-lisp
    asm
    c-c++
@@ -331,7 +334,7 @@ values."
    dotspacemacs-highlight-delimiters 'all
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
    ;; (default '("rg" "ag" "pt" "ack" "grep"))
@@ -355,7 +358,46 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+  ;; alternative to C-[ and ESC
   (setq-default evil-escape-key-sequence "kj")
+  ;; textual file encoding
+  (prefer-coding-system 'utf-8)
+  (setq-default buffer-file-coding-system 'utf-8-auto-unix)
+  ;; stop bells from occurring
+  (setq visible-bell nil ring-bell-function 'ignore)
+  ;; column width handling
+  (set-fill-column 80)
+  ;; some sane defaults for gdb
+  (setq gdb-many-windows t
+        gdb-show-main t)
+  ;; ediff configuration
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally)
+  ;; setup tramp to use ssh by default
+  (setq tramp-default-method "ssh"
+        tramp-backup-directory-alist backup-directory-alist
+        tramp-ssh-controlmaster-options "ssh")
+  ;; allow for moving over camelcase properly
+  (subword-mode)
+  ;; change 'sentence' concept to full-stop single space
+  (setq sentence-end-double-space nil)
+  ;; enable persistent history for prompts
+  (savehist-mode)
+  ;; bar cursor
+  (setq-default cursor-type '(bar . 1))
+  ;; don't blink the cursor
+  (blink-cursor-mode -1)
+  ;; disable splash screen
+  (setq inhibit-startup-message t
+        initial-scratch-message ""
+        inhibit-splash-screen t)
+  ;; store backups in a temporary directory and disable lockfiles
+  (setq auto-save-file-name-transforms `((".*" , temporary-file-directory t))
+        create-lockfiles nil)
+  ;; make prompts ask for y/n instead of yes/no
+  (fset 'yes-or-no-p 'y-or-n-p)
+  ;; automatically reloads the buffer when changed on disk (careful about this!)
+  (global-auto-revert-mode t)
   )
 
 (defun dotspacemacs/user-config ()
