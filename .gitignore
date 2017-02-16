@@ -1,4 +1,5 @@
-.emacs.d/auto-save-list
-.emacs.d/elpa
+.emacs.d.nonspacemacs/auto-save-list
+.emacs.d.nonspacemacs/elpa
 *.elc
 .vim/plugged
+.emacs.d
