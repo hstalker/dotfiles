@@ -140,3 +140,8 @@ export ALTERNATE_EDITOR=""
 export EDITOR='emacsclient -a "" -t'
 export VISUAL='emacsclient -a "" -t'
 alias emacs='emacsclient -a "" -t'
+
+# aliases to quickly do git certificate trust issue workaround
+# (avoid using these)
+alias git-disable-ssl='export GIT_SSL_NO_VERIFY=1'
+alias git-enable-ssl='export GIT_SSL_NO_VERIFY='
