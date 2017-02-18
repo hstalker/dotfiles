@@ -2,4 +2,4 @@
 .emacs.d.nonspacemacs/elpa
 *.elc
 .vim/plugged
-.emacs.d
+.emacs.d/*
