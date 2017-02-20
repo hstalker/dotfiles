@@ -361,11 +361,20 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+  )
+
+(defun dotspacemacs/user-config ()
+  "Configuration function for user code.
+  This function is called at the very end of Spacemacs initialization after
+  layers configuration.
+  This is the place where most of your configurations should be done. Unless it is
+  explicitly specified that a variable should be set before a package is loaded,
+  you should place your code here."
   ;; alternative to C-[ and ESC
-  (setq-default evil-escape-key-sequence "kj")
+  (setq evil-escape-key-sequence "kj")
   ;; textual file encoding
   (prefer-coding-system 'utf-8)
-  (setq-default buffer-file-coding-system 'utf-8-auto-unix)
+  (setq buffer-file-coding-system 'utf-8-auto-unix)
   ;; stop bells from occurring
   (setq visible-bell nil ring-bell-function 'ignore)
   ;; column width handling
@@ -387,7 +396,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
   ;; enable persistent history for prompts
   (savehist-mode)
   ;; bar cursor
-  (setq-default cursor-type '(bar . 1))
+  (setq cursor-type '(bar . 1))
   ;; don't blink the cursor
   (blink-cursor-mode -1)
   ;; disable splash screen
@@ -401,15 +410,6 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (fset 'yes-or-no-p 'y-or-n-p)
   ;; automatically reloads the buffer when changed on disk (careful about this!)
   (global-auto-revert-mode t)
-  )
-
-(defun dotspacemacs/user-config ()
-  "Configuration function for user code.
-  This function is called at the very end of Spacemacs initialization after
-  layers configuration.
-  This is the place where most of your configurations should be done. Unless it is
-  explicitly specified that a variable should be set before a package is loaded,
-  you should place your code here."
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
