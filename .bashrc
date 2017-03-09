@@ -145,3 +145,10 @@ alias emacs='emacsclient -a "" -t'
 # (avoid using these)
 alias git-disable-ssl='export GIT_SSL_NO_VERIFY=1'
 alias git-enable-ssl='export GIT_SSL_NO_VERIFY='
+
+# alias to remove all tracked folders and directories
+# from a local git repo's directory
+alias git-clean-tracked-files='git ls-files -z | xargs -0 rm -f'
+alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD| sort -rz \
+    | xargs -0 rmdir'
+alias git-clean-tracked='git-clean-tracked-files;git-clean-tracked-dir'
