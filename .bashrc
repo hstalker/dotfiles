@@ -153,9 +153,9 @@ alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD| sort -rz \
     | xargs -0 rmdir'
 alias git-clean-tracked='git-clean-tracked-files;git-clean-tracked-dir'
 
-# alias for generating a space separated list of packages installed via pacman 
+# alias for generating a space separated list of packages installed via pacman
 # only created on systems with pacman reachable via PATH
 command -v pacman >/dev/null 2>&1 && \
     { \
-        alias pacman-list-pkgs="pacman -Qe | awk '{print $1}' | tr '\n' ' '"; \
+        alias pacman-list-pkgs="pacman -Qet | awk '{print $1}' | tr '\n' ' '"; \
     }
