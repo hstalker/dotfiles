@@ -157,5 +157,5 @@ alias git-clean-tracked='git-clean-tracked-files;git-clean-tracked-dir'
 # only created on systems with pacman reachable via PATH
 command -v pacman >/dev/null 2>&1 && \
     { \
-        alias pacman-list-pkgs="pacman -Qet | awk '{print $1}' | tr '\n' ' '"; \
+        alias pacman-list-pkgs="pacman -Qqe | tr '\n' ' '"; \
     }
