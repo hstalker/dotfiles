@@ -3,3 +3,4 @@
 *.elc
 .vim/plugged
 .emacs.d/*
+.vagrant.d/*

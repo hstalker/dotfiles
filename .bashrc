@@ -136,9 +136,9 @@ echo -ne '\e]PFfdf6e3'
 clear
 
 # set editor
-export ALTERNATE_EDITOR=""
-export EDITOR='emacsclient -a "" -t'
-export VISUAL='emacsclient -a "" -t'
+export ALTERNATE_EDITOR="nano"
+export EDITOR='vim'
+export VISUAL='vim'
 alias emacs='emacsclient -a "" -t'
 
 # aliases to quickly do git certificate trust issue workaround
