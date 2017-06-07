@@ -34,7 +34,7 @@ set linebreak " Break lines at word (requires Wrap lines)
 set showbreak=~~~ " Wrap-broken line prefix
 set textwidth=80 " Line wrap (number of cols)
 set showmatch " Highlight matching brace
-set hlsearch " Highlight all search results
+set nohlsearch " Don't highlight search results
 set smartcase " Enable smart-case search
 set ignorecase " Always case-insensitive
 set incsearch " Searches for strings incrementally
@@ -116,13 +116,13 @@ set noswapfile
 " Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Change leader key to space
-noremap <Space> <leader>
+nmap <space> <leader>
 
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
 
 " Fast saving
-nmap <leader>w :w!<cr>
+nmap <leader>ww :w!<cr>
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 command W w !sudo tee % > /dev/null
@@ -135,18 +135,30 @@ vnoremap <silent> # :call VisualSelection('b', '')<CR>
 map j gj
 map k gk
 
-" Map <Space> to / (search) and Ctrl-<Space> to ? (backwards search)
-map <space> /
-map <c-space> ?
-
 " Disable highlight when <leader><cr> is pressed
 map <silent> <leader><cr> :noh<cr>
 
-" Smart way to move between windows
+" Faster way to manipulate windows (I can't deal with ^W start)
+" Right/down/up/left
 nmap <leader>wj <C-W>j
-nmap <leader>wj <C-W>k
-nmap <leader>wj <C-W>h
-nmap <leader>wj <C-W>l
+nmap <leader>wk <C-W>k
+nmap <leader>wh <C-W>h
+nmap <leader>wl <C-W>l
+" Open splits
+nmap <leader>wv :vsp<CR>
+nmap <leader>ws :sp<CR>
+" Close splits
+nmap <leader>wc <C-W>c
+nmap <leader>wo <C-W>o
+" Move splits
+nmap <leader>wJ <C-W>J
+nmap <leader>wK <C-W>K
+nmap <leader>wH <C-W>H
+nmap <leader>wL <C-W>L
+" Quick resizing of windows
+nmap <leader>w= <C-W>=
+nmap <leader>w- <C-W>_
+nmap <leader>w/ <C-W>\|
 
 " Move a line of text using Meta+[jk]
 nmap <M-j> mz:m+<cr>`z
