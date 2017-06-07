@@ -1,4 +1,25 @@
 " Vim configuration - aim to keep minimalist
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Use VimPlug for plugin management
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Call :PlugInstall to install, :PlugUpdate to update
+call plug#begin('~/.vim/plugged')
+
+Plug 'altercation/vim-colors-solarized'
+Plug 'bling/vim-airline'
+Plug 'Shougo/vimproc.vim', { 'do': 'make' }
+Plug 'rhysd/vim-clang-format'
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'majutsushi/tagbar'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'ctrlpvim/ctrlp.vim'
+
+call plug#end()
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -54,24 +75,6 @@ endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Use VimPlug for plugin management
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Call :PlugInstall to install, :PlugUpdate to update
-call plug#begin('~/.vim/plugged')
-
-Plug 'altercation/vim-colors-solarized'
-Plug 'bling/vim-airline'
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
-Plug 'rhysd/vim-clang-format'
-Plug 'kien/rainbow_parentheses.vim'
-Plug 'majutsushi/tagbar'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-
-call plug#end()
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors, themes and fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable syntax highlighting
@@ -112,6 +115,9 @@ set noswapfile
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Change leader key to space
+noremap <Space> <leader>
+
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
 
@@ -137,10 +143,10 @@ map <c-space> ?
 map <silent> <leader><cr> :noh<cr>
 
 " Smart way to move between windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+nmap <leader>wj <C-W>j
+nmap <leader>wj <C-W>k
+nmap <leader>wj <C-W>h
+nmap <leader>wj <C-W>l
 
 " Move a line of text using Meta+[jk]
 nmap <M-j> mz:m+<cr>`z
@@ -199,7 +205,30 @@ let g:airline#extensions#tabline#enabled = 1
 " Ultisnips configuration
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Triggers
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<c-b>"
-let g:UltiSnipsListSnippets="<c-tab>"
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsJumpForwardTrigger="<tab>"
+" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" let g:UltiSnipsListSnippets="<s-tab>"
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ctrl-P configuration
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Change the default binding and command name
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+" Change the starting directory search pattern
+let g:ctrlp_working_path_mode = 'ra'
+" Add additional default base directory markers e.g. '.git', '.svn' etc.
+let g:ctrlp_root_markers = []
+" What to do if file already open as buffer (here we switch window to buffer)
+let g:ctrlp_switch_buffer = 'et'
+" Files to ignore
+let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+let g:ctrlp_custom_ignore = {
+  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': 'some_bad_symbolic_links',
+  \ }
+" Leader binding for using ctrlp to search for tags in tag file
+nnoremap <leader>. :CtrlPTag<cr>
