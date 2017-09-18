@@ -8,7 +8,9 @@
 call plug#begin('~/.vim/plugged')
 
 Plug 'altercation/vim-colors-solarized'
-Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'edkolev/tmuxline.vim'
 Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'rhysd/vim-clang-format'
 Plug 'kien/rainbow_parentheses.vim'
@@ -17,6 +19,10 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'jreybert/vimagit'
+Plug 'tpope/vim-commentary'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 
 call plug#end()
 
@@ -173,12 +179,6 @@ if has("mac") || has("macunix")
   vmap <D-k> <M-k>
 endif
 
-" Generate recursive downwards ctags in cur. dir
-map <silent><leader>ct :exe ':silent !ctags -R -f ./tags . &'<cr>:redraw!<cr>
-
-" Toggle tagbar
-map <silent><leader>tb :TagbarToggle<cr>
-
 " Delete trailing white space on save
 func! DeleteTrailingWS()
   exe "normal mz"
@@ -189,6 +189,17 @@ autocmd BufWrite * :call DeleteTrailingWS()
 
 " Use tabs instead of spaces in makefiles
 autocmd FileType make setlocal noexpandtab
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Tagbar configuration
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Generate recursive downwards ctags in cur. dir
+map <silent><leader>ct :exe ':silent !ctags -R -f ./tags . &'<cr>:redraw!<cr>
+
+" Toggle tagbar
+map <silent><leader>tb :TagbarToggle<cr>
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rainbow Parentheses configuration
@@ -211,7 +222,26 @@ autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline configuration
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" show open buffers on line
 let g:airline#extensions#tabline#enabled = 1
+
+" setup themese
+let g:airline_theme='solarized'
+let g:airline_solarized_bg='dark'
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NERDTree configuration
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" open on start if no files specified
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" toggle open nerdtree
+nmap <Leader>nt :NERDTreeToggle<CR>
+
+" show hidden files/folders by default
+let NERDTreeShowHidden = 1
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
