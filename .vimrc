@@ -4,6 +4,12 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Grab vimplug if not available using curl
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 " Call :PlugInstall to install, :PlugUpdate to update
 call plug#begin('~/.vim/plugged')
 
@@ -11,7 +17,6 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'edkolev/tmuxline.vim'
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
 Plug 'rhysd/vim-clang-format'
 Plug 'kien/rainbow_parentheses.vim'
 Plug 'majutsushi/tagbar'
