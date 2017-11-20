@@ -119,7 +119,6 @@ fi
 export ALTERNATE_EDITOR="nano"
 export EDITOR='vim'
 export VISUAL='vim'
-alias emacs='emacsclient -a "" -t'
 
 # aliases to quickly do git certificate trust issue workaround
 # (avoid using these)
