@@ -11,8 +11,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; package handling and setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; must come before configurations of packages
-(package-initialize)
 ;; setup package management
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
@@ -140,14 +138,14 @@
 
 
 ;; CYGWIN-MOUNT
+(require 'cygwin-mount)
 (when (or (eq system-type 'windows-nt) (eq system-type 'cygwin))
-  (require 'cygwin-mount)
   (cygwin-mount-activate)
   )
 
 
 ;; ACE-WINDOW
-(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(defvar aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
 (require 'ace-window)
 
 
@@ -237,6 +235,7 @@
 ;; Delete trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -244,13 +243,14 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (cygwin-mount evil-leader yasnippet solarized-theme rainbow-delimiters magit linum-relative helm goto-last-change flycheck evil clang-format autopair))))
+    (evil-magit evil-escape evil-leader ace-window cygwin-mount powerline clang-format flycheck rainbow-delimiters autopair magit yasnippet ivy solarized-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
 
 (provide 'init)
 ;;; init.el ends here
