@@ -34,6 +34,7 @@
     cygwin-mount
     evil-leader
     evil
+    evil-escape
     evil-magit))
 
 (when (not package-archive-contents)
@@ -63,9 +64,9 @@
   (packages-update))
 
 
-;; SOLARIZED
 ;; load packages, themes and plugins
-(load-theme 'solarized-dark t)
+
+;; SOLARIZED
 ;; make the fringe stand out from the background
 (defvar solarized-distinct-fringe-background t)
 ;; Don't change the font for some headings and titles
@@ -86,6 +87,7 @@
 (defvar solarized-height-plus-2 1.0)
 (defvar solarized-height-plus-3 1.0)
 (defvar solarized-height-plus-4 1.0)
+(load-theme 'solarized-dark t)
 
 
 ;; IVY
@@ -163,7 +165,12 @@
 ;; EVIL
 (require 'evil)
 (evil-mode)
-(define-key evil-insert-state-map "kj" 'evil-normal-state)
+
+
+;; EVIL-ESCAPE
+(evil-escape-mode)
+(setq-default evil-escape-key-sequence "kj")
+(setq-default evil-escape-delay 0.1)
 
 
 ;; EVIL-MAGIT
