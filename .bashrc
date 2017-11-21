@@ -3,7 +3,7 @@
 # for examples
 
 # Hack to fix colour support in xfce terminals
-if [ "$COLORTERM" == "xfce4-terminal" ] ; then
+if [ "$COLORTERM" == "xfce4-terminal" ] || [ "$TERM" == "xterm" ] ; then
     export TERM=xterm-256color
 fi
 
