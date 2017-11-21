@@ -32,6 +32,7 @@
     clang-format
     powerline
     cygwin-mount
+    ace-window
     evil-leader
     evil
     evil-escape
@@ -145,6 +146,11 @@
   )
 
 
+;; ACE-WINDOW
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(require 'ace-window)
+
+
 ;; EVIL-LEADER
 (require 'evil-leader)
 (global-evil-leader-mode)
@@ -159,7 +165,8 @@
   "e" 'find-file
   "b" 'switch-to-buffer
   "k" 'kill-buffer
-  "in" 'find-user-init-file)
+  "in" 'find-user-init-file
+  "w" 'ace-window)
 
 
 ;; EVIL
