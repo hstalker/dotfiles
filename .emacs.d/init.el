@@ -11,177 +11,190 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; package handling and setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; setup package management
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("marmalade" . "https://marmalade-repo.org/packages/")))
+;; setup package management web repo paths
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
-;; install packages
-(defvar-local required-packages
-  '(solarized-theme
-    ivy
-    yasnippet
-    magit
-    autopair
-    rainbow-delimiters
-    flycheck
-    clang-format
-    powerline
-    cygwin-mount
-    ace-window
-    evil-leader
-    evil
-    evil-escape
-    evil-magit))
-
-(when (not package-archive-contents)
-  (package-refresh-contents))
-
-(defun packages-installed-p ()
-  "Predicate checking whether all required packages are already installed."
-  (cl-loop for p in required-packages
-        when (not (package-installed-p p)) return nil
-        finally return t
-        ))
-
-(defun packages-update ()
+;; install use-package
+(defun bootstrap-use-package ()
   "Update all installed packages if possible."
   (interactive)
-  (unless (packages-installed-p)
+  (unless (package-installed-p 'use-package)
     ;; check for new package versions
-    (message "%s" "Refreshing package database...")
+    (message "Refreshing package database...")
     (package-refresh-contents)
-    (message "%s" " done.")
-    ;; install updates
-    (dolist (p required-packages)
-      (when (not (package-installed-p p))
-        (package-install p)))))
+    (message "Bootstrapping use-package...")
+    (package-install 'use-package)))
 
-(unless (file-exists-p "elpa")
-  (packages-update))
+;; do the initial bootstrap if the packages directory can't be found
+(unless (file-directory-p (concat user-emacs-directory "elpa"))
+  (message "Package directory 'elpa' not found...")
+  (bootstrap-use-package))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; load packages, themes and plugins
-
-;; SOLARIZED
-;; make the fringe stand out from the background
-(defvar solarized-distinct-fringe-background t)
-;; Don't change the font for some headings and titles
-(defvar solarized-use-variable-pitch nil)
-;; make the modeline high contrast
-(defvar solarized-high-contrast-mode-line t)
-;; Use less bolding
-(defvar solarized-use-less-bold t)
-;; Use more italics
-(defvar solarized-use-more-italic t)
-;; Use less colors for indicators such as git:gutter, flycheck and similar
-(defvar solarized-emphasize-indicators nil)
-;; Don't change size of org-mode headlines (but keep other size-changes)
-(defvar solarized-scale-org-headlines nil)
-;; Avoid all font-size changes
-(defvar solarized-height-minus-1 1.0)
-(defvar solarized-height-plus-1 1.0)
-(defvar solarized-height-plus-2 1.0)
-(defvar solarized-height-plus-3 1.0)
-(defvar solarized-height-plus-4 1.0)
-(load-theme 'solarized-dark t)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; USE-PACKAGE -- helps the following packaging configurations be easier
+;; to manage
+(require 'use-package)
 
 
-;; IVY
-(ivy-mode)
-(defvar ivy-use-virtual-buffers t)
-(defvar enable-recursive-minibuffers t)
+(use-package solarized-theme
+  :ensure t
+  :init
+  ;; make the fringe stand out from the background
+  (defvar solarized-distinct-fringe-background t)
+  ;; Don't change the font for some headings and titles
+  (defvar solarized-use-variable-pitch nil)
+  ;; make the modeline high contrast
+  (defvar solarized-high-contrast-mode-line t)
+  ;; Use less bolding
+  (defvar solarized-use-less-bold t)
+  ;; Use more italics
+  (defvar solarized-use-more-italic t)
+  ;; Use less colors for indicators such as git:gutter, flycheck and similar
+  (defvar solarized-emphasize-indicators nil)
+  ;; Don't change size of org-mode headlines (but keep other size-changes)
+  (defvar solarized-scale-org-headlines nil)
+  ;; Avoid all font-size changes
+  (defvar solarized-height-minus-1 1.0)
+  (defvar solarized-height-plus-1 1.0)
+  (defvar solarized-height-plus-2 1.0)
+  (defvar solarized-height-plus-3 1.0)
+  (defvar solarized-height-plus-4 1.0)
+  :config
+  (load-theme 'solarized-dark t))
 
 
-;; YASNIPPET
-(require 'yasnippet)
-(yas-global-mode 1)
-(when (not (file-exists-p "~/.emacs.d/snippets"))
-  (make-directory "~/.emacs.d/snippets"))
-(yas-load-directory "~/.emacs.d/snippets")
-(add-hook 'term-mode-hook (lambda()
-                            (setq yas-dont-activate-functions t)))
+(use-package ivy
+  :ensure t
+  :defer t
+  :diminish ivy-mode
+  :init
+  (defvar ivy-use-virtual-buffers t)
+  (defvar enable-recursive-minibuffers t)
+  :config
+  (ivy-mode))
 
 
-;; MAGIT
-(require 'magit)
+(use-package yasnippet
+  :ensure t
+  :defer t
+  :diminish yas-mode
+  :config
+  (yas-global-mode 1)
+  (when (not (file-exists-p "~/.emacs.d/snippets"))
+    (make-directory "~/.emacs.d/snippets"))
+  (yas-load-directory "~/.emacs.d/snippets")
+  (add-hook 'term-mode-hook (lambda()
+                              (setq yas-dont-activate-functions t))))
 
 
-;; AUTOPAIR
-(require 'autopair)
-(autopair-global-mode)
+(use-package magit
+  :ensure t
+  :defer t)
 
 
-;; RAINBOW DELIMITERS
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(use-package autopair
+  :ensure t
+  :defer t
+  :diminish autopair-mode
+  :config
+  (autopair-global-mode))
 
 
-;; FLYCHECK
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(use-package rainbow-delimiters
+  :ensure t
+  :diminish rainbow-delimiters-mode
+  :config
+  (dolist (hook '(prog-mode-hook comint-mode-hook))
+    (add-hook hook 'rainbow-delimiters-mode)))
 
 
-;; CLANG-FORMAT
-(defun clang-format-before-save ()
-  "Clang-format C++ buffer on save hook function."
-  (interactive)
-  (when (eq major-mode 'c++-mode) (clang-format-buffer)))
-
-;; install hook to use clang-format on save
-(add-hook 'before-save-hook 'clang-format-before-save)
+(use-package flycheck
+  :ensure t
+  :defer t
+  :config
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 
 
-;; POWERLINE
-(require 'powerline)
-(powerline-center-evil-theme)
+(use-package clang-format
+  :ensure t
+  :defer t
+  :config
+  (defun clang-format-before-save ()
+    "Clang-format C++ buffer on save hook function."
+    (interactive)
+    (when (eq major-mode 'c++-mode) (clang-format-buffer)))
+
+  ;; install hook to use clang-format on save
+  (add-hook 'before-save-hook 'clang-format-before-save))
 
 
-;; CYGWIN-MOUNT
-(require 'cygwin-mount)
-(when (or (eq system-type 'windows-nt) (eq system-type 'cygwin))
-  (cygwin-mount-activate)
-  )
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-center-evil-theme))
 
 
-;; ACE-WINDOW
-(defvar aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-(require 'ace-window)
+(use-package cygwin-mount
+  :ensure t
+  :defer t
+  :if (memq system-type '(windows-nt cygwin))
+  :config
+  (cygwin-mount-activate))
 
 
-;; EVIL-LEADER
-(require 'evil-leader)
-(global-evil-leader-mode)
-(evil-leader/set-leader "<SPC>")
-
-(defun find-user-init-file ()
-  "Instantly edit the `user-init-file' in current window."
-  (interactive)
-  (find-file user-init-file))
-
-(evil-leader/set-key
-  "e" 'find-file
-  "b" 'switch-to-buffer
-  "k" 'kill-buffer
-  "in" 'find-user-init-file
-  "w" 'ace-window)
+(use-package ace-window
+  :ensure t
+  :init
+  (defvar aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 
-;; EVIL
-(require 'evil)
-(evil-mode)
+(use-package undo-tree
+  :ensure t
+  :diminish undo-tree-mode)
 
 
-;; EVIL-ESCAPE
-(evil-escape-mode)
-(setq-default evil-escape-key-sequence "kj")
-(setq-default evil-escape-delay 0.1)
+(use-package evil-leader
+  :ensure t
+  :diminish evil-leader-mode
+  :config
+  (global-evil-leader-mode)
+  (evil-leader/set-leader "<SPC>")
+
+  (evil-leader/set-key
+    "e" 'find-file
+    "b" 'switch-to-buffer
+    "init" (lambda () (interactive) (find-file user-init-file))
+    "w" 'ace-window))
 
 
-;; EVIL-MAGIT
-(require 'evil-magit)
+(use-package evil
+  :ensure t
+  :diminish evil-mode
+  :config
+  (evil-mode))
 
 
+(use-package evil-escape
+  :ensure t
+  :diminish evil-escape-mode
+  :config
+  (evil-escape-mode)
+  (setq-default evil-escape-key-sequence "kj")
+  (setq-default evil-escape-delay 0.1))
+
+
+(use-package evil-magit
+  :ensure t
+  :defer t)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; non-package related built-in settings changes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; get rid of GUI menu stuff
 (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
   (when (fboundp mode) (funcall mode -1)))
@@ -197,8 +210,8 @@
 ;; highlight current line
 (global-hl-line-mode 1)
 
-;; enable relative line and column numbering
-(linum-mode)
+;; enable line and column numbering
+(global-linum-mode)
 
 ;; change cursor to line
 (setq-default cursor-type 'bar)
@@ -228,14 +241,18 @@
 (setq ring-bell-function 'ignore)
 
 ;; set C/C++ style
-(c-add-style "personal"
-             '("k&r")
-             )
+(setq c-default-style "bsd")
 
 ;; Delete trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+;; change yes or no prompts to be y or n prompts
+(defalias 'yes-or-no-p #'y-or-n-p)
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; automatically manipulated elisp -- DON'T TOUCH
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -243,14 +260,13 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (evil-magit evil-escape evil-leader ace-window cygwin-mount powerline clang-format flycheck rainbow-delimiters autopair magit yasnippet ivy solarized-theme))))
+    (evil-magit evil-escape evil-leader ace-window cygwin-mount powerline clang-format flycheck rainbow-delimiters autopair magit yasnippet use-package solarized-theme ivy))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
 
 (provide 'init)
 ;;; init.el ends here
