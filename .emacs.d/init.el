@@ -12,6 +12,7 @@
 ;; package handling and setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; setup package management web repo paths
+(setq package-enable-at-startup nil)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
@@ -35,8 +36,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; load packages, themes and plugins
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; USE-PACKAGE -- helps the following packaging configurations be easier
-;; to manage
+;; helps the following packaging configurations be easier to manage
 (require 'use-package)
 
 
@@ -69,7 +69,6 @@
 
 (use-package ivy
   :ensure t
-  :defer t
   :diminish ivy-mode
   :init
   (defvar ivy-use-virtual-buffers t)
@@ -80,7 +79,6 @@
 
 (use-package yasnippet
   :ensure t
-  :defer t
   :diminish yas-mode
   :config
   (yas-global-mode 1)
@@ -92,13 +90,11 @@
 
 
 (use-package magit
-  :ensure t
-  :defer t)
+  :ensure t)
 
 
 (use-package autopair
   :ensure t
-  :defer t
   :diminish autopair-mode
   :config
   (autopair-global-mode))
@@ -114,14 +110,12 @@
 
 (use-package flycheck
   :ensure t
-  :defer t
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
 
 (use-package clang-format
   :ensure t
-  :defer t
   :config
   (defun clang-format-before-save ()
     "Clang-format C++ buffer on save hook function."
@@ -140,7 +134,6 @@
 
 (use-package cygwin-mount
   :ensure t
-  :defer t
   :if (memq system-type '(windows-nt cygwin))
   :config
   (cygwin-mount-activate))
@@ -188,8 +181,7 @@
 
 
 (use-package evil-magit
-  :ensure t
-  :defer t)
+  :ensure t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -228,11 +220,19 @@
 ;; set how emacs justifies paragraphs
 (setq-default fill-column 80)
 
+;; set how Emacs displays code that goes over 80 columns
+(setq-default whitespace-line-column 80
+              whitespace-style '(face lines-tail))
+(add-hook 'prog-mode-hook 'whitespace-mode)
+
+
 ;; set emacs to automatically wrap and insert newlines upon wrapping
 (auto-fill-mode)
 
 ;; set default font
 (set-frame-font "DejaVu Sans Mono-11" nil t)
+(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
+(add-to-list 'initial-frame-alist '(font . "DejaVu Sans Mono-11"))
 
 ;; start emacs maximised
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -240,14 +240,40 @@
 ;; remove alarm bell
 (setq ring-bell-function 'ignore)
 
-;; set C/C++ style
-(setq c-default-style "bsd")
-
-;; Delete trailing whitespace on save
+;; delete trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; change yes or no prompts to be y or n prompts
 (defalias 'yes-or-no-p #'y-or-n-p)
+
+;; utils for byte-compiling the .emacs.d directory automatically
+(defun byte-compile-init-dir ()
+  "Byte-compile your Emacs elisp init code."
+  (interactive)
+  (byte-recompile-directory user-emacs-directory 0))
+
+(defun remove-elc-on-save ()
+  "Delete .elc files on save to .el files, as the .elc need recompiling."
+  (add-hook 'after-save-hook
+            (lambda ()
+              (let ((bcf (concat (file-name-sans-extension buffer-file-name) ".elc")))
+                (if (file-exists-p bcf)
+                    (delete-file bcf))))
+            nil
+            t))
+
+(add-hook 'emacs-lisp-mode-hook 'remove-elc-on-save)
+
+;; utils for cleaning up whole buffers
+(defun untabify-buffer ()
+  "Change tabs to spaces on whole buffer."
+  (interactive)
+  (untabify (point-min) (point-max)))
+
+(defun indent-buffer ()
+  "Does Emacs' standard indenting on the whole buffer."
+  (interactive)
+  (indent-region (point-min) (point-max)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
