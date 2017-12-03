@@ -138,6 +138,8 @@
   :config
   (powerline-center-evil-theme))
 
+(use-package cmake-mode
+  :ensure t)
 
 (use-package cygwin-mount
   :ensure t
