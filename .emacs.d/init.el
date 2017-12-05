@@ -5,6 +5,7 @@
 
 ;;; Code:
 (require 'cl-lib)
+(require 'cl)
 (require 'package)
 
 
@@ -34,17 +35,16 @@
     (message "Bootstrapping use-package...")
     (package-install 'use-package)))
 
-;; do the initial bootstrap if the packages directory can't be found
-(unless (file-directory-p (concat user-emacs-directory "elpa"))
-  (message "Package directory 'elpa' not found...")
-  (bootstrap-use-package))
+;; do the initial bootstrap if needed
+(bootstrap-use-package)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; load packages, themes and plugins
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helps the following packaging configurations be easier to manage
-(require 'use-package)
+(eval-when-compile
+  (require 'use-package))
 
 
 (use-package solarized-theme
@@ -117,8 +117,10 @@
 
 (use-package flycheck
   :ensure t
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+  :init
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+  ;; disable flycheck in c/c++ buffers as I don't use it there
+  (setq flycheck-disabled-checkers '(c/c++-clang c/c++-gcc c/c++-cppcheck)))
 
 
 (use-package clang-format
@@ -138,8 +140,24 @@
   :config
   (powerline-center-evil-theme))
 
+
+(use-package company
+  :ensure t
+  :init
+  (add-hook 'after-init-hook 'global-company-mode)
+  (add-hook 'c++-mode-hook 'company-mode)
+  (add-hook 'c-mode-hook 'company-mode)
+  :config
+  (setq company-idle-delay 0.2)
+  (setq company-minimum-prefix-length 2)
+  (setq company-show-numbers t)
+  (setq company-tooltip-limit 20)
+  (defvar company-dabbrev-downcase nil))
+
+
 (use-package cmake-mode
   :ensure t)
+
 
 (use-package cygwin-mount
   :ensure t
