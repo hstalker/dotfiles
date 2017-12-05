@@ -114,7 +114,18 @@
 
 
 (use-package magit
-  :ensure t)
+  :ensure t
+  :config
+  ;; HACK to warn about magit's brokenness when pushing on windows.
+  ;; if on windows and GIT_ASKPASS hasn't been set
+  (if (and (memq system-type '(windows-nt cygwin))
+           (eq (getenv "GIT_ASKPASS") nil))
+      ;; print a warning message to buffer
+      (progn
+        (message "Environment variable GIT_ASKPASS not set!")
+        (message "Magit likely to be broken on this platform (push not working)")
+        (message "Please set GIT_ASKPASS to git-gui--askpass' path to fix this"))
+    ))
 
 
 (use-package autopair
