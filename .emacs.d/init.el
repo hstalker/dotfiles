@@ -242,6 +242,13 @@
   :ensure t)
 
 
+(use-package csharp-mode
+  :ensure t
+  :config
+  (setq auto-mode-alist
+        (append '(("\\.cs$" . csharp-mode)) auto-mode-alist)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; non-package related built-in settings changes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
