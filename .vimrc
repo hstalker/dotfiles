@@ -278,7 +278,9 @@ let g:completor_set_options = 0
 set completeopt-=longest
 set completeopt+=menuone
 set completeopt-=menu
-set completeopt-=preview
+if &completeopt !~# 'noinsert\|noselect'
+    set completeopt+=noselect
+endif
 
 " Use tab to select auto completion
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
