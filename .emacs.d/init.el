@@ -13,13 +13,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; setup package management web repo paths
 (setq package-enable-at-startup nil)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")))
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
-  (add-to-list 'package-archives (cons "melpa" url) t))
-;; For important libraries like cl-lib and let-alist
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("marmalade" . "https://marmalade-repo.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
 ;; install use-package
@@ -99,7 +95,6 @@
   (global-set-key (kbd "C-x l") 'counsel-locate)
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox))
 
-
 (use-package yasnippet
   :ensure t
   :diminish yas-mode
@@ -140,14 +135,6 @@
   :config
   (dolist (hook '(prog-mode-hook comint-mode-hook))
     (add-hook hook 'rainbow-delimiters-mode)))
-
-
-(use-package flycheck
-  :ensure t
-  :init
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-  ;; disable flycheck in c/c++ buffers as I don't use it there
-  (setq flycheck-disabled-checkers '(c/c++-clang c/c++-gcc c/c++-cppcheck)))
 
 
 (use-package clang-format
@@ -240,13 +227,6 @@
 
 (use-package evil-magit
   :ensure t)
-
-
-(use-package csharp-mode
-  :ensure t
-  :config
-  (setq auto-mode-alist
-        (append '(("\\.cs$" . csharp-mode)) auto-mode-alist)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
