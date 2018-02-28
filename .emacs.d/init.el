@@ -173,11 +173,12 @@
   :ensure t)
 
 
-(use-package cygwin-mount
-  :ensure t
-  :if (memq system-type '(windows-nt cygwin))
-  :config
-  (cygwin-mount-activate))
+(if (memq system-type '(windows-nt cygwin))
+    (use-package cygwin-mount
+      :ensure t
+      :if (memq system-type '(windows-nt cygwin))
+      :config
+      (cygwin-mount-activate)))
 
 
 (use-package ace-window
