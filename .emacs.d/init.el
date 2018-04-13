@@ -67,6 +67,8 @@
   :config
   (load-theme 'solarized-dark t))
 
+(use-package diminish
+  :ensure t)
 
 (use-package ivy
   :ensure t
@@ -97,7 +99,7 @@
 
 (use-package yasnippet
   :ensure t
-  :diminish yas-mode
+  :diminish yas-minor-mode
   :config
   (yas-global-mode 1)
   (when (not (file-exists-p "~/.emacs.d/snippets"))
@@ -154,6 +156,10 @@
   :config
   (powerline-center-evil-theme))
 
+(use-package meson-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.meson\\'" . meson-mode)))
 
 (use-package company
   :ensure t
@@ -161,6 +167,7 @@
   (add-hook 'after-init-hook 'global-company-mode)
   (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook 'company-mode)
+  (add-hook 'meson-mode-hook 'company-mode)
   :config
   (setq company-idle-delay 0.2)
   (setq company-minimum-prefix-length 2)
@@ -190,7 +197,6 @@
 (use-package undo-tree
   :ensure t
   :diminish undo-tree-mode)
-
 
 (use-package evil-leader
   :ensure t
@@ -270,6 +276,9 @@
 (setq-default whitespace-line-column 80
               whitespace-style '(face lines-tail))
 (add-hook 'prog-mode-hook 'whitespace-mode)
+;; hide the whitespace and auto-revert minor modes
+(diminish 'whitespace-mode)
+(diminish 'auto-revert-mode)
 
 
 ;; set emacs to automatically wrap and insert newlines upon wrapping
