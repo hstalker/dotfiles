@@ -161,6 +161,9 @@
   :config
   (add-to-list 'auto-mode-alist '("\\.meson\\'" . meson-mode)))
 
+(use-package rust-mode
+  :ensure t)
+
 (use-package company
   :ensure t
   :init
