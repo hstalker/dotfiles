@@ -288,9 +288,17 @@
 (auto-fill-mode)
 
 ;; set default font
-(set-frame-font "DejaVu Sans Mono-11" nil t)
-(add-to-list 'default-frame-alist '(font . "DejaVu Sans Mono-11"))
-(add-to-list 'initial-frame-alist '(font . "DejaVu Sans Mono-11"))
+(create-fontset-from-ascii-font
+ "Source Han Code JP N-11:weight=light:slant=normal" nil "hancode")
+(set-fontset-font "fontset-hancode" 'unicode
+                  (font-spec :family "Source Han Code JP N"
+                             :weight 'normal
+                             :slant 'normal
+                             :size 11)
+                  nil 'append)
+(add-to-list 'default-frame-alist '(font . "fontset-hancode"))
+(add-to-list 'initial-frame-alist '(font . "fontset-hancode"))
+(set-frame-font "fontset-hancode" nil t)
 
 ;; start emacs maximised
 (add-to-list 'default-frame-alist '(fullscreen . maximized))

@@ -101,7 +101,7 @@ if has("gui_running")
     set guioptions-=T " no toolbar
     set guioptions-=e
     set guitablabel=%M\ %t
-    set guifont=DejaVu\ Sans\ Mono\ 10 " Set the font
+    set guifont=Source\ Han\ Code\ JP\ N\ 13 " Set the font
 endif
 
 try
