@@ -1,0 +1,8 @@
+[user]
+	email = hector.g.stalker@gmail.com
+	name = Hector Stalker
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process

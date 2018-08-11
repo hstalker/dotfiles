@@ -1,5 +1,11 @@
 *.elc
-.vim/plugged
+.emacs.d/recentf
 .emacs.d/auto-save-list
 .emacs.d/elpa
+.vim/plugged/
+.vim/autoload/plug.vim.old
+.viminfo
+.bash_history
 .vagrant.d/*
+.gnupg/
+.cache/

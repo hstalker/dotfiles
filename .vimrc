@@ -1,34 +1,20 @@
 " Vim configuration - aim to keep minimalist
 
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Grab vimplug if not available using curl
 if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
+
 " Call :PlugInstall to install, :PlugUpdate to update
 call plug#begin('~/.vim/plugged')
 
 Plug 'altercation/vim-colors-solarized'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'edkolev/tmuxline.vim'
-Plug 'rhysd/vim-clang-format'
-Plug 'kien/rainbow_parentheses.vim'
-Plug 'majutsushi/tagbar'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'tpope/vim-fugitive'
 Plug 'jreybert/vimagit'
-Plug 'tpope/vim-commentary'
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'maralla/completor.vim'
 
 call plug#end()
 
@@ -39,8 +25,7 @@ call plug#end()
 " Enable filetype plugins
 filetype plugin on
 filetype indent on
-" Set to use hybrid line mode - absolute for current line, relative for all
-" others
+" Set to use relative line mode
 set relativenumber
 set number
 set linebreak " Break lines at word (requires Wrap lines)
@@ -59,7 +44,6 @@ set smarttab " Enable smart-tabs
 set softtabstop=4 " Number of spaces per Tab
 set ruler " Show row and column ruler information
 set cmdheight=2 " Height of the command bar
-set autochdir " Change working directory to open buffer
 set history=1000 " Sets how many lines of history VIM has to remember
 set undolevels=1000 " Number of undo levels
 set backspace=indent,eol,start " Backspace behaviour
@@ -70,21 +54,20 @@ set laststatus=2 " Always show the status line
 set noerrorbells
 set novisualbell
 set t_vb=
-set tm=500
+set tm=250
 " Recursively upwards search for a ctags file till root
 set tags=./tags,./TAGS,tags;/,TAGS;/
 
-" Ignore compiled files
-set wildignore=*.o,*~,*.pyc,*.obj,*.exe,*.dll,*.so,*.zip,*.tar.gz,*.swp
-if has("win16") || has("win32")
-    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
-else
-    set wildignore+=.git\*,.hg\*,.svn\*
-endif
-" Enable the mouse if available
-if has('mouse')
-  set mouse=a
-endif
+" Ignore files in in-built search
+set wildignore=*.swp,*.bak
+set wildignore+=*.pyc,*.class,
+set wildignore+=*.sln,*.Master,*.csproj,*.csproj.user,*.cache
+set wildignore+=*.dll,*.dll.a,*.a,*.pdb,*.min.*,.DS_Store
+set wildignore+=*.o,*.obj
+set wildignore+=*/.git/**/*,*/.hg/**/*,*/.svn/**/*
+set wildignore+=tags
+set wildignore+=*.tar.*
+set wildignorecase " Make searches case-insensitive
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -101,9 +84,9 @@ if has("gui_running")
     set guioptions-=T " no toolbar
     set guioptions-=e
     set guitablabel=%M\ %t
-    set guifont=Source\ Han\ Code\ JP\ N\ 13 " Set the font
 endif
 
+" In case we haven't got the theme installed, just ignore errors
 try
     colorscheme solarized
 catch
@@ -129,182 +112,78 @@ set noswapfile
 " Key mappings
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Change leader key to space
-nmap <space> <leader>
+nnoremap <space> <leader>
+let mapleader="\<space>"
 
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
 
 " Fast saving
-nmap <leader>ww :w!<cr>
+nnoremap <leader>ww :w!<cr>
 " :W sudo saves the file
 " (useful for handling the permission-denied error)
 command W w !sudo tee % > /dev/null
-
-" Visual mode pressing * or # searches for the current selection
-vnoremap <silent> * :call VisualSelection('f', '')<CR>
-vnoremap <silent> # :call VisualSelection('b', '')<CR>
 
 " Treat long lines as break lines (useful when moving around in them)
 map j gj
 map k gk
 
-" Disable highlight when <leader><cr> is pressed
-map <silent> <leader><cr> :noh<cr>
-
 " Faster way to manipulate windows (I can't deal with ^W start)
 " Right/down/up/left
-nmap <leader>wj <C-W>j
-nmap <leader>wk <C-W>k
-nmap <leader>wh <C-W>h
-nmap <leader>wl <C-W>l
+nnoremap <leader>wj <C-W>j
+nnoremap <leader>wk <C-W>k
+nnoremap <leader>wh <C-W>h
+nnoremap <leader>wl <C-W>l
 " Open splits
-nmap <leader>wv :vsp<CR>
-nmap <leader>ws :sp<CR>
+nnoremap <leader>wv :vsp<CR>
+nnoremap <leader>ws :sp<CR>
 " Close splits
-nmap <leader>wc <C-W>c
-nmap <leader>wo <C-W>o
+nnoremap <leader>wc <C-W>c
+nnoremap <leader>wo <C-W>o
 " Move splits
-nmap <leader>wJ <C-W>J
-nmap <leader>wK <C-W>K
-nmap <leader>wH <C-W>H
-nmap <leader>wL <C-W>L
-" Quick resizing of windows
-nmap <leader>w= <C-W>=
-nmap <leader>w- <C-W>_
-nmap <leader>w/ <C-W>\|
+nnoremap <leader>wJ <C-W>J
+nnoremap <leader>wK <C-W>K
+nnoremap <leader>wH <C-W>H
+nnoremap <leader>wL <C-W>L
 
-" Move a line of text using Meta+[jk]
-nmap <M-j> mz:m+<cr>`z
-nmap <M-k> mz:m-2<cr>`z
-vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
-vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
-if has("mac") || has("macunix")
-  nmap <D-j> <M-j>
-  nmap <D-k> <M-k>
-  vmap <D-j> <M-j>
-  vmap <D-k> <M-k>
-endif
+" Show buffer list and prompt for number/name for switching - b(uffer) j(ump)
+nnoremap <leader>bj :ls<CR>:b<Space>
+" Buffer navigation
+set wildcharm=<C-z>
+nnoremap <leader>b :buffer <C-z><S-Tab> " Search buffers by name
+nnoremap <leader>B :sbuffer <C-z><S-Tab>
+nnoremap <leader>bn :bn<CR> " Cycle back and forth between buffers
+nnoremap <leader>bp :bp<CR> 
+nnoremap <leader>ba <C-^> " Switch to last open buffer
+
+" Tag regex search
+nnoremap <leader>j :tjump /
+
+" Leave a mark on the current line of the buffer when leaving based
+" on the language of the file contents. Use capital letters only.
+augroup VIMRC
+  autocmd!
+
+  autocmd BufLeave *.c,*.h,*.cc,*.hh,*.c++,*.h++,*.cpp,*.hpp normal! mC
+  autocmd BufLeave *.sh normal! mB
+  autocmd BufLeave *.py normal! mP
+  autocmd BufLeave *.rb normal! mR
+augroup END
+
+" File contents search
+set path=.,**
+" Find word in files under current directory
+nnoremap <leader>f :find *
+" Find word in files under directory of current file
+nnoremap <leader>F :find <C-R>=expand('%:h').'/*'<CR>
 
 " Delete trailing white space on save
 func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
+    exe "normal mz"
+    %s/\s\+$//ge
+    exe "normal `z"
 endfunc
 autocmd BufWrite * :call DeleteTrailingWS()
 
 " Use tabs instead of spaces in makefiles
 autocmd FileType make setlocal noexpandtab
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tagbar configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Generate recursive downwards ctags in cur. dir
-map <silent><leader>ct :exe ':silent !ctags -R -f ./tags . &'<cr>:redraw!<cr>
-
-" Toggle tagbar
-map <silent><leader>tb :TagbarToggle<cr>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Rainbow Parentheses configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-au VimEnter * RainbowParenthesesToggle
-au Syntax * RainbowParenthesesLoadRound    " ()
-au Syntax * RainbowParenthesesLoadSquare   " []
-au Syntax * RainbowParenthesesLoadBraces   " {}
-au Syntax * RainbowParenthesesLoadChevrons " <>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vim-clang-format configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" map to <Leader>cf in C++ code
-autocmd FileType c,cpp,objc nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc vnoremap <buffer><Leader>cf :ClangFormat<CR>
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Airline configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" show open buffers on line
-let g:airline#extensions#tabline#enabled = 1
-
-" setup themese
-let g:airline_theme='solarized'
-let g:airline_solarized_bg='dark'
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" NERDTree configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" open on start if no files specified
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-" toggle open nerdtree
-nmap <Leader>nt :NERDTreeToggle<CR>
-
-" show hidden files/folders by default
-let NERDTreeShowHidden = 1
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ultisnips configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Triggers
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-
-" Hack to get the CR expansion of snippets to work with completor.vim
-let g:UltiSnipsExpandTrigger = "<nop>"
-let g:ulti_expand_or_jump_res = 0
-function ExpandSnippetOrCarriageReturn()
-    let snippet = UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res > 0
-        return snippet
-    else
-        return "\<CR>"
-    endif
-endfunction
-inoremap <expr> <CR> pumvisible() ? "\<C-R>=ExpandSnippetOrCarriageReturn()\<CR>" : "\<CR>"
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" completor.vim configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Defaults
-let g:completor_set_options = 0
-set completeopt-=longest
-set completeopt+=menuone
-set completeopt-=menu
-if &completeopt !~# 'noinsert\|noselect'
-    set completeopt+=noselect
-endif
-
-" Use tab to select auto completion
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ctrl-P configuration
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Change the default binding and command name
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-" Change the starting directory search pattern
-let g:ctrlp_working_path_mode = 'ra'
-" Add additional default base directory markers e.g. '.git', '.svn' etc.
-let g:ctrlp_root_markers = []
-" What to do if file already open as buffer (here we switch window to buffer)
-let g:ctrlp_switch_buffer = 'et'
-" Files to ignore
-let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
-let g:ctrlp_custom_ignore = {
-  \ 'dir':  '\v[\/]\.(git|hg|svn)$',
-  \ 'file': '\v\.(exe|so|dll)$',
-  \ 'link': 'some_bad_symbolic_links',
-  \ }
-" Leader binding for using ctrlp to search for tags in tag file
-nnoremap <leader>. :CtrlPTag<cr>

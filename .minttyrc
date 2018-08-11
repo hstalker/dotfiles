@@ -1,8 +1,8 @@
 BoldAsFont=-1
 Transparency=high
 CursorType=block
-Font=DejaVu Sans Mono
-FontHeight=10
+Font=Source Code Pro
+FontHeight=11
 FontSmoothing=full
 Locale=en_GB
 Charset=UTF-8
