@@ -1,20 +1,20 @@
-" Vim configuration - aim to keep minimalist
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Grab vimplug if not available using curl
 if empty(glob('~/.vim/autoload/plug.vim'))
-    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " Call :PlugInstall to install, :PlugUpdate to update
 call plug#begin('~/.vim/plugged')
 
 Plug 'altercation/vim-colors-solarized'
-Plug 'jreybert/vimagit'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'kien/ctrlp.vim'
 
 call plug#end()
 
@@ -76,19 +76,17 @@ set wildignorecase " Make searches case-insensitive
 " Enable syntax highlighting
 syntax enable
 
-set background=dark
-let g:solarized_termcolors=16
-
 " Set extra options when running in GUI mode
 if has("gui_running")
-    set guioptions-=T " no toolbar
-    set guioptions-=e
-    set guitablabel=%M\ %t
+  set guioptions-=T " no toolbar
+  set guioptions-=e
+  set guitablabel=%M\ %t
 endif
 
 " In case we haven't got the theme installed, just ignore errors
+set background=light
 try
-    colorscheme solarized
+  colorscheme solarized
 catch
 endtry
 
@@ -153,7 +151,7 @@ set wildcharm=<C-z>
 nnoremap <leader>b :buffer <C-z><S-Tab> " Search buffers by name
 nnoremap <leader>B :sbuffer <C-z><S-Tab>
 nnoremap <leader>bn :bn<CR> " Cycle back and forth between buffers
-nnoremap <leader>bp :bp<CR> 
+nnoremap <leader>bp :bp<CR>
 nnoremap <leader>ba <C-^> " Switch to last open buffer
 
 " Tag regex search
@@ -164,26 +162,25 @@ nnoremap <leader>j :tjump /
 augroup VIMRC
   autocmd!
 
-  autocmd BufLeave *.c,*.h,*.cc,*.hh,*.c++,*.h++,*.cpp,*.hpp normal! mC
+  autocmd BufLeave *.C,*.H,*.c,*.h,*.cc,*.hh,*.c++,*.h++,*.cpp,*.hpp normal! mC
   autocmd BufLeave *.sh normal! mB
   autocmd BufLeave *.py normal! mP
   autocmd BufLeave *.rb normal! mR
 augroup END
 
-" File contents search
-set path=.,**
-" Find word in files under current directory
-nnoremap <leader>f :find *
-" Find word in files under directory of current file
-nnoremap <leader>F :find <C-R>=expand('%:h').'/*'<CR>
-
 " Delete trailing white space on save
 func! DeleteTrailingWS()
-    exe "normal mz"
-    %s/\s\+$//ge
-    exe "normal `z"
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
 endfunc
 autocmd BufWrite * :call DeleteTrailingWS()
 
 " Use tabs instead of spaces in makefiles
 autocmd FileType make setlocal noexpandtab
+
+" Load a user-defined custom overrides file if it exists
+if filereadable("~/.vimrc.local")
+  source ~/.vimrc.local
+endif
+

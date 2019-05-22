@@ -1,0 +1,84 @@
+#! /usr/bin/env bash
+
+# Grabs the full directory path to this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Useful utils for this install
+source $DIR/bash/.functions
+source $DIR/bash/.exports
+
+init () {
+  echo "Creating projects folder in ~/"
+  mkdir -p ~/projects
+  echo "Creating documents folder in ~/"
+  mkdir -p ~/documents
+  echo "Creating ~/.local/bin"
+  mkdir -p ~/.local/bin
+}
+
+link () {
+  echo "Symlinking using GNU stow..."
+ 
+  if ask "Proceed? (Y/n)" Y; then
+    command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
+    set -x
+    stow -d $DIR -t ~/ -S vim 
+    stow -d $DIR -t ~/ -S emacs 
+    stow -d $DIR -t ~/ -S tmux 
+    stow -d $DIR -t ~/ -S git 
+    stow -d $DIR -t ~/ -S bash 
+    stow -d $DIR -t ~/ -S dircolors 
+    stow -d $DIR -t ~/ -S clang-tidy 
+    stow -d $DIR -t ~/ -S clang-format 
+    stow -d $DIR -t ~/ -S xorg
+    set +x
+    echo "Done!"
+  else
+    echo "Cancelled"
+  fi
+}
+
+# Unsymlink configs
+unlink () {
+  echo "Unsymlinking using GNU stow..."
+  if ask "Proceed? (Y/n)" Y; then
+    command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
+    set -x
+    stow -d $DIR -t ~/ -D vim 
+    stow -d $DIR -t ~/ -D emacs 
+    stow -d $DIR -t ~/ -D tmux 
+    stow -d $DIR -t ~/ -D git 
+    stow -d $DIR -t ~/ -D bash 
+    stow -d $DIR -t ~/ -D dircolors 
+    stow -d $DIR -t ~/ -D clang-tidy 
+    stow -d $DIR -t ~/ -D clang-format 
+    stow -d $DIR -t ~/ -D xorg
+    set +x
+    echo "Done!"
+  else
+    echo "Cancelled"
+  fi
+}
+
+# Calls the correct platform's install script
+install_tools () {
+  echo "Installing packages & utilities..."
+  if ask "Proceed? (Y/n)" Y; then
+    if [ $( echo "$DISTRO" | grep 'debian' ) ] ; then
+      echo "Detected debian"
+      echo "Installing..."
+      $DIR/platform/debian-packages-install
+    else
+      echo "No known platform detected"
+      echo "Platform -- $DISTRO"
+    fi
+  else
+    echo "Cancelled"
+  fi
+}
+
+init
+unlink
+link
+install_tools
+

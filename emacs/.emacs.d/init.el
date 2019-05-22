@@ -65,7 +65,7 @@
   (defvar solarized-height-plus-3 1.0)
   (defvar solarized-height-plus-4 1.0)
   :config
-  (load-theme 'solarized-dark t))
+  (load-theme 'solarized-light t))
 
 (use-package diminish
   :ensure t)

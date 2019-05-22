@@ -1,0 +1,32 @@
+#! /usr/bin/env bash
+
+[ -f "~/.bash_aliases" ] && source ~/.bash_aliases
+
+if [ -x /usr/bin/dircolors ]; then
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+fi
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+alias ack='ag'
+
+alias tmux='tmux -2'
+
+# aliases to quickly do git certificate trust issue workaround
+alias git-disable-ssl='export GIT_SSL_NO_VERIFY=1'
+alias git-enable-ssl='export GIT_SSL_NO_VERIFY='
+
+# alias to remove all tracked folders and directories
+# from a local git repo's directory
+alias git-clean-tracked-files='git ls-files -z | xargs -0 rm'
+alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD| sort -rz \
+  | xargs -0 rmdir'
+alias git-clean-tracked='git-clean-tracked-files; git-clean-tracked-dir'
+
+[ -f "~/.aliases.local" ] && source "~/.aliases.local"
+
