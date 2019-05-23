@@ -74,8 +74,8 @@ first, and then in `~/.bashrc.local` if more general.
 In other words, try to follow a rule of most-to-least specificity.
 
 Generally package paths for things like emacs and vim are directed into an
-appropriate `~/.local/vim` or `~/.local/emacs` directory in order to avoid
-changes in the tree of this repo's clone wherever possible. `~/.local/` also
+appropriate `~/.cache/vim` or `~/.cache/emacs` directory in order to avoid
+changes in the tree of this repo's clone wherever possible. `~/.local/`
 contains a `bin` directory that is automatically added to `PATH` for temporary
 or personal binaries.
 

@@ -1,17 +1,20 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vim_cache_dir='~/.cache/vim/'
+let g:vim_plugged_dir=g:vim_cache_dir . 'plugged/'
+let g:vim_plug_script=g:vim_plugged_dir . 'plug.vim'
+let g:vim_plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 " Grab vimplug if not available using curl
-if empty(glob('~/.local/vim/plugged/plug.vim'))
-  silent !curl -fLo ~/.local/vim/plugged/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if empty(glob(g:vim_plug_script))
+  execute 'silent !curl -fLo ' . g:vim_plug_script . ' --create-dirs ' . g:vim_plug_url
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
-source ~/.local/vim/plugged/plug.vim
+exec 'source ' . g:vim_plug_script
 
 " Call :PlugInstall to install, :PlugUpdate to update
-call plug#begin('~/.local/vim/plugged')
+call plug#begin(g:vim_plugged_dir)
 
 Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
@@ -52,6 +55,7 @@ set backspace=indent,eol,start " Backspace behaviour
 set lazyredraw " Don't redraw while executing macros (good performance config)
 set foldcolumn=1 " Add a bit extra margin to the left
 set laststatus=2 " Always show the status line
+set viminfo=""
 " No annoying sound on errors
 set noerrorbells
 set novisualbell
@@ -157,7 +161,7 @@ nnoremap <leader>ba <C-^> " Switch to last open buffer
 nnoremap <leader>j :tjump /
 
 " Change netrwhist directory
-let g:netrw_home='~/.local/vim'
+let g:netrw_home=g:vim_cache_dir
 
 " Leave a mark on the current line of the buffer when leaving based
 " on the language of the file contents. Use capital letters only.
@@ -203,7 +207,7 @@ let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 
 
 " Load a user-defined custom overrides file if it exists
-if filereadable("~/.vimrc.local")
-  source ~/.vimrc.local
+if filereadable('~/.vimrc.local')
+  source '~/.vimrc.local'
 endif
 

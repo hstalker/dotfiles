@@ -12,24 +12,28 @@ init () {
   mkdir -p ~/projects
   echo "Creating documents folder in ~/"
   mkdir -p ~/documents
+  echo "Creating ~/.cache"
+  mkdir -p ~/.cache
   echo "Creating ~/.local/bin"
   mkdir -p ~/.local/bin
+  echo "Creating ~/.local/share"
+  mkdir -p ~/.local/share
 }
 
 link () {
   echo "Symlinking using GNU stow..."
- 
+
   if ask "Proceed? (Y/n)" Y; then
     command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
     set -x
-    stow -d $DIR -t ~/ -S vim 
-    stow -d $DIR -t ~/ -S emacs 
-    stow -d $DIR -t ~/ -S tmux 
-    stow -d $DIR -t ~/ -S git 
-    stow -d $DIR -t ~/ -S bash 
-    stow -d $DIR -t ~/ -S dircolors 
-    stow -d $DIR -t ~/ -S clang-tidy 
-    stow -d $DIR -t ~/ -S clang-format 
+    stow -d $DIR -t ~/ -S vim
+    stow -d $DIR -t ~/ -S emacs
+    stow -d $DIR -t ~/ -S tmux
+    stow -d $DIR -t ~/ -S git
+    stow -d $DIR -t ~/ -S bash
+    stow -d $DIR -t ~/ -S dircolors
+    stow -d $DIR -t ~/ -S clang-tidy
+    stow -d $DIR -t ~/ -S clang-format
     stow -d $DIR -t ~/ -S xorg
     set +x
     echo "Done!"
@@ -44,14 +48,14 @@ unlink () {
   if ask "Proceed? (Y/n)" Y; then
     command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
     set -x
-    stow -d $DIR -t ~/ -D vim 
-    stow -d $DIR -t ~/ -D emacs 
-    stow -d $DIR -t ~/ -D tmux 
-    stow -d $DIR -t ~/ -D git 
-    stow -d $DIR -t ~/ -D bash 
-    stow -d $DIR -t ~/ -D dircolors 
-    stow -d $DIR -t ~/ -D clang-tidy 
-    stow -d $DIR -t ~/ -D clang-format 
+    stow -d $DIR -t ~/ -D vim
+    stow -d $DIR -t ~/ -D emacs
+    stow -d $DIR -t ~/ -D tmux
+    stow -d $DIR -t ~/ -D git
+    stow -d $DIR -t ~/ -D bash
+    stow -d $DIR -t ~/ -D dircolors
+    stow -d $DIR -t ~/ -D clang-tidy
+    stow -d $DIR -t ~/ -D clang-format
     stow -d $DIR -t ~/ -D xorg
     set +x
     echo "Done!"

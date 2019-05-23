@@ -7,21 +7,23 @@
 (require 'cl-lib)
 (require 'package)
 
+(setq emacs-cache-dir (file-name-as-directory "~/.cache/emacs/"))
+
 ;; change paths of various sets of auto-generated files
-(setq org-publish-timestamp-directory "~/.local/emacs/org-timestamps"
-      org-id-locations-file "~/.local/emacs/org-id-locations"
-      ido-save-directory-list-file "~/.local/emacs/ido.last"
-      tramp-persistency-file-name "~/.local/emacs/tramp"
-      bookmark-default-file "~/.local/emacs/bookmarks"
-      nsm-settings-file "~/.local/emacs/network-security.data"
-      recentf-save-file "~/.local/emacs/recentf"
-      abbrev-file-name "~/.local/emacs/abbrev_defs"
-      ac-comphist "~/.local/emacs/ac-comphist.dat"
-      save-place-file "~/.local/emacs/emacs-places"
-      smex-save-file "~/.local/emacs/smex-items"
-      yas-snippet-dirs '("~/.local/emacs/snippets")
-      mc/list-file "~/.local/emacs/mc-lists.el"
-      custom-file "~/.local/emacs/custom.el")
+(setq org-publish-timestamp-directory (concat emacs-cache-dir "org-timestamps")
+      org-id-locations-file (concat emacs-cache-dir "org-id-locations")
+      ido-save-directory-list-file (concat emacs-cache-dir "ido.last")
+      tramp-persistency-file-name (concat emacs-cache-dir "tramp")
+      bookmark-default-file (concat emacs-cache-dir "bookmarks")
+      nsm-settings-file (concat emacs-cache-dir "network-security.data")
+      recentf-save-file (concat emacs-cache-dir "recentf")
+      abbrev-file-name (concat emacs-cache-dir "abbrev_defs")
+      ac-comphist (concat emacs-cache-dir "ac-comphist.dat")
+      save-place-file (concat emacs-cache-dir "emacs-places")
+      smex-save-file (concat emacs-cache-dir "smex-items")
+      yas-snippet-dirs (concat emacs-cache-dir "snippets")
+      mc/list-file (concat emacs-cache-dir "mc-lists.el")
+      custom-file (concat emacs-cache-dir "custom.el"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; package handling and setup
@@ -31,7 +33,7 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
-(setq package-user-dir "~/.local/emacs/packages")
+(setq package-user-dir (concat emacs-cache-dir "packages"))
 (package-initialize)
 
 ;; install use-package
@@ -118,9 +120,9 @@
   :diminish yas-minor-mode
   :config
   (yas-global-mode 1)
-  (when (not (file-exists-p "~/.local/emacs/snippets"))
-    (make-directory "~/.local/emacs/snippets"))
-  (yas-load-directory "~/.local/emacs/snippets")
+  (when (not (file-exists-p (concat emacs-cache-dir "snippets")))
+    (make-directory (concat emacs-cache-dir "snippets")))
+  (yas-load-directory (concat emacs-cache-dir "snippets"))
   (add-hook 'term-mode-hook (lambda()
                               (setq yas-dont-activate-functions t))))
 
