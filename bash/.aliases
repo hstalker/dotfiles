@@ -13,7 +13,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-alias ack='ag'
+alias ag='ag --ignore "\.git/*" --ignore "\.svn/*" --ignore "\.hg/*" --hidden'
 alias tmux='tmux -2'
 alias tree='tree -I ".git"'
 
