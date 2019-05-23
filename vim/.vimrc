@@ -156,6 +156,9 @@ nnoremap <leader>ba <C-^> " Switch to last open buffer
 " Tag regex search
 nnoremap <leader>j :tjump /
 
+" Change netrwhist directory
+let g:netrw_home='~/.local/vim'
+
 " Leave a mark on the current line of the buffer when leaving based
 " on the language of the file contents. Use capital letters only.
 augroup VIMRC
@@ -178,8 +181,29 @@ autocmd BufWrite * :call DeleteTrailingWS()
 " Use tabs instead of spaces in makefiles
 autocmd FileType make setlocal noexpandtab
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugin configuration
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ctrl-p
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_custom_ignore = {
+  \ 'dir': '\v[\/]\.(git|hg|svn)$',
+  \ 'file': '\v\.(exe|so|dll)$',
+  \ 'link': '',
+  \ }
+let g:ctrlp_working_path_mode = 'r'
+
+" vim-airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+
+
 " Load a user-defined custom overrides file if it exists
 if filereadable("~/.vimrc.local")
-  source ~/vim/.vimrc.local
+  source ~/.vimrc.local
 endif
 
