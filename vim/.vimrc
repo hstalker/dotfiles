@@ -2,14 +2,16 @@
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Grab vimplug if not available using curl
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.local/vim/plugged/plug.vim'))
+  silent !curl -fLo ~/.local/vim/plugged/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+source ~/.local/vim/plugged/plug.vim
+
 " Call :PlugInstall to install, :PlugUpdate to update
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.local/vim/plugged')
 
 Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
@@ -118,9 +120,6 @@ inoremap kj <ESC>
 
 " Fast saving
 nnoremap <leader>ww :w!<cr>
-" :W sudo saves the file
-" (useful for handling the permission-denied error)
-command W w !sudo tee % > /dev/null
 
 " Treat long lines as break lines (useful when moving around in them)
 map j gj
@@ -181,6 +180,6 @@ autocmd FileType make setlocal noexpandtab
 
 " Load a user-defined custom overrides file if it exists
 if filereadable("~/.vimrc.local")
-  source ~/.vimrc.local
+  source ~/vim/.vimrc.local
 endif
 

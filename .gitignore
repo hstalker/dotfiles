@@ -1,9 +1,4 @@
 *.elc
-emacs/.emacs.d/network-security.data
-emacs/.emacs.d/transient/history.el
-emacs/.emacs.d/recentf
+emacs/.emacs.d/transient
 emacs/.emacs.d/auto-save-list
-emacs/.emacs.d/elpa
-vim/.vim/plugged
-vim/.vim/autoload/plug.vim.old
 

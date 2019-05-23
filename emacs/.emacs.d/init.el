@@ -7,6 +7,21 @@
 (require 'cl-lib)
 (require 'package)
 
+;; change paths of various sets of auto-generated files
+(setq org-publish-timestamp-directory "~/.local/emacs/org-timestamps"
+      org-id-locations-file "~/.local/emacs/org-id-locations"
+      ido-save-directory-list-file "~/.local/emacs/ido.last"
+      tramp-persistency-file-name "~/.local/emacs/tramp"
+      bookmark-default-file "~/.local/emacs/bookmarks"
+      nsm-settings-file "~/.local/emacs/network-security.data"
+      recentf-save-file "~/.local/emacs/recentf"
+      abbrev-file-name "~/.local/emacs/abbrev_defs"
+      ac-comphist "~/.local/emacs/ac-comphist.dat"
+      save-place-file "~/.local/emacs/emacs-places"
+      smex-save-file "~/.local/emacs/smex-items"
+      yas-snippet-dirs '("~/.local/emacs/snippets")
+      mc/list-file "~/.local/emacs/mc-lists.el"
+      custom-file "~/.local/emacs/custom.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; package handling and setup
@@ -16,6 +31,7 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
+(setq package-user-dir "~/.local/emacs/packages")
 (package-initialize)
 
 ;; install use-package
@@ -102,9 +118,9 @@
   :diminish yas-minor-mode
   :config
   (yas-global-mode 1)
-  (when (not (file-exists-p "~/.emacs.d/snippets"))
-    (make-directory "~/.emacs.d/snippets"))
-  (yas-load-directory "~/.emacs.d/snippets")
+  (when (not (file-exists-p "~/.local/emacs/snippets"))
+    (make-directory "~/.local/emacs/snippets"))
+  (yas-load-directory "~/.local/emacs/snippets")
   (add-hook 'term-mode-hook (lambda()
                               (setq yas-dont-activate-functions t))))
 
@@ -282,7 +298,6 @@
 ;; hide the whitespace and auto-revert minor modes
 (diminish 'whitespace-mode)
 (diminish 'auto-revert-mode)
-
 
 ;; set emacs to automatically wrap and insert newlines upon wrapping
 (auto-fill-mode)
