@@ -36,5 +36,17 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# git branch display mechanism for PS1
+get_git_branch() {
+  BRANCH=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)
+  if [[ ! -z "${BRANCH}" ]]; then
+    echo "(${BRANCH})"
+  else
+    echo "${BRANCH}"
+  fi
+}
+
+PS1="$(tput setaf 4)[\$(basename \${PWD})/]$(tput setaf 1)\$(get_git_branch)$(tput setaf 6)$ \033[0m"
+
 [ -f "~/.bashrc.local" ] && source ~/.bashrc.local
 
