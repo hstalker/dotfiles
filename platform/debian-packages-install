@@ -7,7 +7,8 @@ install_packages() {
                        tmux gcc clang ninja-build cmake meson make  \
                        silversearcher-ag autoconf automake xorg     \
                        bash htop linux-perf python doxygen rsync    \
-                       binutils nasm g++ curl wget tree docker -y
+                       binutils nasm g++ curl wget tree docker      \
+                       rxvt-unicode-256color -y
   set +x
 }
 
