@@ -46,7 +46,14 @@ get_git_branch() {
   fi
 }
 
-PS1="$(tput setaf 4)[\$(basename \${PWD})/]$(tput setaf 1)\$(get_git_branch)$(tput setaf 6)$ \033[0m"
+colour1="\[$(tput setaf 1)\]"
+colour4="\[$(tput setaf 4)\]"
+colour6="\[$(tput setaf 6)\]"
+colourreset="\[\033[0m\]"
+PS1="$colour4[\$(basename \${PWD})/]" # path
+PS1+="$colour1\$(get_git_branch)$colour6$ " # git branch
+PS1+="$colourreset" # colour back to normal
+unset colour1 colour4 colour6 colourreset
 
 [ -f "~/.bashrc.local" ] && source ~/.bashrc.local
 
