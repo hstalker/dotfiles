@@ -5,7 +5,7 @@
 # or if ask "prompt-string-here" Y; then  for a yes default
 ask() {
   local prompt default reply
-  
+
   if [ "${2:-}" = "Y" ]; then
     prompt="Y/n"
     default=Y
@@ -30,5 +30,72 @@ ask() {
   done
 }
 
-[ -f "~/.functions.local" ] && source "~/.functions.local"
+# add something to path without duplicating
+# pass path wanted as argument
+path-update() {
+  [[ $# -ne 1 ]] && return 1
+  case ":${PATH:=$1}:" in
+    *:$1:*) ;;
+    *) PATH="$1:$PATH" ;;
+  esac
+}
+
+# sane defaults for generating an rsa key via ssh.
+# pass a name or subpath to call to generate a key under an alternative name to
+# the default.
+generate-rsa-key() {
+  local key_file='~/.ssh/id_rsa'
+  local algo='rsa'
+  local bits=4096
+  local kdf_rounds=100
+  if [ $# -eq 1 ]; then
+    key_file="~/.ssh/$1"
+  fi
+  echo "Generating keyfile: $keyfile"
+  echo "Properties: Algo. $algo, $bits bits, KDF $kdf_rounds rounds"
+  ssh-keygen -t $algo -b $bits -a $kdf_rounds -f $key_file
+}
+
+# useful for starting ssh-agent on login/startup
+start-ssh-agent() {
+  # has the socket var been set?
+  if [ -n "$SSH_AUTH_SOCK" ]; then
+    ssh-add -l &>/dev/null
+    # check ssh-agent is running fine by checking
+    # if ssh-add didn't fail to connect to existing ssh-agent
+    # otherwise continue trying below
+    [[ $? != 2 ]] && return 0
+  fi
+
+  # use the file containing exports for SSH_AUTH_SOCK and SSH_AGENT_PID
+  # if it's already been generated (i.e. ssh-agent has been started)
+  if [ -e ~/.ssh/.ssh-agent-environment ]; then
+    source ~/.ssh/.ssh-agent-environment &>/dev/null
+    ssh-add -l &>/dev/null
+    [[ $? != 2 ]] && return 0
+  fi
+
+  # start an ssh-agent instance and output vars to $ssh_file
+  # then source them into the current environment
+  touch ~/.ssh/.ssh-agent-environment
+  ssh-agent -s > ~/.ssh/.ssh-agent-environment && source ~/.ssh/.ssh-agent-environment &>/dev/null
+}
+
+stop-ssh-agent() {
+  local ssh_file=''
+  ssh-agent -k
+  [[ -f ~/.ssh/.ssh-agent-environment ]] && rm -f ~/.ssh/.ssh-agent-environment
+}
+
+# git branch display mechanism for PS1
+get-git-branch() {
+  local BRANCH=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)
+  if [[ ! -z "${BRANCH}" ]]; then
+    echo "(${BRANCH})"
+  else
+    echo "${BRANCH}"
+  fi
+}
+
+[[ -f ~/.functions.local ]] && source ~/.functions.local
 

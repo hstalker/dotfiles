@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-[ -f "~/.bash_aliases" ] && source ~/.bash_aliases
+[[ -f ~/.bash_aliases ]] && source ~/.bash_aliases
 
 if [ -x /usr/bin/dircolors ]; then
   alias ls='ls --color=auto'
@@ -28,5 +28,5 @@ alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD| sort -rz \
   | xargs -0 rmdir'
 alias git-clean-tracked='git-clean-tracked-files; git-clean-tracked-dir'
 
-[ -f "~/.aliases.local" ] && source "~/.aliases.local"
+[[ -f ~/.aliases.local ]] && source "~/.aliases.local"
 

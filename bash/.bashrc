@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-[[ $- != *i* ]] && return
-
 source ~/.exports
 source ~/.functions
 source ~/.aliases
@@ -18,10 +16,10 @@ HISTFILESIZE=10000
 shopt -s checkwinsize
 
 # make less more friendly for non-text input files
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[[ -x /usr/bin/lesspipe ]] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # enable colour support of ls
-if [ -x dircolors ]; then
+if [ -x /usr/bin/dircolors ]; then
   test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 fi
 
@@ -36,24 +34,22 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# git branch display mechanism for PS1
-get_git_branch() {
-  BRANCH=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD 2>/dev/null)
-  if [[ ! -z "${BRANCH}" ]]; then
-    echo "(${BRANCH})"
-  else
-    echo "${BRANCH}"
-  fi
-}
-
 colour1="\[$(tput setaf 1)\]"
 colour4="\[$(tput setaf 4)\]"
 colour6="\[$(tput setaf 6)\]"
 colourreset="\[\033[0m\]"
 PS1="$colour4[\$(basename \${PWD})/]" # path
-PS1+="$colour1\$(get_git_branch)$colour6$ " # git branch
+PS1+="$colour1\$(get-git-branch)$colour6$ " # git branch
 PS1+="$colourreset" # colour back to normal
 unset colour1 colour4 colour6 colourreset
 
-[ -f "~/.bashrc.local" ] && source ~/.bashrc.local
+[[ -x /usr/bin/ssh-agent ]] && start-ssh-agent &>/dev/null
+
+# put anything you don't want to do every shell invocation here
+case "$-" in
+  *i*) ;; # interactive
+  *) ;; # non-interactive
+esac
+
+[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
 

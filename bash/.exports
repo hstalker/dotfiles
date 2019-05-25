@@ -1,10 +1,12 @@
 #! /usr/bin/env bash
 
+[[ -f ~/.functions ]] && . ~/.functions
+
 export ALTERNATE_EDITOR='nano'
 export EDITOR='vim'
 export VISUAL='vim'
 
-export PATH=~/.local/bin:$PATH
+path-update ~/.local/bin
 
 # store the distro name in DISTRO
 UNAME=$(uname | tr "[:upper:]" "[:lower:]")
@@ -18,8 +20,8 @@ if [ "$UNAME" == "linux" ]; then
 fi
 
 # Last ditch attempt
-[ "$DISTRO" == "" ] && export DISTRO=$UNAME
+[[ "$DISTRO" == "" ]] && export DISTRO=$UNAME
 unset UNAME
 
-[ -f "~/.exports.local" ] && source "~/.exports.local"
+[[ -f ~/.exports.local ]] && source ~/.exports.local
 
