@@ -8,6 +8,8 @@
     br = branch
     unstage = reset HEAD --
     last = log -1 HEAD
+[push]
+    followTags = true
 [filter "lfs"]
     required = true
     clean = git-lfs clean -- %f
