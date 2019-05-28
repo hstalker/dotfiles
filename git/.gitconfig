@@ -6,6 +6,7 @@
     ci = commit
     co = checkout
     br = branch
+    pu = push
     unstage = reset HEAD --
     last = log -1 HEAD
 [push]
