@@ -1,8 +1,15 @@
 [user]
-	email = 1683065+hstalker@users.noreply.github.com
-	name = Hector Stalker
+    email = 1683065+hstalker@users.noreply.github.com
+    name = Hector Stalker
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    br = branch
+    unstage = reset HEAD --
+    last = log -1 HEAD
 [filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
