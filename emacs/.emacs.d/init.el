@@ -304,21 +304,13 @@
 ;; set emacs to automatically wrap and insert newlines upon wrapping
 (auto-fill-mode)
 
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8-unix)
 ;; set default font
-(create-fontset-from-ascii-font
- "Source Han Code JP N-11:weight=light:slant=normal" nil "hancode")
-(set-fontset-font "fontset-hancode" 'unicode
-                  (font-spec :family "Source Han Code JP N"
-                             :weight 'normal
-                             :slant 'normal
-                             :size 11)
-                  nil 'append)
-(add-to-list 'default-frame-alist '(font . "fontset-hancode"))
-(add-to-list 'initial-frame-alist '(font . "fontset-hancode"))
-(set-frame-font "fontset-hancode" nil t)
-
-;; start emacs maximised
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(set-face-attribute 'default nil
+                    :family "DejaVu Sans Mono-12"
+                    :weight 'normal
+                    :slant 'normal)
 
 ;; remove alarm bell
 (setq ring-bell-function 'ignore)
