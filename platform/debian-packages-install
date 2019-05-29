@@ -1,16 +1,36 @@
 #! /usr/bin/env bash
 
-install_packages() {
+install_package_sources() {
   set -x
-  sudo apt-get update -y && sudo apt-get upgrade -y
-  sudo apt-get install stow vim emacs25 git clang-tidy clang-format \
-                       tmux gcc clang ninja-build cmake meson make  \
-                       silversearcher-ag autoconf automake xorg     \
-                       bash htop linux-perf python doxygen rsync    \
-                       binutils nasm g++ curl wget tree docker      \
-                       rxvt-unicode-256color -y
+  sudo mkdir -p /etc/apt/sources.list.d/
+  if [[ ! -e /etc/apt/sources.list.d/stretch-backports.list ]]; then
+    sudo bash -c 'echo "deb http://deb.debian.org/debian stretch-backports main" \
+      >/etc/apt/sources.list.d/stretch-backports.list'
+  fi
   set +x
 }
 
+uninstall_package_sources() {
+  set -x
+  if [[ -e /etc/apt/sources.list.d/stretch-backports.list ]]; then
+    sudo rm -f /etc/apt/sources.list.d/stretch-backports.list
+  fi
+  set +x
+}
+
+install_packages() {
+  set -x
+  sudo apt update -y && sudo apt-get upgrade -y
+  sudo apt install stow vim emacs25 git clang-tidy clang-format \
+                   tmux gcc clang ninja-build cmake meson make  \
+                   silversearcher-ag autoconf automake xorg     \
+                   bash htop linux-perf python doxygen rsync    \
+                   binutils nasm g++ curl wget tree docker      \
+                   rxvt-unicode-256color -y
+  set +x
+}
+
+uninstall_package_sources
+install_package_sources
 install_packages
 
