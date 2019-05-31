@@ -8,20 +8,29 @@ export VISUAL='vim'
 
 path-update ~/.local/bin
 
-# store the distro name in DISTRO
-UNAME=$(uname | tr "[:upper:]" "[:lower:]")
-# Handle linux distros
-if [ "$UNAME" == "linux" ]; then
-  if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
-    export DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
-  else
-    export DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
-  fi
+# store the distro name in DISTRO_ vars
+if type lsb_release >/dev/null 2>&1; then
+  # A modern generic method
+  DISTRO_OS=$(lsb_release -si)
+  DISTRO_VERSION=$(lsb_release -sr)
+  DISTRO_CODENAME=$(lsb_release -sc)
+else
+  # Fallback
+  DISTRO_OS=$(uname -s)
+  DISTRO_VERSION=$(uname -r)
+  DISTRO_CODENAME=$DISTRO_VERSION
 fi
-
-# Last ditch attempt
-[[ "$DISTRO" == "" ]] && export DISTRO=$UNAME
-unset UNAME
+case $(uname -m) in
+  x86_64)
+    DISTRO_BITS=64
+    ;;
+  i*86)
+    DISTRO_BITS=32
+    ;;
+  *)
+    DISTRO_BITS=?
+    ;;
+esac
 
 [[ -f ~/.exports.local ]] && source ~/.exports.local
 

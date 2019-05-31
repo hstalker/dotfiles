@@ -68,13 +68,19 @@ unlink () {
 install_tools () {
   echo "Installing packages & utilities..."
   if ask "Proceed? (Y/n)" Y; then
-    if [ $( echo "$DISTRO" | grep 'debian' ) ] ; then
+    if [ $( echo "$DISTRO_OS" | grep -i 'debian' ) ] ; then
       echo "Detected debian"
       echo "Installing..."
-      $DIR/platform/debian-packages-install
+      $DIR/platform/debian/all-pkg
+      if [ $( echo "$DISTRO_CODENAME" | grep -i 'stretch' ) ] ; then
+        echo "Detected stretch"
+        $DIR/platform/debian/stretch-pkg
+      else
+        echo "Unknown distro codename -- $DISTRO_CODENAME"
+      fi
     else
       echo "No known platform detected"
-      echo "Platform -- $DISTRO"
+      echo "Platform -- $DISTRO_OS - $DISTRO_VERSION - $DISTRO_CODENAME"
     fi
   else
     echo "Cancelled"
