@@ -157,9 +157,6 @@ nnoremap <leader>bn :bn<CR> " Cycle back and forth between buffers
 nnoremap <leader>bp :bp<CR>
 nnoremap <leader>ba <C-^> " Switch to last open buffer
 
-" Tag regex search
-nnoremap <leader>j :tjump /
-
 " Change netrwhist directory
 let g:netrw_home=g:vim_cache_dir
 
