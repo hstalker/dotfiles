@@ -30,12 +30,13 @@ call plug#end()
 " Enable filetype plugins
 filetype plugin on
 filetype indent on
-" Set to use relative line mode
-set relativenumber
-set number
+set relativenumber " Set to use relative line mode
+set textwidth=0 " Hard line wrap (number of cols)
+set wrapmargin=0
+set wrap
 set linebreak " Break lines at word (requires Wrap lines)
-set showbreak=~~~ " Wrap-broken line prefix
-set textwidth=80 " Line wrap (number of cols)
+" set columns=80 " Soft line wrap (number of cols)
+set showbreak=+++ " Wrap-broken line prefix
 set showmatch " Highlight matching brace
 set nohlsearch " Don't highlight search results
 set smartcase " Enable smart-case search
@@ -43,9 +44,9 @@ set ignorecase " Always case-insensitive
 set incsearch " Searches for strings incrementally
 set autoindent " Auto-indent new lines
 set expandtab " Use spaces instead of tabs
-set shiftwidth=4 " Number of auto-indent spaces
 set smartindent " Enable smart-indent
 set smarttab " Enable smart-tabs
+set shiftwidth=4 " Number of auto-indent spaces
 set softtabstop=4 " Number of spaces per Tab
 set ruler " Show row and column ruler information
 set cmdheight=2 " Height of the command bar

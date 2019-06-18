@@ -40,12 +40,16 @@ or
  * Reboot/logout & login.
 
 ### Vim
+Should configure on its own when you run the setup script, but manual steps:
+
  * Start Vim.
  * Run `:PlugUpgrade`and then `:PlugUpdate`.
  * Run `:PlugInstall`.
  * Exit Vim
 
 ### Emacs
+Should configure on its own when you run the setup script, but manual steps:
+
  * Start emacs.
  * Wait.
  * Complete any prompts.
