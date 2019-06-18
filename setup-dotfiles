@@ -1,42 +1,55 @@
 #! /usr/bin/env bash
 
 # Grabs the full directory path to this script
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Add directories to stow here
+DOTFILE_CONFIG_DIRS=(
+  vim
+  emacs
+  tmux
+  git
+  bash
+  dircolors
+  clang-tidy
+  clang-format
+  xorg
+)
 
 # Useful utils for this install
-source $DIR/bash/.functions
-source $DIR/bash/.exports
+source ${SCRIPT_DIR}/bash/.functions
+source ${SCRIPT_DIR}/bash/.exports
+
+is_stow_present () {
+  command -v stow >/dev/null 2>&1
+  if [[ $? ]]; then
+    return 0
+  else
+    echo "Couldn't find stow!"
+    return 1
+  fi
+}
 
 init () {
-  echo "Creating projects folder in ~/"
-  mkdir -p ~/projects
-  echo "Creating documents folder in ~/"
-  mkdir -p ~/documents
-  echo "Creating ~/.cache"
-  mkdir -p ~/.cache
-  echo "Creating ~/.local/bin"
-  mkdir -p ~/.local/bin
-  echo "Creating ~/.local/share"
-  mkdir -p ~/.local/share
+  TO_CREATE=(
+    ~/projects
+    ~/documents
+    ~/.cache
+    ~/.local/bin
+    ~/.local/share
+  )
+  for f in ${TO_CREATE[@]}; do
+    [[ ! -e ${f} ]] && echo "Creating ${f}..." && mkdir -p ${f}
+  done
 }
 
 link () {
   echo "Symlinking using GNU stow..."
 
-  if ask "Proceed? (Y/n)" Y; then
-    command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
-    set -x
-    stow -d $DIR -t ~/ -S vim
-    stow -d $DIR -t ~/ -S emacs
-    stow -d $DIR -t ~/ -S tmux
-    stow -d $DIR -t ~/ -S git
-    stow -d $DIR -t ~/ -S bash
-    stow -d $DIR -t ~/ -S dircolors
-    stow -d $DIR -t ~/ -S clang-tidy
-    stow -d $DIR -t ~/ -S clang-format
-    stow -d $DIR -t ~/ -S xorg
-    set +x
-    echo "Done!"
+  if ask "Proceed? (Y/n)" Y && is_stow_present; then
+    echo "Stowing ${DOTFILE_CONFIG_DIRS[@]}..."
+    stow --no-folding -d "${SCRIPT_DIR}" -t ~/ -S ${DOTFILE_CONFIG_DIRS[@]}
+    [[ $? ]] && echo "Done!" || echo "Failed!"
   else
     echo "Cancelled"
   fi
@@ -45,20 +58,10 @@ link () {
 # Unsymlink configs
 unlink () {
   echo "Unsymlinking using GNU stow..."
-  if ask "Proceed? (Y/n)" Y; then
-    command -v stow >/dev/null 2>&1 || { echo >&2 "Couldn't find stow!"; return; }
-    set -x
-    stow -d $DIR -t ~/ -D vim
-    stow -d $DIR -t ~/ -D emacs
-    stow -d $DIR -t ~/ -D tmux
-    stow -d $DIR -t ~/ -D git
-    stow -d $DIR -t ~/ -D bash
-    stow -d $DIR -t ~/ -D dircolors
-    stow -d $DIR -t ~/ -D clang-tidy
-    stow -d $DIR -t ~/ -D clang-format
-    stow -d $DIR -t ~/ -D xorg
-    set +x
-    echo "Done!"
+  if ask "Proceed? (Y/n)" Y && is_stow_present; then
+    echo "Stowing ${DOTFILE_CONFIG_DIRS[@]}..."
+    stow --no-folding -d "${SCRIPT_DIR}" -t ~/ -D ${DOTFILE_CONFIG_DIRS[@]}
+    [[ $? ]] && echo "Done!" || echo "Failed!"
   else
     echo "Cancelled"
   fi
@@ -68,20 +71,28 @@ unlink () {
 install_tools () {
   echo "Installing packages & utilities..."
   if ask "Proceed? (Y/n)" Y; then
-    if [ $( echo "$DISTRO_OS" | grep -i 'debian' ) ] ; then
+    if [ $( echo "${DISTRO_OS}" | grep -i 'debian' ) ] ; then
       echo "Detected debian"
       echo "Installing..."
-      $DIR/platform/debian/all-pkg
-      if [ $( echo "$DISTRO_CODENAME" | grep -i 'stretch' ) ] ; then
+      "${SCRIPT_DIR}/platform/debian/all-pkg"
+      if [ $( echo "${DISTRO_CODENAME}" | grep -i 'stretch' ) ] ; then
         echo "Detected stretch"
-        $DIR/platform/debian/stretch-pkg
+        "${SCRIPT_DIR}/platform/debian/stretch-pkg"
       else
-        echo "Unknown distro codename -- $DISTRO_CODENAME"
+        echo "Unknown distro codename -- ${DISTRO_CODENAME}"
       fi
     else
       echo "No known platform detected"
-      echo "Platform -- $DISTRO_OS - $DISTRO_VERSION - $DISTRO_CODENAME"
+      echo "Platform -- ${DISTRO_OS} - ${DISTRO_VERSION} - ${DISTRO_CODENAME}"
     fi
+
+    echo "Setting up vim plugins..."
+    vim +:PlugUpgrade +:PlugInstall +:PlugUpdate +:qa 2>/dev/null
+    [[ $? ]] && echo "Done!" || echo "Failed!"
+
+    echo "Setting up emacs plugins..."
+    emacs -nw -batch --load "${HOME}/emacs.d/init.el" --eval "(progn (package-initialize) (kill-emacs 0))" 2>/dev/null
+    [[ $? ]] && echo "Done!" || echo "Failed!"
   else
     echo "Cancelled"
   fi

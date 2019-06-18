@@ -12,7 +12,7 @@ Uses GNU Stow for symlink management.
 
 ## Support
 Currently officially supports the following platforms:
- * Debian Stretch (Stable).
+ * Debian Stretch (Stable w/ backports).
 
 ## Configurations
 Currently includes configurations for:

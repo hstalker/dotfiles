@@ -1,15 +1,25 @@
 #! /usr/bin/env bash
-install_packages() {
-  set -x
-  sudo apt update -y && sudo apt-get upgrade -y
-  sudo apt install stow vim emacs25 git clang-tidy clang-format \
-                   tmux gcc clang ninja-build cmake meson make  \
-                   silversearcher-ag autoconf automake xorg     \
-                   bash htop linux-perf python doxygen rsync    \
-                   binutils nasm g++ curl wget tree docker      \
-                   rxvt-unicode-256color -y
-  set +x
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+install_package_sources() {
+  return
 }
 
+uninstall_package_sources() {
+  return
+}
+
+install_packages() {
+  echo "Installing debian generic packages..."
+  sudo apt-get update -y >/dev/null && sudo apt-get upgrade -y >/dev/null
+  PKGS_TO_INSTALL=$(cat ${SCRIPT_DIR}/all-pkg-list | tr '\n' ' ')
+  echo "Attempting to install: ${PKGS_TO_INSTALL[@]}"
+  sudo apt-get install ${PKGS_TO_INSTALL[@]} -y >/dev/null
+  [[ $? ]] && echo "Done!" || echo "Failed!"
+}
+
+uninstall_package_sources
+install_package_sources
 install_packages
 
