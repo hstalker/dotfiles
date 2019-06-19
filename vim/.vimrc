@@ -196,6 +196,7 @@ let g:ctrlp_custom_ignore = {
   \ 'link': '',
   \ }
 let g:ctrlp_working_path_mode = 'r'
+let g:ctrlp_show_hidden = 1
 
 " vim-airline
 let g:airline#extensions#tabline#enabled = 1
