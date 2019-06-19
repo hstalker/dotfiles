@@ -15,6 +15,7 @@ DOTFILE_CONFIG_DIRS=(
   clang-format
   xorg
   gpg
+  ssh
 )
 
 # Useful utils for this install
