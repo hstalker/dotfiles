@@ -13,6 +13,7 @@ Uses GNU Stow for symlink management.
 ## Support
 Currently officially supports the following platforms:
  * Debian Stretch (Stable w/ backports).
+ * Basically any recent Debian (probably - untested).
 
 ## Configurations
 Currently includes configurations for:
@@ -25,6 +26,8 @@ Currently includes configurations for:
  * Git.
  * Dircolors.
  * Xresources.
+ * SSH.
+ * GPG.
 
 ## Install Instructions
 ```shell
@@ -85,23 +88,26 @@ or personal binaries.
 
 ## Extension
 ### Platforms
- * Add new platform install scripts etc. to `platform/$DISTRO_packages_install`.
+ * Add new platform install scripts etc. to `platform/$DISTRO/`.
  * Update `bash/.exports` and `setup-dotfiles` to handle identification/install
    steps for the new platforms.
 
 ### Tools/Configurations
- * Add the appopriate stow lines to `setup-dotfiles`.
+ * Add the appropriate stow lines to `setup-dotfiles`.
  * Make a folder just to store this set of configs in the repo directory.
  * Add an appropriate .stow-local-ignore to that directory.
  * Add appropriate lines to the .gitignore in the repo directory.
 
 ## Ideas
  * Add a templating mechanism and more complex install step to pick out
-   individual tools/configs to install.
+   individual tools/configs to install. Seems like a good use-case for ansible,
+   but if you're going to go for ansible you may as well abstract out all the
+   actual configs into a bunch of simpler variables and templates. Frankly ansible
+   seems like overkill here; the scope of the project is not to provision machines,
+   but to link some basic configuration files.
  * Use a templating mechanism to customise colour schemes on a global scale.
  * Change so that (as much as possible) the configs placed in name specific
    subdirectories with nearly empty configs in the top-level sourcing them.
    This would allow us to better break up the configurations for things like vim
    into multiple files without cluttering the user's `$HOME` directory.
- * Add some useful scripts and utilities to `~/.local/bin`.
-
+ * Add some useful scripts and utilities to `~/.local/bin` (e.g. cpu stats etc.).
