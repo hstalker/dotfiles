@@ -28,3 +28,5 @@ wget
 tree
 docker
 rxvt-unicode-256color
+gnupg
+ssh
