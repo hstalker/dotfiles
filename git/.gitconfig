@@ -10,6 +10,7 @@
     br = branch
     ps = push
     pl = pull
+    plff = pull --ff-only
     df = diff
     dt = difftool
     cl = clone
