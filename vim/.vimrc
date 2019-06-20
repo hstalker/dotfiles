@@ -31,6 +31,7 @@ call plug#end()
 filetype plugin on
 filetype indent on
 set relativenumber " Set to use relative line mode
+set number " Set to use absolute number for current line only
 set textwidth=0 " Hard line wrap (number of cols)
 set wrapmargin=0
 set wrap
