@@ -5,6 +5,7 @@
 export ALTERNATE_EDITOR='nano'
 export EDITOR='vim'
 export VISUAL='vim'
+export PAGER='less'
 
 path-update ~/.local/bin
 

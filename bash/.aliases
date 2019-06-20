@@ -12,7 +12,21 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+alias l.='ls -d .*'
 
+# because I'm clumsy and accidentally delete stuff
+alias rm='rm -iI --preserve-root'
+alias mv='mv -i'
+alias cp='cp -i'
+alias ln='ln -i'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+
+alias h='history'
+alias j='jobs'
+
+alias vi='vim'
 alias ag='ag --ignore "\.git/*" --ignore "\.svn/*" --ignore "\.hg/*" --hidden'
 alias tmux='tmux -2'
 alias tree='tree -I ".git"'
@@ -24,9 +38,16 @@ alias git-enable-ssl='export GIT_SSL_NO_VERIFY='
 # alias to remove all tracked folders and directories
 # from a local git repo's directory
 alias git-clean-tracked-files='git ls-files -z | xargs -0 rm'
-alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD| sort -rz \
+alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD \
+  | sort -rz \
   | xargs -0 rmdir'
 alias git-clean-tracked='git-clean-tracked-files; git-clean-tracked-dir'
 
-[[ -f ~/.aliases.local ]] && source "~/.aliases.local"
+# various hardware info
+alias cpu-count='nproc --all'
+alias meminfo='free -m -l -t'
+alias cpuinfo='lscpu'
+alias diskinfo='df -H'
+
+[[ -f ~/.aliases.local ]] && source ~/.aliases.local
 
