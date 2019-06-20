@@ -8,7 +8,8 @@
     ci = commit
     co = checkout
     br = branch
-    pu = push
+    ps = push
+    pl = pull
     df = diff
     dt = difftool
     cl = clone
