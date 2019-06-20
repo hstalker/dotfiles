@@ -5,12 +5,20 @@ source ~/.functions
 source ~/.aliases
 
 # don't put duplicate lines or lines starting with space in the history
-HISTCONTROL=ignoreboth
+HISTCONTROL=ignoreboth:erasedups
 # append to the history file, don't overwrite it
 shopt -s histappend
 # for setting history length
 HISTSIZE=10000
 HISTFILESIZE=10000
+[[ ! -d /var/tmp/$USER ]] && mkdir -p /var/tmp/$USER
+HISTFILE=/var/tmp/$USER/.bash_history
+# handle setting history file per-process in tmux
+if [ -n "$TMUX" ]; then
+  # use session id and pane id such that we have unique histories for all panes in
+  # all sessions
+  HISTFILE=/var/tmp/$USER/.bash_history.tmux.session-$(echo $TMUX | cut -d',' -f3).pane-${TMUX_PANE:1}
+fi
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS
 shopt -s checkwinsize
