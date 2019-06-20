@@ -33,5 +33,5 @@ case $(uname -m) in
     ;;
 esac
 
-[[ -f ~/.exports.local ]] && source ~/.exports.local
+[[ -f ~/.exports.local ]] && . ~/.exports.local
 

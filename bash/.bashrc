@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
-source ~/.exports
-source ~/.functions
-source ~/.aliases
+. ~/.exports
+. ~/.functions
+. ~/.aliases
 
 # don't put duplicate lines or lines starting with space in the history
 HISTCONTROL=ignoreboth:erasedups
@@ -59,5 +59,5 @@ case "$-" in
   *) ;; # non-interactive
 esac
 
-[[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
+[[ -f ~/.bashrc.local ]] && . ~/.bashrc.local
 

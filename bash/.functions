@@ -70,7 +70,7 @@ start-ssh-agent() {
   # use the file containing exports for SSH_AUTH_SOCK and SSH_AGENT_PID
   # if it's already been generated (i.e. ssh-agent has been started)
   if [ -e ~/.ssh/.ssh-agent-environment ]; then
-    source ~/.ssh/.ssh-agent-environment &>/dev/null
+    . ~/.ssh/.ssh-agent-environment &>/dev/null
     ssh-add -l &>/dev/null
     [[ $? != 2 ]] && return 0
   fi
@@ -78,7 +78,7 @@ start-ssh-agent() {
   # start an ssh-agent instance and output vars to $ssh_file
   # then source them into the current environment
   touch ~/.ssh/.ssh-agent-environment
-  ssh-agent -s > ~/.ssh/.ssh-agent-environment && source ~/.ssh/.ssh-agent-environment &>/dev/null
+  ssh-agent -s > ~/.ssh/.ssh-agent-environment && . ~/.ssh/.ssh-agent-environment &>/dev/null
 }
 
 stop-ssh-agent() {
@@ -97,5 +97,5 @@ get-git-branch() {
   fi
 }
 
-[[ -f ~/.functions.local ]] && source ~/.functions.local
+[[ -f ~/.functions.local ]] && . ~/.functions.local
 

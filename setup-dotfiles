@@ -19,8 +19,8 @@ DOTFILE_CONFIG_DIRS=(
 )
 
 # Useful utils for this install
-source ${SCRIPT_DIR}/bash/.functions
-source ${SCRIPT_DIR}/bash/.exports
+. ${SCRIPT_DIR}/bash/.functions
+. ${SCRIPT_DIR}/bash/.exports
 
 is_stow_present () {
   command -v stow >/dev/null 2>&1
