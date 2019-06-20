@@ -1,3 +1,7 @@
+set nocompatible
+filetype indent plugin on
+syntax on
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -8,7 +12,10 @@ let g:vim_plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/master/p
 " Grab vimplug if not available using curl
 if empty(glob(g:vim_plug_script))
   execute 'silent !curl -fLo ' . g:vim_plug_script . ' --create-dirs ' . g:vim_plug_url
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  augroup PLUG
+    autocmd! PLUG
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  augroup END
 endif
 
 exec 'source ' . g:vim_plug_script
@@ -27,9 +34,6 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Enable filetype plugins
-filetype plugin on
-filetype indent on
 set relativenumber " Set to use relative line mode
 set number " Set to use absolute number for current line only
 set textwidth=0 " Hard line wrap (number of cols)
@@ -81,9 +85,6 @@ set wildignorecase " Make searches case-insensitive
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors, themes and fonts
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Enable syntax highlighting
-syntax enable
-
 " Set extra options when running in GUI mode
 if has("gui_running")
   set guioptions-=T " no toolbar
@@ -131,7 +132,6 @@ nnoremap <leader>ww :w!<cr>
 map j gj
 map k gk
 
-" Faster way to manipulate windows (I can't deal with ^W start)
 " Right/down/up/left
 nnoremap <leader>wj <C-W>j
 nnoremap <leader>wk <C-W>k
@@ -149,28 +149,18 @@ nnoremap <leader>wK <C-W>K
 nnoremap <leader>wH <C-W>H
 nnoremap <leader>wL <C-W>L
 
-" Show buffer list and prompt for number/name for switching - b(uffer) j(ump)
-nnoremap <leader>bj :ls<CR>:b<Space>
-" Buffer navigation
-set wildcharm=<C-z>
-nnoremap <leader>b :buffer <C-z><S-Tab> " Search buffers by name
-nnoremap <leader>B :sbuffer <C-z><S-Tab>
-nnoremap <leader>bn :bn<CR> " Cycle back and forth between buffers
-nnoremap <leader>bp :bp<CR>
-nnoremap <leader>ba <C-^> " Switch to last open buffer
-
 " Change netrwhist directory
 let g:netrw_home=g:vim_cache_dir
 
 " Leave a mark on the current line of the buffer when leaving based
 " on the language of the file contents. Use capital letters only.
 augroup VIMRC
-  autocmd!
-
+  autocmd! VIMRC
   autocmd BufLeave *.C,*.H,*.c,*.h,*.cc,*.hh,*.c++,*.h++,*.cpp,*.hpp normal! mC
+  autocmd BufLeave .vimrc,*.vim normal! mV
   autocmd BufLeave *.sh normal! mB
   autocmd BufLeave *.py normal! mP
-  autocmd BufLeave *.rb normal! mR
+  autocmd BufLeave *.hs normal! mH
 augroup END
 
 " Delete trailing white space on save
@@ -179,10 +169,16 @@ func! DeleteTrailingWS()
   %s/\s\+$//ge
   exe "normal `z"
 endfunc
-autocmd BufWrite * :call DeleteTrailingWS()
+augroup TRAILINGWS
+  autocmd! TRAILINGWS
+  autocmd BufWrite * :call DeleteTrailingWS()
+augroup END
 
 " Use tabs instead of spaces in makefiles
-autocmd FileType make setlocal noexpandtab
+augroup MAKEFILE
+  autocmd! MAKEFILE
+  autocmd FileType make setlocal noexpandtab
+augroup END
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
