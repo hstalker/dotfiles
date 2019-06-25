@@ -204,6 +204,6 @@ let g:airline_theme='solarized'
 
 " Load a user-defined custom overrides file if it exists
 if filereadable('~/.vimrc.local')
-  source '~/.vimrc.local'
+  source ~/.vimrc.local
 endif
 
