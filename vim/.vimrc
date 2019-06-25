@@ -34,6 +34,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let defaulttabsize = 2 " Sets all the tab options appropriately later on
 set relativenumber " Set to use relative line mode
 set number " Set to use absolute number for current line only
 set textwidth=0 " Hard line wrap (number of cols)
@@ -47,12 +48,6 @@ set nohlsearch " Don't highlight search results
 set smartcase " Enable smart-case search
 set ignorecase " Always case-insensitive
 set incsearch " Searches for strings incrementally
-set autoindent " Auto-indent new lines
-set expandtab " Use spaces instead of tabs
-set smartindent " Enable smart-indent
-set smarttab " Enable smart-tabs
-set shiftwidth=4 " Number of auto-indent spaces
-set softtabstop=4 " Number of spaces per Tab
 set ruler " Show row and column ruler information
 set cmdheight=2 " Height of the command bar
 set history=1000 " Sets how many lines of history VIM has to remember
@@ -173,6 +168,19 @@ augroup TRAILINGWS
   autocmd! TRAILINGWS
   autocmd BufWrite * :call DeleteTrailingWS()
 augroup END
+
+" Manually change tab size in current session
+func! ChangeTabs(size)
+  set autoindent " Auto-indent new lines
+  set expandtab " Use spaces instead of tabs
+  set smartindent " Enable smart-indent
+  set smarttab " Enable smart-tabs
+  let &shiftwidth=a:size " Number of auto-indent spaces
+  let &tabstop=a:size " Size appearance of \t in text
+  set softtabstop=0 " Number of spaces per Tab
+endfunc
+
+call ChangeTabs(defaulttabsize)
 
 " Use tabs instead of spaces in makefiles
 augroup MAKEFILE
