@@ -144,6 +144,12 @@ nnoremap <leader>wK <C-W>K
 nnoremap <leader>wH <C-W>H
 nnoremap <leader>wL <C-W>L
 
+" Grep word cursor is on
+nnoremap <leader>fw :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+" bind :Ag to call underlying grep (ag if available)
+command -nargs=+ -complete=file -bar Grep silent! grep! <args>|cwindow|redraw!
+nnoremap <leader>gr :Grep<Space>
+
 " Change netrwhist directory
 let g:netrw_home=g:vim_cache_dir
 
@@ -202,6 +208,14 @@ let g:ctrlp_custom_ignore = {
   \ }
 let g:ctrlp_working_path_mode = 'r'
 let g:ctrlp_show_hidden = 1
+if executable('ag')
+  " Prefer ag
+  set grepprg=ag\ --nogroup\ --nocolor
+  " Use ag for ctrlp search
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  " Turn off caching due to ag's speed
+  let g:ctrlp_use_caching = 0
+endif
 
 " vim-airline
 let g:airline#extensions#tabline#enabled = 1
