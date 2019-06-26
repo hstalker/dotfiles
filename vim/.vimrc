@@ -5,7 +5,7 @@ syntax on
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:vim_cache_dir='~/.cache/vim/'
+let g:vim_cache_dir=expand('~/.cache/vim/')
 let g:vim_plugged_dir=g:vim_cache_dir . 'plugged/'
 let g:vim_plug_script=g:vim_plugged_dir . 'plug.vim'
 let g:vim_plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
@@ -225,7 +225,7 @@ let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline_theme='solarized'
 
 " Load a user-defined custom overrides file if it exists
-if filereadable('~/.vimrc.local')
+if filereadable(expand('~/.vimrc.local'))
   source ~/.vimrc.local
 endif
 
