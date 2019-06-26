@@ -27,7 +27,9 @@ alias h='history'
 alias j='jobs'
 
 alias vi='vim'
-alias ag='ag --ignore "\.git/*" --ignore "\.svn/*" --ignore "\.hg/*" --hidden'
+alias ag='ag \
+  --ignore "\.git/*" --ignore "\.svn/*" --ignore "\.hg/*" \
+  --hidden --smart-case'
 alias tmux='tmux -2'
 alias tree='tree -I ".git"'
 
