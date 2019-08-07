@@ -54,7 +54,7 @@ set history=1000 " Sets how many lines of history VIM has to remember
 set undolevels=1000 " Number of undo levels
 set backspace=indent,eol,start " Backspace behaviour
 set lazyredraw " Don't redraw while executing macros (good performance config)
-set foldcolumn=1 " Add a bit extra margin to the left
+set foldcolumn=4 " Add a bit extra margin to the left
 set laststatus=2 " Always show the status line
 set viminfo=""
 " No annoying sound on errors
@@ -75,6 +75,12 @@ set wildignore+=*/.git/**/*,*/.hg/**/*,*/.svn/**/*
 set wildignore+=tags
 set wildignore+=*.tar.*
 set wildignorecase " Make searches case-insensitive
+
+" Fold configuration
+set foldmethod=syntax " Use syntax understanding to auto fold
+set foldnestmax=10
+" set nofoldenable " Disable automatic folding on buffer open
+set foldlevel=2 " Default nesting to automatically open folds to
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
