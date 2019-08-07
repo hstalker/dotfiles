@@ -174,10 +174,6 @@ func! DeleteTrailingWS()
   %s/\s\+$//ge
   exe "normal `z"
 endfunc
-augroup TRAILINGWS
-  autocmd! TRAILINGWS
-  autocmd BufWrite * :call DeleteTrailingWS()
-augroup END
 
 " Manually change tab size in current session
 func! ChangeTabs(size)
