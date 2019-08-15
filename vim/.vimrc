@@ -77,10 +77,10 @@ set wildignore+=*.tar.*
 set wildignorecase " Make searches case-insensitive
 
 " Fold configuration
-set foldmethod=syntax " Use syntax understanding to auto fold
+set foldmethod=indent " Use indent level to auto fold
 set foldnestmax=10
 " set nofoldenable " Disable automatic folding on buffer open
-set foldlevel=2 " Default nesting to automatically open folds to
+set foldlevel=0 " Default nesting to automatically open folds to
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
