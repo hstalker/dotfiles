@@ -27,6 +27,9 @@ Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'ctrlpvim/ctrlp.vim'
+if (has('python') || has('python3'))
+  Plug 'SirVer/ultisnips'
+endif
 
 call plug#end()
 
@@ -230,6 +233,11 @@ let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
 let g:airline_theme='solarized'
+
+" ultisnips
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<c-b>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-z>"
 
 " Load a user-defined custom overrides file if it exists
 if filereadable(expand('~/.vimrc.local'))
