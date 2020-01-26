@@ -51,5 +51,5 @@ alias meminfo='free -m -l -t'
 alias cpuinfo='lscpu'
 alias diskinfo='df -H'
 
-[[ -f ~/.aliases.local ]] && . ~/.aliases.local
+[[ -f ~/.bash.d/aliases.local ]] && . ~/.bash.d/aliases.local
 

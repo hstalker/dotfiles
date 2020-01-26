@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-[[ -f ~/.functions ]] && . ~/.functions
+[[ -f ~/.bash.d/functions ]] && . ~/.bash.d/functions
 
 export ALTERNATE_EDITOR='nano'
 export EDITOR='vim'
@@ -33,5 +33,5 @@ case $(uname -m) in
     ;;
 esac
 
-[[ -f ~/.exports.local ]] && . ~/.exports.local
+[[ -f ~/.bash.d/exports.local ]] && . ~/.bash.d/exports.local
 

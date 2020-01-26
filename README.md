@@ -61,10 +61,10 @@ Should configure on its own when you run the setup script, but manual steps:
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
- * vim (`~/.vimrc.local`)
- * tmux (`~/.tmux.conf.local`)
- * bash (`~/.exports.local`, `~/.functions.local`, `~/.aliases.local`,
-   `~/.bashrc.local`, `~/.profile`, `~/.bash_profile.local`,
+ * vim (`~/.vim.d/vimrc.local`)
+ * tmux (`~/.tmux.d/tmux.conf.local`)
+ * bash (`~/.bash.d/exports.local`, `~/.bash.d/functions.local`, `~/.bash.d/aliases.local`,
+   `~/.bash.d/bashrc.local`, `~/.profile`, `~/.bash.d/bash_profile.local`,
    `~/.bash_aliases`)
 
 By adding your own versions of the files listed above, you may stack
@@ -72,9 +72,9 @@ your own customisations on top of the ones provided.
 
 Bash customisations/overrides should preferably be placed within one of:
 
- * `~/.functions.local`
- * `~/.aliases.local`
- * `~/.exports.local`
+ * `~/.bash.d/functions.local`
+ * `~/.bash.d/aliases.local`
+ * `~/.bash.d/exports.local`
 
 first, and then in `~/.bashrc.local` if more general.
 

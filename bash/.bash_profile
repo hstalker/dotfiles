@@ -10,5 +10,5 @@
 # if interactive login shell, source bashrc
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-[[ -f ~/.bash_profile.local ]] && . ~/.bash_profile.local
+[[ -f ~/.bash.d/bash_profile.local ]] && . ~/.bash.d/bash_profile.local
 

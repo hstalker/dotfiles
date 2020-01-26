@@ -97,5 +97,5 @@ get-git-branch() {
   fi
 }
 
-[[ -f ~/.functions.local ]] && . ~/.functions.local
+[[ -f ~/.bash.d/functions.local ]] && . ~/.bash.d/functions.local
 

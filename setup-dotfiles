@@ -19,8 +19,8 @@ DOTFILE_CONFIG_DIRS=(
 )
 
 # Useful utils for this install
-. ${SCRIPT_DIR}/bash/.functions
-. ${SCRIPT_DIR}/bash/.exports
+. ${SCRIPT_DIR}/bash/.bash.d/functions
+. ${SCRIPT_DIR}/bash/.bash.d/exports
 
 is_stow_present () {
   command -v stow >/dev/null 2>&1
@@ -79,6 +79,9 @@ install_tools () {
       "${SCRIPT_DIR}/platform/debian/all-pkg"
       if [ $( echo "${DISTRO_CODENAME}" | grep -i 'stretch' ) ] ; then
         echo "Detected stretch"
+        "${SCRIPT_DIR}/platform/debian/stretch-pkg"
+      elif [ $( echo "${DISTRO_CODENAME}" | grep -i 'buster' ) ] ; then
+        echo "Detected buster"
         "${SCRIPT_DIR}/platform/debian/stretch-pkg"
       else
         echo "Unknown distro codename -- ${DISTRO_CODENAME}"

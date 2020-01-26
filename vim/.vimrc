@@ -240,7 +240,7 @@ let g:UltiSnipsJumpForwardTrigger = "<c-b>"
 let g:UltiSnipsJumpBackwardTrigger = "<c-z>"
 
 " Load a user-defined custom overrides file if it exists
-if filereadable(expand('~/.vimrc.local'))
-  source ~/.vimrc.local
+if filereadable(expand('~/.vim.d/vimrc.local'))
+  source ~/.vim.d/vimrc.local
 endif
 
