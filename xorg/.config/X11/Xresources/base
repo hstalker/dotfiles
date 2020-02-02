@@ -1,4 +1,4 @@
 ! Attempt to load all the correct configs for different applications
-#include ".Xresources.d/xterm.light"
-#include ".Xresources.d/urxvt"
+#include "xterm/light"
+#include "urxvt"
 

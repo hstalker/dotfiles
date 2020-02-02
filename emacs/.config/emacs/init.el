@@ -7,7 +7,11 @@
 (require 'cl-lib)
 (require 'package)
 
-(setq emacs-cache-dir (file-name-as-directory "~/.cache/emacs/"))
+(setq emacs-cache-dir 
+      (file-name-as-directory 
+        (substitute-env-vars "$XDG_CACHE_HOME/emacs" 
+                             (lambda (_)
+                             (concat (file-name-as-directory (getenv "HOME")) ".cache")))))
 
 ;; change paths of various sets of auto-generated files
 (setq org-publish-timestamp-directory (concat emacs-cache-dir "org-timestamps")
@@ -31,9 +35,10 @@
 ;; setup package management web repo paths
 (setq package-enable-at-startup nil)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
-(setq package-user-dir (concat emacs-cache-dir "packages"))
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa")))
+(setq package-user-dir (concat (file-name-as-directory emacs-cache-dir) "packages"))
 (package-initialize)
 
 ;; install use-package
@@ -119,10 +124,10 @@
   :ensure t
   :diminish yas-minor-mode
   :config
-  (yas-global-mode 1)
   (when (not (file-exists-p (concat emacs-cache-dir "snippets")))
     (make-directory (concat emacs-cache-dir "snippets")))
-  (yas-load-directory (concat emacs-cache-dir "snippets"))
+  (setq yas-snippet-dirs `(,(concat emacs-cache-dir "snippets")))
+  (yas-global-mode 1)
   (add-hook 'term-mode-hook (lambda()
                               (setq yas-dont-activate-functions t))))
 
@@ -138,8 +143,10 @@
       (progn
         (message "Environment variable GIT_ASKPASS not set!")
         (message "Magit likely to be broken on this platform (push not working)")
-        (message "Please set GIT_ASKPASS to git-gui--askpass' path to fix this"))
-    ))
+        (message "Please set GIT_ASKPASS to git-gui--askpass' path to fix this")))
+  (setq transient-values-file (concat emacs-cache-dir "transient/values.el"))
+  (setq transient-levels-file (concat emacs-cache-dir "transient/levels.el"))
+  (setq transient-history-file (concat emacs-cache-dir "transient/history.el")))
 
 
 (use-package autopair

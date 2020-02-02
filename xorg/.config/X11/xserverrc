@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+exec /usr/bin/Xorg -nolisten tcp "$@" vt$XDG_VTNR
+[[ -r ${XDG_CONFIG_HOME}/X11/xserverrc.local ]] && . ${XDG_CONFIG_HOME}/X11/xserverrc.local
+

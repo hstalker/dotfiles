@@ -1,13 +1,13 @@
 #! /usr/bin/env bash
 
-[[ -f ~/.bash.d/functions ]] && . ~/.bash.d/functions
+[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions
 
 export ALTERNATE_EDITOR='nano'
 export EDITOR='vim'
 export VISUAL='vim'
 export PAGER='less'
 
-path-update ~/.local/bin
+path-update $HOME/.local/bin
 
 # store the distro name in DISTRO_ vars
 if type lsb_release >/dev/null 2>&1; then
@@ -33,5 +33,5 @@ case $(uname -m) in
     ;;
 esac
 
-[[ -f ~/.bash.d/exports.local ]] && . ~/.bash.d/exports.local
+[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/exports.local ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/exports.local
 

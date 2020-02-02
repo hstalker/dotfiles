@@ -11,16 +11,15 @@ DOTFILE_CONFIG_DIRS=(
   git
   bash
   dircolors
-  clang-tidy
-  clang-format
   xorg
+  xdg
   gpg
   ssh
 )
 
 # Useful utils for this install
-. ${SCRIPT_DIR}/bash/.bash.d/functions
-. ${SCRIPT_DIR}/bash/.bash.d/exports
+. ${SCRIPT_DIR}/bash/.config/bash/functions
+. ${SCRIPT_DIR}/bash/.config/bash/exports
 
 is_stow_present () {
   command -v stow >/dev/null 2>&1
@@ -35,7 +34,6 @@ is_stow_present () {
 init () {
   TO_CREATE=(
     ~/projects
-    ~/documents
     ~/.cache
     ~/.local/bin
     ~/.local/share
@@ -82,7 +80,7 @@ install_tools () {
         "${SCRIPT_DIR}/platform/debian/stretch-pkg"
       elif [ $( echo "${DISTRO_CODENAME}" | grep -i 'buster' ) ] ; then
         echo "Detected buster"
-        "${SCRIPT_DIR}/platform/debian/stretch-pkg"
+        "${SCRIPT_DIR}/platform/debian/buster-pkg"
       else
         echo "Unknown distro codename -- ${DISTRO_CODENAME}"
       fi
@@ -96,7 +94,7 @@ install_tools () {
     [[ $? ]] && echo "Done!" || echo "Failed!"
 
     echo "Setting up emacs plugins..."
-    emacs -nw -batch --load "${HOME}/emacs.d/init.el" --eval "(progn (package-initialize) (kill-emacs 0))" 2>/dev/null
+    emacs -nw -batch --load "${XDG_CONFIG_HOME}/emacs/init.el" --eval "(progn (package-initialize) (kill-emacs 0))" 2>/dev/null
     [[ $? ]] && echo "Done!" || echo "Failed!"
   else
     echo "Cancelled"

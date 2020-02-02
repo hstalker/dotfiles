@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+
+[[ -f ${XDG_CONFIG_HOME}/X11/Xresources/base ]] && xrdb -merge ${XDG_CONFIG_HOME}/X11/Xresources/base
+[[ -r ${XDG_CONFIG_HOME}/X11/xinitrc.local ]] && . ${XDG_CONFIG_HOME}/X11/xinitrc.local
+

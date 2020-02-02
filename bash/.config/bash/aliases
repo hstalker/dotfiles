@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-[[ -f ~/.bash_aliases ]] && . ~/.bash_aliases
+[[ -f $HOME/.bash_aliases ]] && . $HOME/.bash_aliases
 
 if [ -x /usr/bin/dircolors ]; then
   alias ls='ls --color=auto'
@@ -30,7 +30,7 @@ alias vi='vim'
 alias ag='ag \
   --ignore "\.git/*" --ignore "\.svn/*" --ignore "\.hg/*" \
   --hidden --smart-case'
-alias tmux='tmux -2'
+alias tmux='tmux -2 -f "$XDG_CONFIG_HOME"/tmux/tmux.conf'
 alias tree='tree -I ".git"'
 
 # aliases to quickly do git certificate trust issue workaround
@@ -51,5 +51,5 @@ alias meminfo='free -m -l -t'
 alias cpuinfo='lscpu'
 alias diskinfo='df -H'
 
-[[ -f ~/.bash.d/aliases.local ]] && . ~/.bash.d/aliases.local
+[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/aliases.local ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/aliases.local
 

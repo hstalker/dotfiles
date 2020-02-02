@@ -13,15 +13,14 @@ Uses GNU Stow for symlink management.
 ## Support
 Currently officially supports the following platforms:
  * Debian Stretch (Stable w/ backports).
+ * Debian Buster (Stable w/ backports).
  * Basically any recent Debian (probably - untested).
 
 ## Configurations
 Currently includes configurations for:
  * Vim.
  * Emacs.
- * Clang-Format.
- * Clang-Tidy.
- * TMux.
+ * Tmux.
  * Bash.
  * Git.
  * Dircolors.
@@ -61,22 +60,22 @@ Should configure on its own when you run the setup script, but manual steps:
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
- * vim (`~/.vim.d/vimrc.local`)
- * tmux (`~/.tmux.d/tmux.conf.local`)
- * bash (`~/.bash.d/exports.local`, `~/.bash.d/functions.local`, `~/.bash.d/aliases.local`,
-   `~/.bash.d/bashrc.local`, `~/.profile`, `~/.bash.d/bash_profile.local`,
-   `~/.bash_aliases`)
+ * vim (`$XDG_CONFIG_HOME/vim/vimrc.local`)
+ * tmux (`$XDG_CONFIG_HOME/tmux/tmux.conf.local`)
+ * bash (`$XDG_CONFIG_HOME/bash/exports.local`, `$XDG_CONFIG_HOME/bash/functions.local`,
+   `$XDG_CONFIG_HOME/bash/aliases.local`, `$XDG_CONFIG_HOME/bash/bashrc.local`, `~/.profile`,
+   `$XDG_CONFIG_HOME/bash/bash_profile.local`, `~/.bash_aliases`)
 
 By adding your own versions of the files listed above, you may stack
 your own customisations on top of the ones provided.
 
 Bash customisations/overrides should preferably be placed within one of:
 
- * `~/.bash.d/functions.local`
- * `~/.bash.d/aliases.local`
- * `~/.bash.d/exports.local`
+ * `$XDG_CONFIG_HOME/bash/functions.local`
+ * `$XDG_CONFIG_HOME/bash/aliases.local`
+ * `$XDG_CONFIG_HOME/bash/exports.local`
 
-first, and then in `~/.bashrc.local` if more general.
+first, and then in `$XDG_CONFIG_HOME/bash/bashrc.local` if more general.
 
 In other words, try to follow a rule of most-to-least specificity.
 
@@ -86,10 +85,13 @@ changes in the tree of this repo's clone wherever possible. `~/.local/`
 contains a `bin` directory that is automatically added to `PATH` for temporary
 or personal binaries.
 
+Generally config paths for things are stored in ~/.config (i.e. we follow XDG
+layout wherever feasible)
+
 ## Extension
 ### Platforms
  * Add new platform install scripts etc. to `platform/$DISTRO/`.
- * Update `bash/.exports` and `setup-dotfiles` to handle identification/install
+ * Update `$XDG_CONFIG_HOME/bash/exports` and `setup-dotfiles` to handle identification/install
    steps for the new platforms.
 
 ### Tools/Configurations
