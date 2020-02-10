@@ -12,7 +12,6 @@ DOTFILE_CONFIG_DIRS=(
   bash
   dircolors
   xorg
-  xdg
   gpg
   ssh
 )
