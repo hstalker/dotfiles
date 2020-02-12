@@ -1,4 +1,4 @@
-let g:ctrlp_map = '<c-p>'
+let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 " Neither custom_ignore nor show_hidden work when we have user_command custom
 " set
