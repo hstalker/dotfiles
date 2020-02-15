@@ -8,6 +8,8 @@ export VISUAL='vim'
 export PAGER='less'
 
 path-update $HOME/.local/bin
+# add doom emacs configuration scripts to path
+path-update ${XDG_CONFIG_HOME:-$HOME/.config}/emacs/bin
 
 # store the distro name in DISTRO_ vars
 if type lsb_release >/dev/null 2>&1; then

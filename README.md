@@ -50,13 +50,30 @@ Should configure on its own when you run the setup script, but manual steps:
  * Exit Vim
 
 ### Emacs
-Should configure on its own when you run the setup script, but manual steps:
+We use doom emacs at the moment (though I would like to replace it with a
+stripped down reimplementation following the same core idea because it's really
+well designed, just too much going on).
+
+To setup run
+```shell
+git submodule update --init --recursive
+doom env   # generate envvar file 
+doom sync  # sync our config with doom
+```
 
  * Start emacs.
  * Wait.
  * Complete any prompts.
  * Wait some more.
  * Rinse and repeat until done (or heat death of the universe).
+
+If help is needed use the doom or doom.cmd scripts.
+
+For modifications to our config, see `$XDG_CONFIG_HOME/doom`.
+
+NOTE: doom puts the autoloads in the repo (`emacs/.config/emacs/.local` instead
+of the actual user's home directory, causing issues due to being unable to find
+it, so on `doom sync`-esque commands we need to manually move them over)
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
