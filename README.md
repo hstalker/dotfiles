@@ -68,10 +68,10 @@ To setup run:
 git submodule update --init --recursive
 
 # generate envvar file
-doom --localdir $XDG_CONFIG_HOME/emacs/.local env    
+doom --localdir $XDG_CACHE_HOME/emacs env    
 
  # sync our config with doom
-doom --localdir $XDG_CONFIG_HOME/emacs/.local sync 
+doom --localdir $XDG_CACHE_HOME/emacs sync 
 ```
 
 Alternatively just leave it up to `setup-dotfiles`.
@@ -84,8 +84,10 @@ NOTE: doom puts local directory inside the dotfiles repo
 (`emacs/.config/emacs/.local`) instead of the actual user's home directory by
 default, causing issues due to being unable to find it on a normal emacs run
 post-sync, so on `doom sync`-esque commands we need to manually move them over
-to the `XDG_CONFIG_HOME` directory by setting the switch: `--localdir
-$XDG_CONFIG_HOME/emacs/.local` whenever running doom.
+to the `XDG_CACHE_HOME/emacs` directory by setting the switch: `--localdir
+$XDG_CONFIG_HOME/emacs` whenever running doom. Alternatively the `DOOMDIR` and
+`DOOMLOCALDIR` environment variables need to be set prior to running emacs and
+doom commands (this is setup in the bash config already).
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
