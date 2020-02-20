@@ -4,6 +4,7 @@
 [credential]
     helper = cache
 [alias]
+    a = add
     st = status
     ci = commit
     co = checkout
