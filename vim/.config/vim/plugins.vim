@@ -21,9 +21,10 @@ call plug#begin(g:vim_plugged_dir)
 Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'ctrlpvim/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
 if (has('python') || has('python3'))
-  Plug 'SirVer/ultisnips'
+  Plug 'SirVer/ultisnips', { 'on': ['UltiSnipsExpandTrigger'] }
+  Plug 'honza/vim-snippets'
 endif
 
 call plug#end()
