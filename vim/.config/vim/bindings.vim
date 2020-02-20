@@ -1,52 +1,137 @@
 " Change leader key to space
-nnoremap <space> <leader>
-let mapleader="\<space>"
+let g:mapleader = "\<Space>"
+" For filetype specific leader bindings
+let g:localleader = ','
 
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
-
-" Fast saving
-nnoremap <leader>ww :w!<cr>
-
 " Treat long lines as break lines (useful when moving around in them)
 map j gj
 map k gk
 
+
+" Spacemacs-esque bindings via whichkey
+" Setup which-key
+let g:which_key_map = {}
+call which_key#register(g:mapleader, 'g:which_key_map')
+nnoremap <silent> <leader> :<C-u>WhichKey '<leader>'<CR>
+nnoremap <silent> <localleader> :<C-u>WhichKey ','<CR>
+vnoremap <silent> <leader> :<C-u>WhichKeyVisual '<leader>'<CR>
+let g:which_key_vertical = 0 " Should guide appear vertically?
+let g:which_key_position = 'botright' " Guide split position
+let g:which_key_hspace = 2 " Min horizontal space between columns
+
+let g:which_key_map.q = { 'name': '+quit' }
+let g:which_key_map.q.s = [':wqa', 'save-kill-vim']
+let g:which_key_map.q.q = [':conf q', 'prompt-kill-vim']
+let g:which_key_map.q.Q = [':qa!', 'kill-vim']
+
+
+let g:which_key_map.w = { 'name': '+windows' }
+let g:which_key_map.w.1 = ['1<C-W><C-W>', 'jump-1']
+let g:which_key_map.w.2 = ['2<C-W><C-W>', 'jump-2']
+let g:which_key_map.w.3 = ['3<C-W><C-W>', 'jump-3']
+let g:which_key_map.w.4 = ['4<C-W><C-W>', 'jump-4']
+let g:which_key_map.w.5 = ['5<C-W><C-W>', 'jump-5']
+let g:which_key_map.w.6 = ['6<C-W><C-W>', 'jump-6']
+let g:which_key_map.w.7 = ['7<C-W><C-W>', 'jump-7']
+let g:which_key_map.w.8 = ['8<C-W><C-W>', 'jump-8']
+let g:which_key_map.w.9 = ['9<C-W><C-W>', 'jump-9']
 " Right/down/up/left
-nnoremap <leader>wj <C-W>j
-nnoremap <leader>wk <C-W>k
-nnoremap <leader>wh <C-W>h
-nnoremap <leader>wl <C-W>l
+let g:which_key_map.w.j = ['<C-W>j', 'select-down']
+let g:which_key_map.w.k = ['<C-W>k', 'select-up']
+let g:which_key_map.w.h = ['<C-W>h', 'select-left']
+let g:which_key_map.w.l = ['<C-W>l', 'select-right']
+" Alternate
+let g:which_key_map.w['<Tab>'] = ['<C-W>w', 'move-alternate']
 " Open splits
-nnoremap <leader>wv :vsp<CR>
-nnoremap <leader>ws :sp<CR>
+let g:which_key_map.w.v = [':vsp', 'split-vertical']
+let g:which_key_map.w.s = [':sp', 'split-horizonital']
 " Close splits
-nnoremap <leader>wc <C-W>c
-nnoremap <leader>wo <C-W>o
+let g:which_key_map.w.d = ['<C-W>c', 'delete']
+let g:which_key_map.w.D = ['<C-W>o', 'delete-other']
 " Move splits
-nnoremap <leader>wJ <C-W>J
-nnoremap <leader>wK <C-W>K
-nnoremap <leader>wH <C-W>H
-nnoremap <leader>wL <C-W>L
+let g:which_key_map.w.J = ['<C-W>J', 'move-down']
+let g:which_key_map.w.K = ['<C-W>K', 'move-up']
+let g:which_key_map.w.H = ['<C-W>H', 'move-left']
+let g:which_key_map.w.L = ['<C-W>L', 'move-right']
+let g:which_key_map.w.r = ['<C-W>r', 'rotate']
+" Resize splits
+let g:which_key_map.w['{'] = ['<C-W>+', 'increase-height']
+let g:which_key_map.w['}'] = ['<C-W>-', 'decrease-height']
+let g:which_key_map.w['['] = ['<C-W><', 'decrease-width']
+let g:which_key_map.w[']'] = ['<C-W>>', 'increase-width']
+let g:which_key_map.w['='] = ['<C-W>=', 'balance-size']
+let g:which_key_map.w['_'] = ['<C-W>_', 'maximize-size']
 
-" Grepping utils
-if executable('ag')
-  " Prefer ag
-  let &grepprg = 'ag --smart-case --nogroup --nocolor --vimgrep'
-  set grepformat^=%f:%l:%c:%m
-endif
-command! -nargs=+ GrepQF silent! grep <args> | cw | redraw!
-nnoremap <leader>s :GrepQF<Space>
-nnoremap <leader>sw :GrepQF <C-R><C-W><CR>
 
-" Leave a mark on the current line of the buffer when leaving based
-" on the language of the file contents. Use capital letters only.
-augroup VIMRC
-  autocmd! VIMRC
-  autocmd BufLeave *.C,*.H,*.c,*.h,*.cc,*.hh,*.c++,*.h++,*.cpp,*.hpp normal! mC
-  autocmd BufLeave .vimrc,*.vim normal! mV
-  autocmd BufLeave *.sh normal! mB
-  autocmd BufLeave *.py normal! mP
-  autocmd BufLeave *.hs normal! mH
-augroup END
+let g:which_key_map.b = { 'name': '+buffers' }
+let g:which_key_map.b.l = [':buffers', 'list']
+let g:which_key_map.b.N = [':enew', 'new']
+let g:which_key_map.b.d = [':bd', 'delete']
+let g:which_key_map.b.D = [':%bd|e#', 'delete-others']
+let g:which_key_map.b.n = [':bn', 'next']
+let g:which_key_map.b.y = [':%y', 'yank']
+let g:which_key_map.b.p = [':bp', 'previous']
+let g:which_key_map.b.1 = [':b1', 'jump-1']
+let g:which_key_map.b.2 = [':b2', 'jump-2']
+let g:which_key_map.b.3 = [':b3', 'jump-3']
+let g:which_key_map.b.4 = [':b4', 'jump-4']
+let g:which_key_map.b.5 = [':b5', 'jump-5']
+let g:which_key_map.b.6 = [':b6', 'jump-6']
+let g:which_key_map.b.7 = [':b7', 'jump-7']
+let g:which_key_map.b.8 = [':b8', 'jump-8']
+let g:which_key_map.b.9 = [':b9', 'jump-9']
+
+function! g:ToggleSyntaxHighlighting()
+  if exists("g:syntax_on")
+    syntax off
+  else
+    syntax enable
+  endif
+endfunction
+let g:which_key_map.t = { 'name': '+toggles' }
+let g:which_key_map.t.s = { 'name': '+syntax' }
+let g:which_key_map.t.s.h = [':call g:ToggleSyntaxHighlighting()', 'syntax-hl']
+
+function! g:RenameCurrentBuffer()
+  let l:new_name = input("New buffer name: ")
+  execute ":f " . l:new_name
+endfunction
+function! g:FindFileLiterally()
+  let l:path = input("Literal file path: ")
+  execute ":e " . l:path
+endfunction
+let g:which_key_map.f = { 'name': '+files' }
+let g:which_key_map.f.d = [":call delete(expand('%'))", 'delete-current']
+let g:which_key_map.f.v = { 'name': '+vim' }
+let g:which_key_map.f.v.d = [':e ' . g:vim_cfg_dir . '/vimrc', 'find-dotfile']
+let g:which_key_map.f.v.r = [':source ' . g:vim_cfg_dir . '/vimrc', 'source-dotfile']
+let g:which_key_map.f.C = { 'name': '+conversion' }
+let g:which_key_map.f.C.d = [':set fileformat=dos', 'unix2dos']
+let g:which_key_map.f.C.u = [':set fileformat=unix', 'dos2unix']
+let g:which_key_map.f.w = [':w', 'write-buffer']
+let g:which_key_map.f.w = [':wa', 'write-all']
+let g:which_key_map.f.r = [
+  \ ":call delete(expand('%')) \| call g:RenameCurrentBuffer()",
+  \ 'rename'
+  \ ]
+let g:which_key_map.f.y = [':let @" = expand("%")', 'yank-file-name']
+let g:which_key_map.f.l = [':call FindFileLiterally()', 'find-literally']
+let g:which_key_map.f.S = [':w !sudo tee %', 'sudo-write-buffer']
+
+let g:which_key_map.h = [':h', 'help']
+
+let g:which_key_map.e = { 'name': '+errors' }
+let g:which_key_map.e.o = [':copen', 'open']
+let g:which_key_map.e.h = [':cclose', 'hide']
+let g:which_key_map.e.c = [':cc', 'display-current']
+let g:which_key_map.e.n = [':cnext', 'next']
+let g:which_key_map.e.p = [':cprev', 'previous']
+
+let g:which_key_map.j = { 'name': '+jumps' }
+
+let g:which_key_map.c = { 'name': '+compilation' }
+
+let g:which_key_map.p = { 'name': '+projects' }
 

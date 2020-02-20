@@ -26,6 +26,7 @@ if (has('python') || has('python3'))
   Plug 'SirVer/ultisnips', { 'on': ['UltiSnipsExpandTrigger'] }
   Plug 'honza/vim-snippets'
 endif
+Plug 'liuchengxu/vim-which-key'
 
 call plug#end()
 
