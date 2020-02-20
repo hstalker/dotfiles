@@ -45,6 +45,8 @@ set foldmethod=indent " Use indent level to auto fold
 set foldnestmax=10
 " set nofoldenable " Disable automatic folding on buffer open
 set foldlevel=0 " Default nesting to automatically open folds to
+" We don't want folds to be closed by default, especially for which-key
+set foldlevelstart=99 
 
 " Turn backup/swap off
 set nobackup
