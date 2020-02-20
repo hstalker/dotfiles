@@ -27,6 +27,9 @@ if (has('python') || has('python3'))
   Plug 'honza/vim-snippets'
 endif
 Plug 'liuchengxu/vim-which-key'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary', { 'on': '<Plug>Commentary' }
 
 call plug#end()
 
