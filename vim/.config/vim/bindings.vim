@@ -28,15 +28,9 @@ let g:which_key_map.q.Q = [':qa!', 'kill-vim']
 
 
 let g:which_key_map.w = { 'name': '+windows' }
-let g:which_key_map.w.1 = ['1<C-W><C-W>', 'jump-1']
-let g:which_key_map.w.2 = ['2<C-W><C-W>', 'jump-2']
-let g:which_key_map.w.3 = ['3<C-W><C-W>', 'jump-3']
-let g:which_key_map.w.4 = ['4<C-W><C-W>', 'jump-4']
-let g:which_key_map.w.5 = ['5<C-W><C-W>', 'jump-5']
-let g:which_key_map.w.6 = ['6<C-W><C-W>', 'jump-6']
-let g:which_key_map.w.7 = ['7<C-W><C-W>', 'jump-7']
-let g:which_key_map.w.8 = ['8<C-W><C-W>', 'jump-8']
-let g:which_key_map.w.9 = ['9<C-W><C-W>', 'jump-9']
+for s:i in range(1, 9)
+  execute "let g:which_key_map.w.".s:i."=['".s:i."<C-W><C-W>', 'jump-".s:i."']"
+endfor
 " Right/down/up/left
 let g:which_key_map.w.j = ['<C-W>j', 'select-down']
 let g:which_key_map.w.k = ['<C-W>k', 'select-up']
@@ -73,15 +67,9 @@ let g:which_key_map.b.D = [':%bd|e#', 'delete-others']
 let g:which_key_map.b.n = [':bn', 'next']
 let g:which_key_map.b.y = [':%y', 'yank']
 let g:which_key_map.b.p = [':bp', 'previous']
-let g:which_key_map.b.1 = [':b1', 'jump-1']
-let g:which_key_map.b.2 = [':b2', 'jump-2']
-let g:which_key_map.b.3 = [':b3', 'jump-3']
-let g:which_key_map.b.4 = [':b4', 'jump-4']
-let g:which_key_map.b.5 = [':b5', 'jump-5']
-let g:which_key_map.b.6 = [':b6', 'jump-6']
-let g:which_key_map.b.7 = [':b7', 'jump-7']
-let g:which_key_map.b.8 = [':b8', 'jump-8']
-let g:which_key_map.b.9 = [':b9', 'jump-9']
+for s:i in range(1, 9)
+  execute "let g:which_key_map.b.".s:i."=[':b".s:i."', 'jump-".s:i."']"
+endfor
 
 function! g:ToggleSyntaxHighlighting()
   if exists("g:syntax_on")
