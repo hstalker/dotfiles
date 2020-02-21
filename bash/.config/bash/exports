@@ -39,5 +39,3 @@ case $(uname -m) in
     ;;
 esac
 
-[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/exports.local ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/exports.local
-

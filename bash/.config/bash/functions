@@ -97,5 +97,3 @@ get-git-branch() {
   fi
 }
 
-[[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions.local ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions.local
-
