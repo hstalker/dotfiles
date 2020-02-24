@@ -5,9 +5,6 @@ let g:localleader = ','
 
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
-" Treat long lines as break lines (useful when moving around in them)
-map j gj
-map k gk
 
 
 " Spacemacs-esque bindings via whichkey
@@ -99,7 +96,7 @@ let g:which_key_map.f.C = { 'name': '+conversion' }
 let g:which_key_map.f.C.d = [':set fileformat=dos', 'unix2dos']
 let g:which_key_map.f.C.u = [':set fileformat=unix', 'dos2unix']
 let g:which_key_map.f.w = [':w', 'write-buffer']
-let g:which_key_map.f.w = [':wa', 'write-all']
+let g:which_key_map.f.W = [':wa', 'write-all']
 let g:which_key_map.f.r = [
   \ ":call delete(expand('%')) \| call g:RenameCurrentBuffer()",
   \ 'rename'
