@@ -26,6 +26,10 @@ Plug 'liuchengxu/vim-which-key'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
+Plug '907th/vim-auto-save'
+if has('nvim') || has('patch-8.0.902')
+  Plug 'mhinz/vim-signify'
+endif
 if (has('python') || has('python3'))
   Plug 'SirVer/ultisnips'
   Plug 'honza/vim-snippets'

@@ -54,6 +54,9 @@ set noswapfile
 " Change netrwhist directory
 let g:netrw_home=g:vim_cache_dir
 
+" Default updatetime of 4000ms is bad for async updates
+set updatetime=100
+
 " Delete trailing white space on save
 func! DeleteTrailingWS()
   exe "normal mz"
