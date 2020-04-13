@@ -18,18 +18,42 @@ exec 'source ' . g:vim_plug_script
 " Call :PlugInstall to install, :PlugUpdate to update
 call plug#begin(g:vim_plugged_dir)
 
+" Strict loading
 Plug 'altercation/vim-colors-solarized'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
+Plug 'liuchengxu/vim-which-key'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+
+" Lazy loading
+Plug 'ctrlpvim/ctrlp.vim', { 'on': [
+  \ 'CtrlP',
+  \ 'CtrlPTag', 
+  \ 'CtrlPBuffer', 
+  \ 'CtrlPMRU',
+  \ 'CtrlPMixed'
+  \ ] }
+Plug 'majutsushi/tagbar', { 'on': [
+  \ 'TagbarOpen', 
+  \ 'TagbarToggle',
+  \ 'TagbarOpenAutoClose'
+  \ ] }
+Plug 'preservim/nerdtree', { 'on': [
+  \ 'NERDTree',
+  \ 'NERDTreeVCS',
+  \ 'NERDTreeFromBookmark',
+  \ 'NERDTreeToggle',
+  \ 'NERDTreeToggleVCS',
+  \ 'NERDTreeFind',
+  \ 'NERDTreeCWD',
+  \ 'NERDTreeRefreshRoot'
+  \ ] }
 if (has('python') || has('python3'))
   Plug 'SirVer/ultisnips', { 'on': ['UltiSnipsExpandTrigger'] }
   Plug 'honza/vim-snippets'
 endif
-Plug 'liuchengxu/vim-which-key'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary', { 'on': '<Plug>Commentary' }
 
 call plug#end()
 

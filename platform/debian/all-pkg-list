@@ -30,3 +30,4 @@ docker
 rxvt-unicode-256color
 gnupg
 ssh
+universal-ctags

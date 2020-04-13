@@ -26,8 +26,6 @@ set noerrorbells
 set novisualbell
 set t_vb=
 set tm=250
-" Recursively upwards search for a ctags file till root
-set tags=./tags,./TAGS,tags;/,TAGS;/
 
 " Ignore files in in-built search
 set wildignore=*.swp,*.bak
