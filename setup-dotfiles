@@ -95,13 +95,10 @@ install_tools () {
     vim +:PlugUpgrade +:PlugInstall +:PlugUpdate +:qa 2>/dev/null
     [[ $? ]] && echo "Done!" || echo "Failed!"
 
-    echo "Setting up emacs plugins..."
-    ${XDG_CONFIG_HOME:-$HOME/.config}/emacs/bin/doom -y \
-      --localdir ${XDG_CONFIG_HOME:-$HOME/.config}/emacs \
-      sync
+    #echo "Setting up emacs plugins..."
     #emacs -nw -batch --load "${XDG_CONFIG_HOME:-$HOME/.config}/emacs/init.el" \
     #  --eval "(progn (package-initialize) (kill-emacs 0))" 2>/dev/null
-    [[ $? ]] && echo "Done!" || echo "Failed!"
+    #[[ $? ]] && echo "Done!" || echo "Failed!"
   else
     echo "Cancelled"
   fi

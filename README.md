@@ -35,6 +35,7 @@ Currently includes configurations for:
  * Xresources.
  * SSH.
  * GPG.
+ * Ctags.
 
 ## Install Instructions
 ```shell
@@ -58,36 +59,7 @@ Should configure on its own when you run the setup script, but manual steps:
  * Exit Vim
 
 ### Emacs
-We use doom emacs at the moment (though I would like to replace it with a
-stripped down reimplementation following the same core idea because it's really
-well designed, just too much going on).
-
-To setup run:
-```shell
-# pull down doom from github
-git submodule update --init --recursive
-
-# generate envvar file
-doom --localdir $XDG_CACHE_HOME/emacs env    
-
- # sync our config with doom
-doom --localdir $XDG_CACHE_HOME/emacs sync 
-```
-
-Alternatively just leave it up to `setup-dotfiles`.
-
-If help is needed use the doom or doom.cmd scripts.
-
-For modifications to our config, see `$XDG_CONFIG_HOME/doom`.
-
-NOTE: doom puts local directory inside the dotfiles repo
-(`emacs/.config/emacs/.local`) instead of the actual user's home directory by
-default, causing issues due to being unable to find it on a normal emacs run
-post-sync, so on `doom sync`-esque commands we need to manually move them over
-to the `XDG_CACHE_HOME/emacs` directory by setting the switch: `--localdir
-$XDG_CONFIG_HOME/emacs` whenever running doom. Alternatively the `DOOMDIR` and
-`DOOMLOCALDIR` environment variables need to be set prior to running emacs and
-doom commands (this is setup in the bash config already).
+Not really configured as I don't use it currently.
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
