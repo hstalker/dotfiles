@@ -26,6 +26,10 @@ Plug 'liuchengxu/vim-which-key'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
+if (has('python') || has('python3'))
+  Plug 'SirVer/ultisnips'
+  Plug 'honza/vim-snippets'
+endif
 
 " Lazy loading
 Plug 'ctrlpvim/ctrlp.vim', { 'on': [
@@ -50,10 +54,6 @@ Plug 'preservim/nerdtree', { 'on': [
   \ 'NERDTreeCWD',
   \ 'NERDTreeRefreshRoot'
   \ ] }
-if (has('python') || has('python3'))
-  Plug 'SirVer/ultisnips', { 'on': ['UltiSnipsExpandTrigger'] }
-  Plug 'honza/vim-snippets'
-endif
 
 call plug#end()
 
