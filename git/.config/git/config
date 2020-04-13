@@ -38,4 +38,4 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
 [include]
-    path = gitconfig.local
+    path = ~/.config/git/config.local
