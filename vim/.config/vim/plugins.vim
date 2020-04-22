@@ -43,11 +43,6 @@ Plug 'ctrlpvim/ctrlp.vim', { 'on': [
   \ 'CtrlPMRU',
   \ 'CtrlPMixed'
   \ ] }
-Plug 'majutsushi/tagbar', { 'on': [
-  \ 'TagbarOpen', 
-  \ 'TagbarToggle',
-  \ 'TagbarOpenAutoClose'
-  \ ] }
 Plug 'preservim/nerdtree', { 'on': [
   \ 'NERDTree',
   \ 'NERDTreeVCS',
@@ -57,6 +52,12 @@ Plug 'preservim/nerdtree', { 'on': [
   \ 'NERDTreeFind',
   \ 'NERDTreeCWD',
   \ 'NERDTreeRefreshRoot'
+  \ ] }
+Plug 'pechorin/any-jump.vim', { 'on': [
+  \ 'AnyJump',
+  \ 'AnyJumpVisual',
+  \ 'AnyJumpBack',
+  \ 'AnyJumpLastResults'
   \ ] }
 
 call plug#end()

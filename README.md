@@ -35,7 +35,6 @@ Currently includes configurations for:
  * Xresources.
  * SSH.
  * GPG.
- * Ctags.
 
 ## Install Instructions
 ```shell
@@ -57,6 +56,11 @@ Should configure on its own when you run the setup script, but manual steps:
  * Run `:PlugUpgrade`and then `:PlugUpdate`.
  * Run `:PlugInstall`.
  * Exit Vim
+
+Alternatively, to do setup all in batch form run:
+```shell
+vim +PlugUpgrade +PlugUpdate +qall
+```
 
 ### Emacs
 Not really configured as I don't use it currently.

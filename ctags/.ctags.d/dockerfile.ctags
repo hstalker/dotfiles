@@ -1,4 +1,0 @@
---langdef=Dockerfile
---langmap=Dockerfile:+(Dockerfile)
---regex-Dockerfile=/^(FROM|MAINTAINER|RUN|CMD|LABEL|EXPOSE|ENV|ADD|COPY|ENTRYPOINT|VOLUME|USER|WORKDIR|ARG|ONBUILD|STOPSIGNAL|HEALTHCHECK|SHELL)/\1/d,dockerfile,dockerfiles/
-

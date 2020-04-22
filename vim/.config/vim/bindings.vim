@@ -115,10 +115,12 @@ let g:which_key_map.e.n = [':cnext', 'next']
 let g:which_key_map.e.p = [':cprev', 'previous']
 
 let g:which_key_map.j = { 'name': '+jumps' }
+let g:which_key_map.j.l = [':jumps', 'jumplist-list']
 let g:which_key_map.j.b = ['<C-o>', 'jumplist-backward']
 let g:which_key_map.j.f = ['<C-i>', 'jumplist-forward']
 
 let g:which_key_map.c = { 'name': '+compilation' }
+let g:which_key_map.c.m = [':make', 'make']
 
 let g:which_key_map.p = { 'name': '+projects' }
 

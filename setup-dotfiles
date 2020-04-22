@@ -14,7 +14,6 @@ DOTFILE_CONFIG_DIRS=(
   xorg
   gpg
   ssh
-  ctags
 )
 
 # Useful utils for this install

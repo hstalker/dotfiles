@@ -25,7 +25,7 @@ execute 'source ' . expand(g:vim_cfg_dir . 'ctrlp.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'airline.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'ultisnips.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'nerdtree.vim')
-execute 'source ' . expand(g:vim_cfg_dir . 'tags.vim')
+execute 'source ' . expand(g:vim_cfg_dir . 'anyjump.vim')
 
 " Load a user-defined custom overrides file if it exists
 if filereadable(expand('$XDG_CONFIG_HOME/vim/vimrc.local'))
