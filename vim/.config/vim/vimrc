@@ -1,3 +1,5 @@
+scriptencoding utf-8
+set encoding=utf8
 set nocompatible
 filetype indent plugin on
 syntax on
@@ -19,7 +21,6 @@ execute 'source ' . expand(g:vim_cfg_dir . 'plugins.vim')
 " All the settings changes
 execute 'source ' . expand(g:vim_cfg_dir . 'general.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'colour.vim')
-execute 'source ' . expand(g:vim_cfg_dir . 'encoding.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'bindings.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'ctrlp.vim')
 execute 'source ' . expand(g:vim_cfg_dir . 'airline.vim')

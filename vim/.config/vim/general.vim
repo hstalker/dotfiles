@@ -1,3 +1,4 @@
+set ffs=unix,dos,mac
 let defaulttabsize = 2 " Sets all the tab options appropriately later on
 set relativenumber " Set to use relative line mode
 set number " Set to use absolute number for current line only
@@ -6,7 +7,6 @@ set wrapmargin=0
 set wrap
 set linebreak " Break lines at word (requires Wrap lines)
 " set columns=80 " Soft line wrap (number of cols)
-set showbreak=+++ " Wrap-broken line prefix
 set showmatch " Highlight matching brace
 set nohlsearch " Don't highlight search results
 set smartcase " Enable smart-case search
@@ -57,12 +57,16 @@ let g:netrw_home=g:vim_cache_dir
 " Default updatetime of 4000ms is bad for async updates
 set updatetime=100
 
-" Delete trailing white space on save
-func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
+" Display invisible characters in the editor
+set showbreak=↪\
+set listchars=tab:→\ ,eol:↲,nbsp:␣,trail:·,extends:⟩,precedes:⟨
+set list " Necessary to force display
+
+fun! TrimTrailingWhitespace()
+  let l:save = winsaveview()
+  keeppatterns %s/\s\+$//e
+  call winrestview(l:save)
+endfun
 
 " Manually change tab size in current session
 func! ChangeTabs(size)
