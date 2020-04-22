@@ -21,7 +21,6 @@
     last = log -1 HEAD
     cached = diff --cached
     graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
-    ctags = !.git/hooks/ctags
 [color]
     ui = auto
 [diff]
