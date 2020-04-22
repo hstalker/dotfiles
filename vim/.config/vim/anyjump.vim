@@ -30,7 +30,8 @@ let g:any_jump_ignored_files = ['*.tmp', '*.temp']
 let g:any_jump_references_only_for_current_filetype = 0
 let g:any_jump_disable_vcs_ignore = 0
 
-let g:which_key_map.j.c = [':AnyJump', 'under-cursor']
-let g:which_key_map.j.p = [':AnyJumpBack', 'previous']
-let g:which_key_map.j.l = [':AnyJumpLastResults', 'last-results']
+let g:which_key_map.j.c = [':AnyJump', 'any-jump-under-cursor']
+let g:which_key_map.j.s = [':AnyJumpVisual', 'any-jump-selection']
+let g:which_key_map.j.p = [':AnyJumpBack', 'any-jump-previous']
+let g:which_key_map.j.l = [':AnyJumpLastResults', 'any-jump-last-results']
 

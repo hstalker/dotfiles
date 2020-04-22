@@ -1,7 +1,7 @@
 " Change leader key to space
 let g:mapleader = "\<Space>"
 " For filetype specific leader bindings
-let g:localleader = ','
+let g:maplocalleader = ','
 
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
@@ -10,13 +10,18 @@ inoremap kj <ESC>
 " Spacemacs-esque bindings via whichkey
 " Setup which-key
 let g:which_key_map = {}
+let g:which_key_major_mode_map = {}
 call which_key#register(g:mapleader, 'g:which_key_map')
+call which_key#register(g:maplocalleader, 'g:which_key_major_mode_map')
 nnoremap <silent> <leader> :<C-u>WhichKey '<leader>'<CR>
-nnoremap <silent> <localleader> :<C-u>WhichKey ','<CR>
+nnoremap <silent> <localleader> :<C-u>WhichKey '<localleader>'<CR>
 vnoremap <silent> <leader> :<C-u>WhichKeyVisual '<leader>'<CR>
+vnoremap <silent> <localleader> :<C-u>WhichKeyVisual '<localleader>'<CR>
 let g:which_key_vertical = 0 " Should guide appear vertically?
 let g:which_key_position = 'botright' " Guide split position
 let g:which_key_hspace = 2 " Min horizontal space between columns
+
+let g:which_key_map.m = [g:maplocalleader, '+major-mode']
 
 let g:which_key_map.q = { 'name': '+quit' }
 let g:which_key_map.q.s = [':wqa', 'save-kill-vim']
@@ -89,6 +94,7 @@ function! g:FindFileLiterally()
 endfunction
 let g:which_key_map.f = { 'name': '+files' }
 let g:which_key_map.f.d = [":call delete(expand('%'))", 'delete-current']
+let g:which_key_map.f.t = [":call TrimTrailingWhitespace()", 'trim-trailing-whitespace']
 let g:which_key_map.f.v = { 'name': '+vim' }
 let g:which_key_map.f.v.d = [':e ' . g:vim_cfg_dir . '/vimrc', 'find-dotfile']
 let g:which_key_map.f.v.r = [':source ' . g:vim_cfg_dir . '/vimrc', 'source-dotfile']
