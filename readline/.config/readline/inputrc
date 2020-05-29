@@ -28,28 +28,34 @@ set bell-style none
 # We prefer to wrap
 set horizontal-scroll-mode off
 
-# Setup vi style input on all readline prompts
+# Setup vi style input by default on all readline prompts
 set editing-mode vi
-$if mode=vi
-  set show-mode-in-prompt on
-  # Cursor block in command, pipe in insert
-  $if term=linux
-    # If in a vt, we need different codes
-    set vi-ins-mode-string \1\e[?0c\2
-    set vi-cmd-mode-string \1\e[?8c\2
-  $else
-    set vi-ins-mode-string \1\e[6 q\2
-    set vi-cmd-mode-string \1\e[2 q\2
-  $endif
+# If on changes PS1 prompt between cmd/ins, but we have custom prompt that
+# overrides it, so doesn't work as one might expect
+set show-mode-in-prompt off
 
-  # Custom keybindings
-  set keymap vi-command
-  # None for now
-
-  set keymap vi-insert
-  # Custom escape
-  "kj": vi-movement-mode
+# Vi setup
+# Cursor block in command, pipe in insert
+$if term=linux
+  # If in a vt, we need different codes
+  set vi-ins-mode-string \1\e[?0c\2
+  set vi-cmd-mode-string \1\e[?8c\2
 $else
-  # Emacs mode
+  set vi-ins-mode-string \1\e[6 q\2
+  set vi-cmd-mode-string \1\e[2 q\2
 $endif
+
+# Custom keybindings
+set keymap vi-command
+# Esc-e for toggling editing modes
+"\ee": emacs-editing-mode
+
+set keymap vi-insert
+# Custom escape
+"kj": vi-movement-mode
+
+# Emacs setup
+set keymap emacs
+# Esc-e for toggling editing modes
+"\ee": vi-editing-mode
 
