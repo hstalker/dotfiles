@@ -15,7 +15,7 @@ General philosophy:
 
 ## Prerequisites
  * Git (to clone this repo somewhere local).
- * GNU Stow.
+ * GNU Stow (Though technically you can manually copy/symlink).
  * Bash.
 
 ## Support
@@ -33,8 +33,14 @@ Currently includes configurations for:
  * Git.
  * Dircolors.
  * Xresources.
+ * XInit.
+ * XModMap.
  * SSH.
  * GPG.
+ * Ack.
+ * IRuby.
+ * NPM.
+ * Readline.
 
 ## Install Instructions
 ```shell
@@ -63,7 +69,7 @@ vim +PlugUpgrade +PlugUpdate +qall
 ```
 
 ### Emacs
-Not really configured as I don't use it currently.
+In the process of writing a full highly customised config.
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
@@ -86,7 +92,7 @@ contains a `bin` directory that is automatically added to `PATH` for temporary
 or personal binaries.
 
 Generally config paths for things are stored in ~/.config (i.e. we follow XDG
-layout wherever feasible)
+layout wherever feasible).
 
 ## Extension
 ### Platforms
