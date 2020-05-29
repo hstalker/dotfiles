@@ -26,6 +26,14 @@ set noerrorbells
 set novisualbell
 set t_vb=
 set tm=250
+" For interfacing with the system clipboard via unnamed register by default
+if has('clipboard')
+  if has('unnamedplus')
+    set clipboard^=unnamed,unnamedplus
+  else
+    set clipboard^=unnamed
+  endif
+endif
 
 " Ignore files in in-built search
 set wildignore=*.swp,*.bak
