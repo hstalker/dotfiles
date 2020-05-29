@@ -1,6 +1,14 @@
 # Copy defaults from site-wide inputrc
 $include /etc/inputrc
 
+# Allow iso-latin1 characters to be inserted
+set convert-meta off
+#
+# Don't strip high bit when reading or displaying
+set input-meta on
+set output-meta on
+
+
 # Colour files by types
 set colored-stats on
 # Append character to indicate filetype
@@ -48,7 +56,7 @@ $endif
 # Custom keybindings
 set keymap vi-command
 # Esc-e for toggling editing modes
-"\ee": emacs-editing-mode
+"\C-\M-e": emacs-editing-mode
 
 set keymap vi-insert
 # Custom escape
@@ -57,5 +65,5 @@ set keymap vi-insert
 # Emacs setup
 set keymap emacs
 # Esc-e for toggling editing modes
-"\ee": vi-editing-mode
+"\C-\M-e": vi-editing-mode
 
