@@ -14,6 +14,10 @@ DOTFILE_CONFIG_DIRS=(
   xorg
   gpg
   ssh
+  irb
+  npm
+  ack
+  readline
 )
 
 # Useful utils for this install

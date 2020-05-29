@@ -12,14 +12,6 @@ shopt -s histappend
 # for setting history length
 HISTSIZE=10000
 HISTFILESIZE=10000
-[[ ! -d /var/tmp/$USER ]] && mkdir -p /var/tmp/$USER
-HISTFILE=/var/tmp/$USER/.bash_history
-# handle setting history file per-process in tmux
-if [ -n "$TMUX" ]; then
-  # use session id and pane id such that we have unique histories for all panes in
-  # all sessions
-  HISTFILE=/var/tmp/$USER/.bash_history.tmux.session-$(echo $TMUX | cut -d',' -f3).pane-${TMUX_PANE:1}
-fi
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS
 shopt -s checkwinsize
@@ -29,7 +21,9 @@ shopt -s checkwinsize
 
 # enable colour support of ls
 if [ -x /usr/bin/dircolors ]; then
-  test -r ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors && eval "$(dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)" || eval "$(dircolors -b)"
+  test -r ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors && \
+    eval "$(dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)" || \
+    eval "$(dircolors -b)"
 fi
 
 # enable programmable completion features (you don't need to enable

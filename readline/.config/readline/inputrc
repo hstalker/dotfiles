@@ -1,0 +1,55 @@
+# Copy defaults from site-wide inputrc
+$include /etc/inputrc
+
+# Colour files by types
+set colored-stats on
+# Append character to indicate filetype
+set visible-stats on
+
+# Mark symlink directories with trailing /
+set mark-symlinked-directories on
+
+# Colour the common prefix
+set colored-completion-prefix on
+# Colour the common prefix in menu-complete
+set menu-complete-display-prefix on
+
+set completion-ignore-case on
+set completion-prefix-display-length 3
+set show-all-if-ambiguous off
+set show-all-if-unmodified off
+
+# Turn off echoing of ctrl characters
+set echo-control-characters off
+
+# Turn off the bell because it's annoying
+set bell-style none
+
+# We prefer to wrap
+set horizontal-scroll-mode off
+
+# Setup vi style input on all readline prompts
+set editing-mode vi
+$if mode=vi
+  set show-mode-in-prompt on
+  # Cursor block in command, pipe in insert
+  $if term=linux
+    # If in a vt, we need different codes
+    set vi-ins-mode-string \1\e[?0c\2
+    set vi-cmd-mode-string \1\e[?8c\2
+  $else
+    set vi-ins-mode-string \1\e[6 q\2
+    set vi-cmd-mode-string \1\e[2 q\2
+  $endif
+
+  # Custom keybindings
+  set keymap vi-command
+  # None for now
+
+  set keymap vi-insert
+  # Custom escape
+  "kj": vi-movement-mode
+$else
+  # Emacs mode
+$endif
+
