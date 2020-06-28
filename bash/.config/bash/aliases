@@ -26,12 +26,13 @@ alias chgrp='chgrp --preserve-root'
 alias h='history'
 alias j='jobs'
 
+alias vim-minimal='VIM_MINIMAL=1 vim'
 alias vi='vim'
 alias tmux='tmux -2 -f "$XDG_CONFIG_HOME"/tmux/tmux.conf'
 
 # aliases to quickly do git certificate trust issue workaround
-alias git-disable-ssl='GIT_SSL_NO_VERIFY=1 git'
-alias git-enable-ssl='GIT_SSL_NO_VERIFY=0 git'
+alias git-ssl-off='GIT_SSL_NO_VERIFY=1 git'
+alias git-ssl-on='GIT_SSL_NO_VERIFY=0 git'
 
 # alias to remove all tracked folders and directories
 # from a local git repo's directory

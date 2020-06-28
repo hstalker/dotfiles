@@ -68,6 +68,12 @@ Alternatively, to do setup all in batch form run:
 vim +PlugUpgrade +PlugUpdate +qall
 ```
 
+The Vim configuration is split into a minimal plugin-less core and a plugin
+heavy setup. Minimal vim can be started by setting the environment variable
+`$VIM_MINIMAL` prior to launch.
+
+Local customisations can be placed in $XDG_CONFIG_HOME/vim/custom.vim.
+
 ### Emacs
 In the process of writing a full highly customised config.
 

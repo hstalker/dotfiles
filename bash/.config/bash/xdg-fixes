@@ -59,7 +59,7 @@ export RXVT_SOCKET="${XDG_RUNTIME_DIR}/urxvtd"
 export SUBVERSION_HOME="${XDG_CONFIG_HOME}/subversion"
 
 # Vim
-export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
+export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/core.vim" | source $MYVIMRC'
 
 # Bash
 export HISTFILE="${XDG_DATA_HOME}/bash/history"

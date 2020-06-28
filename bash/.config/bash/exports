@@ -3,8 +3,8 @@
 [[ -f ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions ]] && . ${XDG_CONFIG_HOME:-$HOME/.config}/bash/functions
 
 export ALTERNATE_EDITOR='nano'
-export EDITOR='vim'
-export VISUAL='vim'
+export EDITOR='VIM_MINIMAL=1 vim'
+export VISUAL='VIM_MINIMAL=1 vim'
 export PAGER='less'
 
 # Doom-emacs variables
