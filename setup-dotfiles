@@ -125,43 +125,7 @@ unlink () {
   fi
 }
 
-# Calls the correct platform's install script
-install_tools () {
-  echo "Installing packages & utilities..."
-  if ask "Proceed? (Y/n)" Y; then
-    if [ $( echo "${DISTRO_OS}" | grep -i 'debian' ) ] ; then
-      echo "Detected debian"
-      echo "Installing..."
-      "${SCRIPT_DIR}/platform/debian/all-pkg"
-      if [ $( echo "${DISTRO_CODENAME}" | grep -i 'stretch' ) ] ; then
-        echo "Detected stretch"
-        "${SCRIPT_DIR}/platform/debian/stretch-pkg"
-      elif [ $( echo "${DISTRO_CODENAME}" | grep -i 'buster' ) ] ; then
-        echo "Detected buster"
-        "${SCRIPT_DIR}/platform/debian/buster-pkg"
-      else
-        echo "Unknown distro codename -- ${DISTRO_CODENAME}"
-      fi
-    else
-      echo "No known platform detected"
-      echo "Platform -- ${DISTRO_OS} - ${DISTRO_VERSION} - ${DISTRO_CODENAME}"
-    fi
-
-    echo "Setting up vim plugins..."
-    vim +:PlugUpgrade +:PlugInstall +:PlugUpdate +:qa 2>/dev/null
-    [[ $? ]] && echo "Done!" || echo "Failed!"
-
-    #echo "Setting up emacs plugins..."
-    #emacs -nw -batch --load "${XDG_CONFIG_HOME:-$HOME/.config}/emacs/init.el" \
-    #  --eval "(progn (package-initialize) (kill-emacs 0))" 2>/dev/null
-    #[[ $? ]] && echo "Done!" || echo "Failed!"
-  else
-    echo "Cancelled"
-  fi
-}
-
 init
 unlink
 link
-install_tools
 
