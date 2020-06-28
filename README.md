@@ -3,20 +3,18 @@ A repo for storing my personal configuration files for software development.
 
 *Not really intended for public consumption, but I won't stop you*
 
-Uses GNU Stow for symlink management.
+*Currently in the process of converting over to a NixOS configuration*
 
 General philosophy:
 
  * Follow XDG layout where possible.
  * Use generally available tools where possible.
  * Make it possible to pull individual pieces out of the repo where possible.
- * Follow a pattern of main configuration files including a local configuration
-   file allowing for environment specific overrides and secrets.
 
 ## Prerequisites
  * Git (to clone this repo somewhere local).
  * GNU Stow (Though technically you can manually copy/symlink).
- * Bash.
+ * GNUMake (For automating running stow on the packages).
 
 ## Support
 Currently officially supports the following platforms:
@@ -24,7 +22,7 @@ Currently officially supports the following platforms:
  * Debian Buster (Stable w/ backports).
  * Basically any recent Debian (probably - untested).
 
-## Configurations
+## Configuratikns
 Currently includes configurations for:
  * Vim.
  * Emacs.
@@ -45,18 +43,36 @@ Currently includes configurations for:
 ## Install Instructions
 ```shell
 cd directory-of-this-repo
-./setup-dotfiles
+make all
+# Or you can run just the symlinking process via:
+make link
 ```
-Follow the on screen prompts.
 
-### Shell
+Configuration installation can be customised via setting custom variables
+for make. For example:
+```shell
+SOURCE_DIR=directory-of-this-repo/ TARGET_DIR=custom-home/ PACKAGES="vim emacs" make all
+```
+
+Configuration symlinks can be uninstalled via:
+```shell
+cd directory-of-this-repo
+make unlink
+```
+
+See the makefile for more targets and customisation points.
+
+### Bash
 Either:
  * Start a new shell.
 or
  * Reboot/logout & login.
 
 ### Vim
-Should configure on its own when you run the setup script, but manual steps:
+Should configure on its own when you run for the first time provided github
+and curl are available.
+
+Manual steps:
 
  * Start Vim.
  * Run `:PlugUpgrade`and then `:PlugUpdate`.
@@ -96,16 +112,12 @@ contains a `bin` directory that is automatically added to `PATH` for temporary
 or personal binaries.
 
 Generally config paths for things are stored in ~/.config (i.e. we follow XDG
-layout wherever feasible).
+layout wherever feasible, but this is made extremely hard by various project
+owners).
 
 ## Extension
-### Platforms
- * Add new platform install scripts etc. to `platform/$DISTRO/`.
- * Update `$XDG_CONFIG_HOME/.bashrc` and `setup-dotfiles` to handle
-   identification/install steps for the new platforms.
-
 ### Tools/Configurations
- * Add the appropriate stow lines to `setup-dotfiles`.
+ * Add the appropriate package entry to `Makefile`.
  * Make a folder just to store this set of configs in the repo directory.
  * Add an appropriate .stow-local-ignore to that directory.
  * Add appropriate lines to the .gitignore in the repo directory.
