@@ -1,5 +1,59 @@
 #! /usr/bin/env bash
 
+# store the distro name in DISTRO_ vars
+if type lsb_release >/dev/null 2>&1; then
+  # A modern generic method
+  DISTRO_OS=$(lsb_release -si)
+  DISTRO_VERSION=$(lsb_release -sr)
+  DISTRO_CODENAME=$(lsb_release -sc)
+else
+  # Fallback
+  DISTRO_OS=$(uname -s)
+  DISTRO_VERSION=$(uname -r)
+  DISTRO_CODENAME=$DISTRO_VERSION
+fi
+case $(uname -m) in
+  x86_64)
+    DISTRO_BITS=64
+    ;;
+  i*86)
+    DISTRO_BITS=32
+    ;;
+  *)
+    DISTRO_BITS=?
+    ;;
+esac
+
+# simple user prompt
+# usage: if ask "prompt-string-here"; then
+# or if ask "prompt-string-here" Y; then  for a yes default
+ask() {
+  local prompt default reply
+
+  if [ "${2:-}" = "Y" ]; then
+    prompt="Y/n"
+    default=Y
+  elif [ "${2:-}" = "N" ]; then
+    prompt="y/N"
+    default=N
+  else
+    prompt="y/n"
+    default=
+  fi
+
+  while true; do
+    echo -n "$1 [$prompt] "
+    read reply </dev/tty
+    if [ -z "$reply" ]; then
+      reply=$default
+    fi
+    case "$reply" in
+      Y*|y*) return 0 ;;
+      N*|n*) return 1 ;;
+    esac
+  done
+}
+
 # Grabs the full directory path to this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -21,8 +75,7 @@ DOTFILE_CONFIG_DIRS=(
 )
 
 # Useful utils for this install
-. ${SCRIPT_DIR}/bash/.config/bash/functions
-. ${SCRIPT_DIR}/bash/.config/bash/exports
+. ${SCRIPT_DIR}/bash/.bashrc
 
 is_stow_present () {
   command -v stow >/dev/null 2>&1

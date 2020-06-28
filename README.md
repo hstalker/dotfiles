@@ -79,17 +79,15 @@ In the process of writing a full highly customised config.
 
 ## Usage Instructions
 The following configurations support override configs for the current user:
- * vim (`$XDG_CONFIG_HOME/vim/vimrc.local`)
+ * vim (`$XDG_CONFIG_HOME/vim/custom.vim`)
  * tmux (`$XDG_CONFIG_HOME/tmux/tmux.conf.local`)
- * bash (`$XDG_CONFIG_HOME/bash/bashrc.local`, `~/.profile`,
-   `$XDG_CONFIG_HOME/bash/bash_profile.local`, `~/.bash_aliases`)
+ * bash (`$XDG_CONFIG_HOME/bash/custom.bash`, `~/.profile`)
 
 By adding your own versions of the files listed above, you may stack
 your own customisations on top of the ones provided.
 
 Bash customisations/overrides should preferably be placed within
-`$XDG_CONFIG_HOME/bash/bashrc.local` or
-`$XDG_CONFIG_HOME/bash/bash_profile.local`
+`$XDG_CONFIG_HOME/bash/custom.bash`.
 
 Generally package paths for things like emacs and vim are directed into an
 appropriate `~/.cache/vim` or `~/.cache/emacs` directory in order to avoid
@@ -103,7 +101,7 @@ layout wherever feasible).
 ## Extension
 ### Platforms
  * Add new platform install scripts etc. to `platform/$DISTRO/`.
- * Update `$XDG_CONFIG_HOME/bash/exports` and `setup-dotfiles` to handle
+ * Update `$XDG_CONFIG_HOME/.bashrc` and `setup-dotfiles` to handle
    identification/install steps for the new platforms.
 
 ### Tools/Configurations
