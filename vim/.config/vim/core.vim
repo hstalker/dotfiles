@@ -200,7 +200,7 @@ function TrimTrailingWhitespace()
   keeppatterns %s/\s\+$//e
   call winrestview(l:save)
 endfunction
-command TrimTrailingWhitespace call TrimTrailingWhitespace
+command TrimTrailingWhitespace call TrimTrailingWhitespace()
 
 " Load plugins with configurations if not specified to run in minimal mode.
 if empty($VIM_MINIMAL)
