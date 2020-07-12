@@ -2,7 +2,7 @@ scriptencoding utf-8
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Use VimPlug for plugin management
-let g:plug_dir=g:cache_dir . 'plug/'
+let g:plug_dir=g:data_dir . 'plug/'
 let g:plug_script=g:plug_dir . 'plug.vim'
 let g:plug_commit_hash='3aa3b5a4e85620dd58302926b571860c92fdbb2f'
 let g:plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/'

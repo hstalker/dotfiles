@@ -17,6 +17,11 @@ if !empty($XDG_CACHE_HOME)
 else
   let g:cache_dir=expand('$HOME/.cache/vim/')
 endif
+if !empty($XDG_DATA_HOME)
+  let g:data_dir=expand('$XDG_DATA_HOME/vim/')
+else
+  let g:data_dir=expand('$HOME/.local/share/vim/')
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check for if we're running in minimal mode (core only, no plugins)
@@ -81,7 +86,6 @@ set backspace=indent,eol,start " Backspace behaviour
 set lazyredraw " Don't redraw while executing macros (good performance config)
 set foldcolumn=4 " Add a bit extra margin to the left
 set laststatus=2 " Always show the status line.
-execute 'set viminfo+=n' . g:cache_dir . 'vim/viminfo'
 " No annoying sound on errors
 set noerrorbells
 set novisualbell
@@ -117,13 +121,17 @@ set foldlevel=0 " Default nesting to automatically open folds to.
 " We don't want folds to be closed by default, especially for which-key
 set foldlevelstart=99
 
-" Turn backup/swap off
-set nobackup
-set nowb
-set noswapfile
-
 " Change netrwhist directory
 let g:netrw_home=g:cache_dir
+
+" Set swap/backup/undo/viminfo/rtp based on our base paths
+execute 'set directory=' . g:cache_dir . '/swap,~/,/tmp'
+execute 'set backupdir=' . g:cache_dir . '/backup,~/,/tmp'
+execute 'set undodir=' . g:cache_dir . '/undo,~/,/tmp'
+execute 'set viminfo+=n' . g:cache_dir . '/viminfo'
+execute 'set runtimepath+=' . g:config_dir . ','
+  \ . g:config_dir . '/after,'
+  \ . '$VIM,$VIMRUNTIME'
 
 " Default updatetime of 4000ms is bad for async updates
 set updatetime=100
