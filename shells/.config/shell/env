@@ -1,0 +1,96 @@
+#!/usr/bin/env sh
+###############################################################################
+# Setup environment for all Posix compatible shells.
+# Is run by all such shells on start.
+# Must be Posix shell compatible.
+
+###############################################################################
+# Convenience functions for loading files and modifying files.
+# Grab the value of environment variable $1
+# Usage: indirect_expand PATH -> $PATH
+indirect_expand() {
+  env | sed -n "s/^$1=//p"
+}
+
+# Remove an instance of $1 from $2 (default: PATH)
+# Usage: path_remove /path/to/bin [PATH]
+path_remove() {
+  IFS=':'
+  newpath=
+  dir=
+  var=${2:-PATH}
+  for dir in `indirect_expand "$var"`; do
+    IFS=''
+    if [ "$dir" != "$1" ]; then
+      newpath=$newpath:$dir
+    fi
+  done
+  export $var=${newpath#:}
+}
+
+# Prepend $1 to $2 (default: PATH) guaranteeing uniqueness
+# Usage: pathprepend /path/to/bin [PATH]
+path_prepend() {
+  # if the path is already in the variable,
+  # remove it so we can move it to the front
+  path_remove "$1" "$2"
+  var="${2:-PATH}"
+  value=`indirect_expand "$var"`
+  export ${var}="${1}${value:+:${value}}"
+}
+
+# Append $1 to $2 (default: PATH) guaranteeing uniqueness
+# Usage: path_append /path/to/bin [PATH]
+path_append() {
+  path_remove "${1}" "${2}"
+  var=${2:-PATH}
+  value=`indirect_expand "$var"`
+  export $var="${value:+${value}:}${1}"
+}
+
+# Source if file is readable
+# Usage: try_source filename
+try_source() {
+  if [ -r "$1" ]; then
+    . "$1"
+  fi
+}
+
+###############################################################################
+# Actual setting up of the environment
+# $ENV is run when an interactive sh/ksh is started, so we want to emulate
+# the way bash loads .bashrc when a non-login interactive shell.
+# Ksh and sh share the variable ENV, so we point to a shared script .shrc which
+# does the appropriate checks for shell, and loads the correct files.
+export ENV=$HOME/.shrc
+
+# The path at $BASH_ENV is run when the bash shell is non-interactive
+export BASH_ENV=$HOME/.bashrc
+
+# Enable colour support of ls
+if [ -x /usr/bin/dircolors ]; then
+  test -r ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors && \
+    eval "$(dircolors -b \
+      ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)" || \
+    eval "$(dircolors -b)"
+fi
+
+# Load application specific env files
+# An alternative approach using `eval $(find -exec echo . {}';' \;)` is
+# possible (as show below), but quite frankly messy. Instead we choose to do a
+# guarded glob.
+#eval $(find "${XDG_CONFIG_HOME:-$HOME/.config}" -mindepth 2 -maxdepth 2 \
+#  -type f,l -name '.env' \
+#  -exec echo . \"{}\"';' \;)
+if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
+        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
+then
+  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
+    try_source "${p}/.env"
+  done
+fi
+
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.env"
+

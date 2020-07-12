@@ -1,0 +1,77 @@
+#!/usr/bin/env sh
+###############################################################################
+# Perform login operations for all Posix compatible shells supporting it.
+# Must be Posix shell compatible.
+
+###############################################################################
+# Setting up environment variables and PATH
+# Personal information
+export GITHUB_NAME='Hector Stalker'
+export GITHUB_EMAIL='1683065+hstalker@users.noreply.github.com'
+export NAME=$GITHUB_NAME
+export EMAIL=$GITHUB_EMAIL
+
+# Preferred programs
+# $EDITOR-style variables don't allow for passing flags. If you want that you
+# need to use a wrapper script which things like (sudo)edit can directly
+# execute.
+export ALTERNATE_EDITOR='nano'
+export EDITOR='vim'
+export VISUAL="vim-minimal"
+export SUDO_EDITOR="vim-minimal"
+export PAGER='less'
+
+# Base keyboard layout, language & locale
+export KEYBOARD_LAYOUT=us
+if $(locale -a | grep -q 'en_GB'); then
+  export LANG=en_GB.UTF-8
+else
+  export LANG=en_US.UTF-8
+fi
+export LANGUAGE=
+export LC_CTYPE="$LANG"
+export LC_NUMERIC="$LANG"
+export LC_TIME="$LANG"
+export LC_COLLATE="$LANG"
+export LC_MONETARY="$LANG"
+export LC_MESSAGES="$LANG"
+export LC_PAPER="$LANG"
+export LC_NAME="$LANG"
+export LC_ADDRESS="$LANG"
+export LC_TELEPHONE="$LANG"
+export LC_MEASUREMENT="$LANG"
+export LC_IDENTIFICATION="$LANG"
+export LC_ALL=$LANG
+
+# Set all the XDG path vars
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+# Shouldn't set this ourselves as systemd sets it up
+#export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS:-/etc/xdg}"
+
+# Path settings
+# Local installation overrides should be prioritized
+path_prepend $HOME/.local/bin PATH
+path_prepend $HOME/.local/lib LD_LIBRARY_PATH
+path_prepend $HOME/.local/include CPATH
+
+# Making sure the current directory isn't in PATH for security & weirdness
+# reasons.
+path_remove . PATH
+path_remove "" PATH
+
+# Load application specific login files
+if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
+        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
+then
+  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
+    try_source "${p}/.login"
+  done
+fi
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.login"
+

@@ -4,6 +4,9 @@ set nocompatible
 filetype indent plugin on
 syntax on
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Setup core vim directory variables
 if !empty($XDG_CONFIG_HOME)
   let g:config_dir=expand('$XDG_CONFIG_HOME/vim/')
 else
@@ -15,25 +18,48 @@ else
   let g:cache_dir=expand('$HOME/.cache/vim/')
 endif
 
-" We have a light/dark theme toggling system.
-" Override the strings g:theme_dark and g:theme_light
-" to select new colour schemes for vim.
-let g:theme_current_default='light'
-let g:theme_dark_default='torte'
-let g:theme_light_default='desert'
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Check for if we're running in minimal mode (core only, no plugins)
+if empty($VIM_MINIMAL)
+  let g:minimal_mode=0
+else
+  let g:minimal_mode=1
+endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Setup theming defaults
+" We have a light/dark theme toggling system
+" For truecolour support under newer version of vim
+if has("termguicolors")
+  set termguicolors
+  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
+let g:theme_current_default=&background
+let g:theme_dark_default='evening'
+let g:theme_light_default='morning'
 let g:theme_current=g:theme_current_default
 let g:theme_dark=g:theme_dark_default
 let g:theme_light=g:theme_light_default
 
-" Sets all the tab options appropriately later on.
-" Call UpdateTabs(n) to change tab width everywhere vim requires it.
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Sets all the tab options appropriately later on
+" Call UpdateTabs(n) to change tab width everywhere vim requires it
 let g:tab_width_default = 2
 
-" Change leader key to space.
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Setup leader keys
+" Change leader key to space
 let g:mapleader = "\<Space>"
-" For filetype specific leader bindings.
+" For filetype specific leader bindings
 let g:maplocalleader = ','
 
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" All the core settings
 set ffs=unix,dos,mac " Set line ending order of preference
 set relativenumber " Set to use relative line mode
 set number " Set to use absolute number for current line only
@@ -56,12 +82,14 @@ set lazyredraw " Don't redraw while executing macros (good performance config)
 set foldcolumn=4 " Add a bit extra margin to the left
 set laststatus=2 " Always show the status line.
 execute 'set viminfo+=n' . g:cache_dir . 'vim/viminfo'
-" No annoying sound on errors.
+" No annoying sound on errors
 set noerrorbells
 set novisualbell
 set t_vb=
 set tm=250
-" For interfacing with the system clipboard via unnamed register by default.
+" Enable mouse
+set mouse=a
+" For interfacing with the system clipboard via unnamed register by default
 if has('clipboard')
   if has('unnamedplus')
     set clipboard^=unnamed,unnamedplus
@@ -70,7 +98,7 @@ if has('clipboard')
   endif
 endif
 
-" Ignore files in in-built search.
+" Ignore files in in-built search
 set wildignore=*.swp,*.bak
 set wildignore+=*.pyc,*.class,
 set wildignore+=*.sln,*.Master,*.csproj,*.csproj.user,*.cache
@@ -81,72 +109,112 @@ set wildignore+=tags
 set wildignore+=*.tar.*
 set wildignorecase " Make searches case-insensitive.
 
-" Fold configuration.
+" Fold configuration
 set foldmethod=indent " Use indent level to auto fold.
 set foldnestmax=10
-" set nofoldenable " Disable automatic folding on buffer open.
+" set nofoldenable " Disable automatic folding on buffer open
 set foldlevel=0 " Default nesting to automatically open folds to.
-" We don't want folds to be closed by default, especially for which-key.
+" We don't want folds to be closed by default, especially for which-key
 set foldlevelstart=99
 
-" Turn backup/swap off.
+" Turn backup/swap off
 set nobackup
 set nowb
 set noswapfile
 
-" Change netrwhist directory.
+" Change netrwhist directory
 let g:netrw_home=g:cache_dir
 
-" Default updatetime of 4000ms is bad for async updates.
+" Default updatetime of 4000ms is bad for async updates
 set updatetime=100
 
-" Display invisible characters in the editor.
+" Display invisible characters in the editor
 set showbreak=↪\
 set listchars=tab:→\ ,eol:↲,nbsp:␣,trail:·,extends:⟩,precedes:⟨
 set list " Necessary to force display
 
-" Use tabs instead of spaces in makefiles.
+" Tab configuration
+set autoindent " Auto-indent new lines
+set expandtab " Use spaces instead of tabs
+set smartindent " Enable smart-indent
+set smarttab " Enable smart-tabs
+set softtabstop=0 " Number of spaces per Tab
+
+" Use tabs instead of spaces in makefiles
 augroup MAKEFILE
   autocmd! MAKEFILE
   autocmd FileType make setlocal noexpandtab
 augroup END
 
-" Map escape to kj for fast return to normal mode.
+" Map escape to kj for fast return to normal mode
 imap kj <ESC>
 
 " Set extra options when running in GUI mode
 if has("gui_running")
-  set guioptions-=T " no toolbar
-  set guioptions-=e
+  set guioptions-=T " Toolbar
+  set guioptions-=m " Menu bar
+  set guioptions-=r " Right-hand scroll bar
+  set guioptions-=R " When vertically split window?
+  set guioptions-=l " Left-hand scroll bar
+  set guioptions-=L " When vertically split window?
+  set guioptions-=b " bottom horizontal scroll bar
+  set guioptions+=e " Tab pages
+  set guioptions+=g " Show inactive menu items as greyed out?
+  set guioptions+=i " Use Vim icon
+  set guioptions-=f " Should gvim fork-detach from parent shell?
+  set guioptions+=v " Should prefer vertical button layout for dialogs?
+  " Describes text to use in labels on GUI tab pages line
   set guitablabel=%M\ %t
-  set guifont=Consolas:12,DejaVuSansMono:12
+  " Set fonts for different platforms and GUI toolkits
+  if has("gui_gtk3") || has("gui_gtk3")
+    set guifont=DejaVu\ Sans\ Mono\ 12
+  elseif has("gui_macvim")
+    " MacOS
+    set guifont=Menlo\ Regular:h12
+  elseif has("gui_win32")
+    " Windows
+    set guifont=Consolas:h12:cANSI
+  else
+    " No idea what gui we're using, so just wing it
+    set guifont=DejaVu\ Sans\ Mono\ 12
+  endif
 endif
 
-" Update themes according to set light/dark theme selection.
-function ThemeUpdate()
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Useful core functions
+" Attempt to source the given file if it's readable on the filesystem
+function! core#TrySource(script_path)
+  if filereadable(a:script_path)
+    execute 'source ' . a:script_path
+  endif
+endfunction
+
+" Update themes according to set light/dark theme selection
+function! core#ThemeUpdate()
   try
     execute 'set background=' . g:theme_current
-    if g:theme_current == 'light'
-      execute 'colorscheme ' . g:theme_light
-    elseif g:theme_current == 'dark'
-      execute 'colorscheme ' . g:theme_dark
-    endif
-  catch
-    execute 'set background=' . g:theme_current_default
     if g:theme_current ==? 'light'
       execute 'colorscheme ' . g:theme_light
     elseif g:theme_current ==? 'dark'
       execute 'colorscheme ' . g:theme_dark
     endif
+  catch
+    execute 'set background=' . g:theme_current_default
+    if g:theme_current ==? 'light'
+      execute 'colorscheme ' . g:theme_dark_default
+    elseif g:theme_current ==? 'dark'
+      execute 'colorscheme ' . g:theme_light_default
+    endif
     echom 'Preferred ' . g:theme_current . ' colour scheme not available'
   endtry
 endfunction
-command ThemeUpdate call ThemeUpdate()
+command! ThemeUpdate call core#ThemeUpdate()
 
-" Function for toggling between light and dark themes
-function ThemeToggle(...)
+" For toggling between light and dark themes
+function! core#ThemeToggle(...)
   let l:target_theme = get(a:, 1, 0)
-  if l:target_theme && (l:target_theme ==? 'light' || target_theme ==? 'dark')
+  if l:target_theme =~? 'light\|dark'
     let g:theme_current=l:target_theme
   else
     if g:theme_current ==? 'light'
@@ -160,55 +228,135 @@ function ThemeToggle(...)
       let g:theme_current='light'
     endif
   endif
-  call ThemeUpdate()
+  call core#ThemeUpdate()
 endfunction
-command -nargs=? ThemeToggle call ThemeToggle(<args>)
-command ThemeLight call ThemeToggle('light')
-command ThemeDark call ThemeToggle('dark')
+command! -nargs=? ThemeToggle call core#ThemeToggle(<args>)
+command! ThemeLight call core#ThemeToggle('light')
+command! ThemeDark call core#ThemeToggle('dark')
 
 " Manually change tab size in current session
-function TabWidthChange(...)
+function! core#TabWidthChange(...)
   let l:target_size = get(a:, 1, 0)
   if !l:target_size
     let l:target_size = g:tab_width_default
   endif
-  set autoindent " Auto-indent new lines
-  set expandtab " Use spaces instead of tabs
-  set smartindent " Enable smart-indent
-  set smarttab " Enable smart-tabs
   let &shiftwidth=l:target_size " Number of auto-indent spaces
   let &tabstop=l:target_size " Size appearance of \t in text
-  set softtabstop=0 " Number of spaces per Tab
 endfunction
-command -nargs=? TabWidthChange call TabWidthChange(<args>)
-command TabWidthReset call TabWidthChange(g:tab_width_default)
+command! -nargs=? TabWidthChange call core#TabWidthChange(<args>)
+command! TabWidthReset call core#TabWidthChange(g:tab_width_default)
 
-call TabWidthChange()
-call ThemeUpdate()
+" Set the tabs and themes to their default state
+call core#TabWidthChange()
+call core#ThemeUpdate()
 
-function SyntaxHlToggle()
+
+function! core#SyntaxHlToggle()
   if exists("g:syntax_on")
     syntax off
   else
     syntax enable
   endif
 endfunction
-command SyntaxHlToggle call SyntaxHlToggle()
+command! SyntaxHlToggle call core#SyntaxHlToggle()
 
-function TrimTrailingWhitespace()
+function! core#TrimTrailingWhitespace()
   let l:save = winsaveview()
   keeppatterns %s/\s\+$//e
   call winrestview(l:save)
 endfunction
-command TrimTrailingWhitespace call TrimTrailingWhitespace()
+command! TrimTrailingWhitespace call core#TrimTrailingWhitespace()
 
-" Load plugins with configurations if not specified to run in minimal mode.
-if empty($VIM_MINIMAL)
-  execute 'source ' . g:config_dir . 'plugins.vim'
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Custom delayed loading plugin handling functions
+" Allows a local install to customise package usage completely before
+" attempting to load anything.
+
+" Maintain a delayed registry of plugins to load to allow for custom overrides
+let g:plugin_registry = {}
+
+
+" Add a plugin to the delay load registry
+function! core#PluginAdd(name)
+  if !has_key(g:plugin_registry, a:name)
+    let g:plugin_registry[a:name] = {'enabled': 1, 'loaded': 0}
+  else
+    echom 'Attempted to add already known plugin: ' . a:name
+  endif
+endfunction
+
+" Disable a plugin in the delay load registry
+function! core#PluginDisable(name)
+  if has_key(g:plugin_registry, a:name)
+    let g:plugin_registry[a:name]['enabled'] = 0
+  else
+    echom 'Attempted to disable unknown plugin: ' . a:name
+  endif
+endfunction
+
+" Pin a plugin in the delay load registry to a specific commit SHA
+function! core#PluginPin(name, commit_hash)
+  " Check if plugin name exists, error if doesn't
+  if has_key(g:plugin_registry, a:name)
+    let g:plugin_registry[a:name]['commit'] = a:commit_hash
+  else
+    echom 'Attempted to pin to commit hash unknown plugin: ' . a:name
+  endif
+endfunction
+
+" Run an action after an update occurs (e.g. compile a module)
+function! core#PluginPostUpdateHook(name, operation)
+  " Check if plugin name exists, error if doesn't
+  if has_key(g:plugin_registry, a:name)
+    let g:plugin_registry[a:name]['do'] = a:operation
+  else
+    echom 'Attempted to add post update hook to unknown plugin: ' . a:name
+  endif
+endfunction
+
+" Unpin a previously pinned plugin in the delay load registry
+function! core#PluginUnpin(name, commit_hash)
+  if has_key(g:plugin_registry, a:name)
+    remove(g:plugin_registry[a:name], 'commit')
+  else
+    echom 'Attempted to unpin unknown plugin: ' . a:name
+  endif
+endfunction
+
+" Queries whether a given plugin has loaded
+function! core#PluginIsLoaded(name)
+  if has_key(g:plugin_registry, a:name)
+    return g:plugin_registry[a:name]['loaded']
+  else
+    echom 'Attempted to query whether unknown plugin is loaded: ' . a:name
+    return 0
+  endif
+endfunction
+
+" Use the delay load plugin registry to prime vim-plug
+function! core#PluginProcessRegistry()
+  for [name, extra_options] in items(g:plugin_registry)
+    if extra_options['enabled']
+      try
+        Plug name, extra_options
+        let g:plugin_registry[name]['loaded'] = 1
+      catch
+        echom "Failed to load plugin: '" . name .  "'"
+        let g:plugin_registry[name]['loaded'] = 0
+      endtry
+    endif
+  endfor
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Loading additional scripts
+" Load plugins with configurations if not specified to run in minimal mode
+if !g:minimal_mode
+  execute 'source ' . g:config_dir . 'plugin.vim'
 endif
 
-" Load local installation customisations after everything else is done.
-if filereadable(g:config_dir . 'custom.vim')
-  execute 'source ' . g:config_dir . 'custom.vim'
-endif
+" Load local installation customisations after everything else is done
+call core#TrySource(g:config_dir . 'custom.config.vim')
 

@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+alias g='git'
+
+# To quickly do git certificate trust issue workaround
+alias git-ssl-off='GIT_SSL_NO_VERIFY=1 git'
+alias git-ssl-on='GIT_SSL_NO_VERIFY=0 git'
+
+# Alias to remove all tracked folders and directories from a local git repo's
+# directory
+alias git-clean-tracked-files='git ls-files -z | xargs -0 rm'
+alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD \
+  | sort -rz \
+  | xargs -0 rmdir'
+alias git-clean-tracked='git-clean-tracked-files; git-clean-tracked-dir'
+

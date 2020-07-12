@@ -1,0 +1,13 @@
+#!/usr/bin/env ksh
+###############################################################################
+# Setup environment for ksh
+# Not run for non-login non-interactive shells.
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+# Run shell/env in order to get appropriate $ENV
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/custom.env"
+

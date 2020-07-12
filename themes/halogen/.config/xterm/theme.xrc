@@ -1,0 +1,25 @@
+XTerm*faceName: DEFAULT_FONT
+XTerm*faceSize: DEFAULT_FONT_SIZE
+XTerm*foreground: DEFAULT_COLOR_FG
+XTerm*background: DEFAULT_COLOR_BG
+XTerm*pointerColor: DEFAULT_COLOR_10
+XTerm*pointerColorBackground: DEFAULT_COLOR_14
+XTerm*pointerColorForeground: DEFAULT_COLOR_10
+
+XTerm*color0: DEFAULT_COLOR_0
+XTerm*color1: DEFAULT_COLOR_1
+XTerm*color2: DEFAULT_COLOR_2
+XTerm*color3: DEFAULT_COLOR_3
+XTerm*color4: DEFAULT_COLOR_4
+XTerm*color5: DEFAULT_COLOR_5
+XTerm*color6: DEFAULT_COLOR_6
+XTerm*color7: DEFAULT_COLOR_7
+XTerm*color8: DEFAULT_COLOR_8
+XTerm*color9: DEFAULT_COLOR_9
+XTerm*color10: DEFAULT_COLOR_10
+XTerm*color11: DEFAULT_COLOR_11
+XTerm*color12: DEFAULT_COLOR_12
+XTerm*color13: DEFAULT_COLOR_13
+XTerm*color14: DEFAULT_COLOR_14
+XTerm*color15: DEFAULT_COLOR_15
+

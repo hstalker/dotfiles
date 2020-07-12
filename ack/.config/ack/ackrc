@@ -1,11 +1,9 @@
-$ Ignore list
+# Always sort the files
+--sort
+
+# Ignore list
 --ignore-dir=.idea/
---ignore-dir=node_modules/
 --ignore-dir=.git/
-
-# Always sort files
---sort-files
-
-# Use `less -r` as pager
---pager=less -r
+--ignore-dir=.svn/
+--ignore-dir=node_modules/
 

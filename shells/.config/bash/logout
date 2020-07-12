@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+###############################################################################
+# Perform actions required on logout for login bash shells
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/logout"
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.logout"
+

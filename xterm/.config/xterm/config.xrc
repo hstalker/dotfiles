@@ -1,0 +1,28 @@
+#include "theme.xrc"
+
+! All xterm shells should be login shells (respect .profile etc.)
+XTerm*loginShell: DEFAULT_TERMINAL_AS_LOGIN
+! Terminal size in characters
+XTerm*vt100*geometry: DEFAULT_TERMINAL_GEOMETRY
+! Force terminal to use set locale (UTF-8 in most cases)
+XTerm*vt100*locale: true
+! Make alt key behave as in most other terminal emulators
+XTerm*vt100*metaSendsEscape: true
+! Fix broken backspace under some platforms (sends ~H by mistake)
+XTerm*vt100*backarrowKey: false
+XTerm*ttyModes: erase ^?
+! Scrollback size in lines
+XTerm*saveLines: 10000
+! Allow us to double click to select a word via character classes
+XTerm*charClass: 33:48,35:48,37:48,43:48,45-47:48,64:48,95:48,126:48
+! Sets $TERM
+XTerm*termName: xterm-256color
+! 8-bit input is odd so turn it off (historical holdover from alt key)
+XTerm*eightBitInput: false
+! We want to allow real bold text vs simple colour change
+XTerm*boldMode: true
+! Make xterms use reverse video? (light text on dark background)
+XTerm*reverseVideo: off
+! Copy selections to clipboard
+XTerm*selectToClipboard: true
+

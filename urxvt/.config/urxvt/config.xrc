@@ -1,0 +1,44 @@
+#include "theme.xrc"
+
+! Treat every terminal as a login shell (respect .profile etc.)
+URxvt*loginShell: DEFAULT_TERMINAL_AS_LOGIN
+URxvt*cutchars: "`\"'&()*,:;<=>?[\\]^{|}$"
+! Terminal size in characters
+URxvt*geometry: DEFAULT_TERMINAL_GEOMETRY
+! Cursor configuration
+URxvt*cursorBlink: true
+URxvt*cursorUnderline: false
+! Scrollback buffer size in lines
+URxvt*savelines: 10000
+! Scrollbar configuration
+URxvt*scrollBar: false
+URxvt*scrollBar_right: false
+! SCroll to bottom when tty receives output?
+URxvt*scrollTtyOutput: true
+! Scroll with scrollback buffer when tty receives new lines?
+URxvt*scrollWithBuffer: false
+! Scroll to bottom when a non-urxvt-intercepted key is pressed?
+URxvt*scrollTtyKeypress: false
+! Use a batched update mode for scrolling on lots of lines?
+URxvt*skipScroll: false
+! Colour bit depth
+URxvt*depth: 32
+! Format URLs to be underlined
+URxvt*underlineURLs: true
+! Launch URLs with browser
+URxvt*urlLauncher: firefox
+
+! Turn off bell notifications
+URxvt*urgentOnBell: false
+URxvt*visualBell: true
+
+! Turn off 8-bit input
+URxvt*meta: ignore
+
+! Where to print terminal lines to (for testing)
+URxvt*print-pipe: "cat > /dev/null"
+
+! Disable ctrl-shift iso14755 mode
+URxvt*iso14755: false
+URxvt*iso14755_52: false
+

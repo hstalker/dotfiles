@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+alias rless='less -r' # Allow control codes in input (e.g. colours)
+

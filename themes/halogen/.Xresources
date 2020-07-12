@@ -1,0 +1,85 @@
+! Base font definitions
+#define DEFAULT_FONT_SIZE 12
+#define DEFAULT_FONT_FACE DejaVu Sans Mono
+#define DEFAULT_FONT \
+  xft:DEFAULT_FONT_FACE:regular:size=DEFAULT_FONT_SIZE
+
+#define DEFAULT_BOLD_FONT \
+  xft:DEFAULT_FONT_FACE:bold:size=DEFAULT_FONT_SIZE
+
+#define DEFAULT_ITALIC_FONT \
+  xft:DEFAULT_FONT_FACE:italic:size=DEFAULT_FONT_SIZE
+
+#define DEFAULT_BOLDITALIC_FONT \
+  xft:DEFAULT_FONT_FACE:bold:italic:size=DEFAULT_FONT_SIZE
+
+! Base padding definitions
+#define DEFAULT_BORDER_PADDING 4
+#define DEFAULT_LINE_PADDING 0
+#define DEFAULT_CHAR_PADDING 0
+
+! Treat terminals as login shells (true/false)
+#define DEFAULT_TERMINAL_AS_LOGIN false
+
+! Terminal geometry (width x height)
+#define DEFAULT_TERMINAL_GEOMETRY 80x24
+
+! Base colour theming definitions
+#define DEFAULT_COLOR_BG #fdf6e3
+#define DEFAULT_COLOR_FG #657b83
+! black dark/light
+#define DEFAULT_COLOR_0 #073642
+#define DEFAULT_COLOR_8 #002b36
+! red dark/light
+#define DEFAULT_COLOR_1 #dc322f
+#define DEFAULT_COLOR_9 #cb4b16
+! green dark/light
+#define DEFAULT_COLOR_2 #859900
+#define DEFAULT_COLOR_10 #586e75
+! yellow dark/light
+#define DEFAULT_COLOR_3 #b58900
+#define DEFAULT_COLOR_11 #657b83
+! blue dark/light
+#define DEFAULT_COLOR_4 #268bd2
+#define DEFAULT_COLOR_12 #839496
+! magenta dark/light
+#define DEFAULT_COLOR_5 #d33682
+#define DEFAULT_COLOR_13 #6c71c4
+! cyan dark/light
+#define DEFAULT_COLOR_6 #2aa198
+#define DEFAULT_COLOR_14 #93a1a1
+! white dark/light
+#define DEFAULT_COLOR_7 #eee85d
+#define DEFAULT_COLOR_15 #fdf6e3
+
+*.colorfg: DEFAULT_COLOR_FG
+*.colorbg: DEFAULT_COLOR_BG
+*.color0:  DEFAULT_COLOR_0
+*.color1:  DEFAULT_COLOR_1
+*.color2:  DEFAULT_COLOR_2
+*.color3:  DEFAULT_COLOR_3
+*.color4:  DEFAULT_COLOR_4
+*.color5:  DEFAULT_COLOR_5
+*.color6:  DEFAULT_COLOR_6
+*.color7:  DEFAULT_COLOR_7
+*.color8:  DEFAULT_COLOR_8
+*.color9:  DEFAULT_COLOR_9
+*.color10: DEFAULT_COLOR_10
+*.color11: DEFAULT_COLOR_11
+*.color12: DEFAULT_COLOR_12
+*.color13: DEFAULT_COLOR_13
+*.color14: DEFAULT_COLOR_14
+*.color15: DEFAULT_COLOR_15
+
+! Xft font general styling options
+Xft.dpi: 96
+Xft.antialias: true
+Xft.hinting: true
+Xft.hintstyle: hintfull
+Xft.rgba: rgb
+Xft.lcdfilter: lcddefault
+
+! Load application configurations
+#include ".config/urxvt/config.xrc"
+#include ".config/xterm/config.xrc"
+

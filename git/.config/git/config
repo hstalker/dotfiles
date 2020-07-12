@@ -5,7 +5,7 @@
     helper = cache
 [alias]
     a = add
-    st = status
+    s = status
     ci = commit
     co = checkout
     br = branch

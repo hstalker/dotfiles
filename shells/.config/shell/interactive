@@ -1,0 +1,107 @@
+#!/usr/bin/env sh
+###############################################################################
+# Perform setup for all interactive Posix compatible shells supporting it.
+# Must be Posix shell compatible.
+
+###############################################################################
+# Setup aliases
+if [ -x /usr/bin/dircolors ]; then
+  alias ls='ls --color=auto'
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
+fi
+
+# Directory traversal shortcuts
+alias ..='cd ..'
+alias ...='cd ../../'
+alias ....='cd ../../../'
+alias .....='cd ../../../../'
+
+# LS shortcuts
+# Simple ls in vertical list format
+alias ll='ls -alF'
+# Simple ls including hidden files
+alias la='ls -A'
+# Simple ls
+alias l='ls -CF'
+# All hidden files in cwd
+alias l.='ls -d .*'
+# All directories in cwd
+alias ldir='ls -l | grep ^d'
+# Grep through filenames
+alias lg='ls -AF | grep'
+# List full paths
+alias lp='ls -d `pwd`/*'
+# Grep through filenames with full path
+alias lpg='ls -d `pwd`/* | grep'
+# Sort by time & in reverse
+alias lt='ls -Alt'
+alias ltr='ls -Altr'
+# Sort by size & in reverse
+alias lss='ls -AFlS'
+alias lsr='ls -AFlSr'
+
+# Safety aliases because I'm clumsy and accidentally delete stuff
+alias rm='rm -iI --preserve-root'
+alias mv='mv -i'
+alias cp='cp -i'
+alias ln='ln -i'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+alias chgrp='chgrp --preserve-root'
+
+# Convenience
+alias q='exit'
+alias a='alias'
+alias h='history'
+alias hs='history | grep $1'
+alias j='jobs'
+alias psg='ps aux | grep -i $1'
+treeless () {
+  tree -C -I .git -a $1 | less -r
+}
+
+# Tar aliases, because who remembers the encantations?
+alias tarc='tar czvf' # Compress
+alias tarx='tar xzvf' # Extract
+alias tart='tar tzvf' # List contents
+
+# Various bits of hardware info
+alias cpu-count='nproc --all'
+alias meminfo='free -m -l -t'
+alias cpuinfo='lscpu'
+alias diskinfo='df -H'
+
+# PS1 related functions
+# VCS branch display mechanism
+get_vcs_branch() {
+  if [ -n "$(command -v svn)" -a -n "$(svn info 2>/dev/null)" ]; then
+    svn_branch="$(svn info | \
+      grep '^URL:' | \
+      egrep -o '(tags|branches)/[^/]+|trunk' | \
+      egrep -o '[^/]+$') 2>/dev/null"
+  fi
+  if [ -n "$(command -v git)" ]; then
+    git_branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD \
+      2>/dev/null)"
+  fi
+  if [ -n "${git_branch}" ]; then
+    echo "(git:${git_branch})"
+  elif [ -n "${svn_branch}" ]; then
+    echo "(svn:${svn_branch})"
+  fi
+}
+
+# Load application specific interactive files
+if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
+        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
+then
+  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
+    try_source "${p}/.interactive"
+  done
+fi
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.interactive"
+

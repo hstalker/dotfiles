@@ -1,4 +1,5 @@
-*.elc
-emacs/.emacs.d/transient
-emacs/.emacs.d/auto-save-list
+emacs/*.elc
+emacs/.config/emacs/*.elc
+emacs/.config/emacs/transient
+emacs/.config/emacs/auto-save-list
 

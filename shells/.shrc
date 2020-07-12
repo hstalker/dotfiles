@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+# This file is loaded via $ENV when interactive for both sh and ksh, so we must
+# account for either possibility in terms of what we load.
+
+if [ -n "$KSH_VERSION" ]; then
+  # We're in a ksh shell
+  # Load env only if not a login shell (a login shell will have already loaded
+  # it in .profile before this and we don't want to double load for no reason)
+  case $- in
+    *l*) ;;
+    *). "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/env";;
+  esac
+
+  # This is definitely an interactive shell (otherwise $ENV wouldn't have been
+  # loaded), but double check just to be certain.
+  case $- in
+    *i*) . "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/interactive";;
+  esac
+else
+  # We're in a sh shell (or some unaccounted for shell that also uses $ENV)
+  # Only load if .profile hasn't already run and has set IS_LOGIN_SHELL
+  if [ -z "$IS_LOGIN_SHELL" ]; then
+    . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"
+  else
+    # Get rid of the temporary variable between .profile and here to remove
+    # clutter
+    unset IS_LOGIN_SHELL
+  fi
+
+  # Same reasoning as for ksh
+  case $- in
+    *i*) . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/interactive";;
+  esac
+fi
+

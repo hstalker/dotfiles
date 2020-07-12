@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+###############################################################################
+# Perform configuration for all login bash shells
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
+
+# Grab user bash-completion scripts from $XDG_CONFIG_HOME
+export BASH_COMPLETION_USER_FILE=\
+  "${XDG_CONFIG_HOME}/bash-completion/bash_completion"
+try_source "${XDG_CONFIG_HOME}/bash-completion/bash_completion"
+
+if [ ! -d  "${XDG_CACHE_HOME:-$HOME/.cache}/bash" ]; then
+  mkdir "${XDG_CACHE_HOME:-$HOME/.cache}/bash"
+fi
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.login"
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env zsh
+###############################################################################
+# Setup environment for zsh
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/custom.env"
+

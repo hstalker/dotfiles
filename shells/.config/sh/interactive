@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+###############################################################################
+# Perform setup for interactive sh shells.
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
+
+# Colors and PS1 setup - for now this is largely shared between shells
+if [ $(id -u) -eq 0 ]; then
+  # Special root PS1 colors
+  color_shell=10
+  color_path=10
+  color_git=10
+  color_separator=6
+else
+  # PS1 for other users
+  color_shell=10
+  color_path=1
+  color_git=4
+  color_separator=6
+fi
+# Add a convenient shell name identifier
+PS1="$(tput setaf $color_shell)[\$(whoami)@\$(hostname):sh]"
+PS1="$PS1$(tput setaf $color_path)<\$(basename \${PWD})/>" # Path
+PS1="$PS1$(tput setaf $color_git)\$(get_vcs_branch)" # VCS branch
+PS1="$PS1$(tput setaf $color_separator)λ " # Separator
+PS1="$PS1$(tput sgr0)" # Color back to normal
+unset color_shell color_path color_git color_separator
+
+reload_dotfiles() {
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/login"
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/interactive"
+}
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/sh/custom.interactive"
+

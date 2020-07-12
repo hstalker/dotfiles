@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+###############################################################################
+# Setup environment for bash
+# Run shell/env in order to get appropriate $BASH_ENV
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.env"
+

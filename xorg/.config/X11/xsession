@@ -1,5 +1,0 @@
-#! /usr/bin/env bash
-
-[[ -r ${XDG_CONFIG_HOME}/X11/xsession.local ]] && . ${XDG_CONFIG_HOME}/X11/xsession.local
-[[ -r ${XDG_CONFIG_HOME}/X11/xinitrc ]] && . ${XDG_CONFIG_HOME}/X11/xinitrc
-

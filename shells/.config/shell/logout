@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+###############################################################################
+# Perform logout operations for all Posix compatible shells supporting it.
+# Must be Posix shell compatible.
+
+###############################################################################
+# Logout operations
+# Clear the screen to increase privacy.
+if [ "$SHLVL" = 1 ]; then
+    if which clear_console &> /dev/null; then
+        clear_console -q
+    fi
+fi
+
+# Load application specific logout files
+if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
+        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
+then
+  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
+    try_source "${p}/.logout"
+  done
+fi
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.logout"
+

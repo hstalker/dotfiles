@@ -1,0 +1,124 @@
+#!/usr/bin/env zsh
+###############################################################################
+# Perform configuration for all interactive zsh shells
+# Shouldn't need much if any further configuration beyond the shared
+# configuration present in $XDG_CONFIG_HOME/shell/.
+
+. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
+
+autoload -U colors && colors
+setopt prompt_subst
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git cvs svn hg
+zstyle ':vcs_info:*' \
+  formats "%{$fg[blue]%}(%s:%b)%{$reset_color%}"
+zstyle ':vcs_info:*' \
+  actionformats "%{$fg[blue]%}(%s:%b-%a)%{$reset_color%}"
+vcs_info_wrapper() {
+  vcs_info
+  if [ -n "$vcs_info_msg_0_" ]; then
+    echo "${vcs_info_msg_0_}%{$reset_color%}"
+  fi
+}
+precmd_functions+='vcs_info_wrapper'
+chpwd_functions+='vcs_info_wrapper'
+preexec_functions+='vcs_info_wrapper'
+unset PS1 # Just to make sure a previous setting isn't interfering
+PROMPT='[$(whoami)@$(hostname):zsh]' # System info
+PROMPT+='%{$fg[red]%}<%1//>%{$reset_color%}' # Path
+PROMPT+='$(vcs_info_wrapper)' # VCS info
+PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Separator
+
+zmodload zsh/zle
+# Forcefully ZLE put into vi mode
+bindkey -v
+# Restore some emacs bindings removed by vi keybind mode
+bindkey '^P' up-history
+bindkey '^N' down-history
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey '^w' backward-kill-word
+bindkey -M viins 'kj' vi-cmd-mode
+
+# Reduce latency when pressing <Esc>
+KEYTIMEOUT=10
+
+# ci"
+autoload -U select-quoted
+zle -N select-quoted
+for m in visual viopp; do
+  for c in {a,i}{\',\",\`}; do
+    bindkey -M $m $c select-quoted
+  done
+done
+
+# ci{, ci(
+autoload -U select-bracketed
+zle -N select-bracketed
+for m in visual viopp; do
+  for c in {a,i}${(s..)^:-'()[]{}<>bB'}; do
+    bindkey -M $m $c select-bracketed
+  done
+done
+
+# vim-surround emulation
+autoload -Uz surround
+zle -N delete-surround surround
+zle -N add-surround surround
+zle -N change-surround surround
+bindkey -a cs change-surround
+bindkey -a ds delete-surround
+bindkey -a ys add-surround
+bindkey -M visual S add-surround
+
+# Place the history in cache
+HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history-$HOST-$USER"
+# For setting history length
+SAVEHIST=10000
+HISTSIZE=$SAVEHIST
+HISTFILESIZE=$HISTSIZE
+# Append to the history file rather than overwriting it
+setopt APPEND_HISTORY
+# Share across all zsh sessions
+setopt SHARE_HISTORY
+# Don't store duplicates
+setopt HIST_IGNORE_DUPS
+# Remove the duplicates before others
+setopt HIST_EXPIRE_DUPS_FIRST
+# Ignore duplicates when searching history
+setopt HIST_FIND_NO_DUPS
+# Don't store blank blines
+setopt HIST_REDUCE_BLANKS
+# Add commands as they are typed
+setopt INC_APPEND_HISTORY
+
+# Introduce prompt to correct typos in command?
+setopt CORRECT
+# All in line?
+unsetopt CORRECT_ALL
+
+# Automatically navigate to a directory if typed without a preceding `cd`?
+unsetopt AUTO_CD
+
+autoload -Uz compinit
+ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$HOST-$ZSH_VERSION"
+# Only update the completions file if it's sufficiently stale by updating if
+# day has changed
+if [ -r "$ZSH_COMPDUMP" ] && \
+  [ $(date +'%j') = $(date +'%j' -r "$ZSH_COMPDUMP") ]
+then
+  compinit -d "$ZSH_COMPDUMP"
+else
+  compinit -C -d "$ZSH_COMPDUMP"
+fi
+_comp_options+=(globdots)
+
+reload_dotfiles() {
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/env"
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/login"
+  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/interactive"
+}
+
+# Local installation overrides
+try_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/custom.interactive"
+

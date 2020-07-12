@@ -1,0 +1,38 @@
+! Fonts
+URxvt*font: DEFAULT_FONT
+URxvt*boldFont: DEFAULT_BOLD_FONT
+URxvt*italicFont: DEFAULT_ITALIC_FONT
+URxvt*boldItalicfont: DEFAULT_BOLDITALIC_FONT
+
+! Colours
+URxvt*background: DEFAULT_COLOR_15
+URxvt*foreground: DEFAULT_COLOR_11
+URxvt*fadeColor: DEFAULT_COLOR_15
+URxvt*cursorColor: DEFAULT_COLOR_10
+URxvt*pointerColorBackground: DEFAULT_COLOR_14
+URxvt*pointerColorForeground: DEFAULT_COLOR_10
+URxvt*color0: DEFAULT_COLOR_0
+URxvt*color1: DEFAULT_COLOR_1
+URxvt*color2: DEFAULT_COLOR_2
+URxvt*color3: DEFAULT_COLOR_3
+URxvt*color4: DEFAULT_COLOR_4
+URxvt*color5: DEFAULT_COLOR_5
+URxvt*color6: DEFAULT_COLOR_6
+URxvt*color7: DEFAULT_COLOR_7
+URxvt*color8: DEFAULT_COLOR_8
+URxvt*color9: DEFAULT_COLOR_9
+URxvt*color10: DEFAULT_COLOR_10
+URxvt*color11: DEFAULT_COLOR_11
+URxvt*color12: DEFAULT_COLOR_12
+URxvt*color13: DEFAULT_COLOR_13
+URxvt*color14: DEFAULT_COLOR_14
+URxvt*color15: DEFAULT_COLOR_15
+
+! Padding
+URxvt*internalBorder: DEFAULT_BORDER_PADDING
+URxvt*letterSpace: DEFAULT_CHAR_PADDING
+URxvt*lineSpace: DEFAULT_LINE_PADDING
+
+! 0 to 99 darkens, 101 to 200 lightens
+URxvt*shading: 100
+
