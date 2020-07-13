@@ -21,15 +21,15 @@ else
   # Only load if .profile hasn't already run and has set IS_LOGIN_SHELL
   if [ -z "$IS_LOGIN_SHELL" ]; then
     . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"
-  else
-    # Get rid of the temporary variable between .profile and here to remove
-    # clutter
-    unset IS_LOGIN_SHELL
   fi
 
   # Same reasoning as for ksh
   case $- in
     *i*) . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/interactive";;
   esac
+
+  # Get rid of the temporary variable between .profile and here to remove
+  # clutter
+  unset IS_LOGIN_SHELL
 fi
 

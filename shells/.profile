@@ -9,9 +9,12 @@
 if [ -n "$KSH_VERSION" ]; then
   . "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/env"
   . "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/login"
+  # Set exit trap so that we can simulate a ~/.logout script
+  trap '. "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/logout"' EXIT
 else
   . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"
   . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/login"
+  trap '. "${XDG_CONFIG_HOME:-$HOME/.config}/sh/logout"' EXIT
   # Set this to show future sourced files that we are a login shell (not a way
   # to tell this under sh normally)
   IS_LOGIN_SHELL=1

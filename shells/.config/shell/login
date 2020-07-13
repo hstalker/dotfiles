@@ -52,6 +52,13 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS:-/etc/xdg}"
 
+# Start agents
+# If there isn't a ssh-agent started for this login session
+if [ -z "$SSH_AUTH_SOCK" ]; then
+  # Launch ssh-agent (can use -t Nh to set a timeout for N hours)
+  eval $(ssh-agent -s) >/dev/null
+fi
+
 # Path settings
 # Local installation overrides should be prioritized
 path_prepend $HOME/.local/bin PATH

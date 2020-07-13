@@ -4,6 +4,16 @@
 # Shouldn't need much if any further configuration beyond the shared
 # configuration present in $XDG_CONFIG_HOME/shell/.
 
+if [ -z "$IS_LOGIN_SHELL" ]; then
+  # If this is a login sh, then setting up $SHLVL will already have been done.
+  # Otherwise, initialize/increment $SHLVL here (see: `sh/login` for details)
+  if [ -z "$SHLVL" ]; then
+    export SHLVL=1
+  else
+    export SHLVL=$((SHLVL+1))
+  fi
+fi
+
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 
 # Colors and PS1 setup - for now this is largely shared between shells

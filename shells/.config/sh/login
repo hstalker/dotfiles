@@ -4,6 +4,18 @@
 # Shouldn't need much if any further configuration beyond the shared
 # configuration present in $XDG_CONFIG_HOME/shell/.
 
+# Sh doesn't support $SHLVL by default, but we kinda need it to handle logout
+# of nested login shells properly.
+# We put it before loading other login scripts as they might want its most
+# up-to-date value (for this shell instance) to operate correctly
+if [ -z "$SHLVL" ]; then
+  export SHLVL=1
+else
+  # There is not guarantee that non-login/non-interactive sh shells will have
+  # an appropriate SHLVL
+  export SHLVL=$((SHLVL+1))
+fi
+
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 # Local installation overrides

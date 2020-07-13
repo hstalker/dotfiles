@@ -5,11 +5,9 @@
 
 ###############################################################################
 # Logout operations
-# Clear the screen to increase privacy.
-if [ "$SHLVL" = 1 ]; then
-    if which clear_console &> /dev/null; then
-        clear_console -q
-    fi
+# Kill agents
+if [ -n "$SSH_AUTH_SOCK" -a "$SHLVL" = 1 ]; then
+  eval $(ssh-agent -k) >/dev/null
 fi
 
 # Load application specific logout files
