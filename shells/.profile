@@ -11,6 +11,15 @@ if [ -n "$KSH_VERSION" ]; then
   . "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/login"
   # Set exit trap so that we can simulate a ~/.logout script
   trap '. "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/logout"' EXIT
+elif [ -n "$BASH" ]; then
+  # We might be in an unexpected shell due to graphical login hacks (think gdm
+  # etc.) sourcing ~/.profile directly.
+  # If so, just forward to those respective profiles
+  . "$HOME/.bash_profile"
+elif [ -n "$ZSH_NAME" ]; then
+  # Ditto above
+  . "$HOME/.zshenv"
+  . "$HOME/.zprofile"
 else
   . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"
   . "${XDG_CONFIG_HOME:-$HOME/.config}/sh/login"
