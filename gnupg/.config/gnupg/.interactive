@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+export GPG_TTY="$(tty)"
+
