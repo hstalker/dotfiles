@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-export KDEHOME="${XDG_CONFIG_HOME}/kde"
+export KDEHOME="${XDG_CONFIG_HOME:-$HOME/.config}/kde"
 

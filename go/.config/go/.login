@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-export GOPATH="${XDG_DATA_HOME}/go"
+export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
 
