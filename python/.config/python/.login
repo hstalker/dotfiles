@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 
-export PYTHONHISTORY="${XDG_CACHE_HOME:-$HOME/.cache}/python/python_history"
+PYTHONHISTORY="${XDG_CACHE_HOME:-$HOME/.cache}/python/python_history"
+export PYTHONHISTORY
 # SetupTools
-export PYTHON_EGG_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/python-eggs"
+PYTHON_EGG_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/python-eggs"
+export PYTHON_EGG_CACHE
 # PyLint
-export PYLINTHOME="${XDG_CACHE_HOME:-$HOME/.cache}/pylint"
+PYLINTHOME="${XDG_CACHE_HOME:-$HOME/.cache}/pylint"; export PYLINTHOME
 

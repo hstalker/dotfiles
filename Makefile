@@ -27,7 +27,6 @@ PACKAGES ?= shells \
 						python \
 						ruby \
 						javascript \
-						scheme \
 						javascript \
 						dotnet \
 						cpp \

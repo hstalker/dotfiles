@@ -4,11 +4,6 @@
 # Must be Posix shell compatible.
 
 ###############################################################################
-# Logout operations
-# Kill agents
-if [ -n "$SSH_AUTH_SOCK" -a "$SHLVL" = 1 ]; then
-  eval $(ssh-agent -k) >/dev/null
-fi
 
 # Load application specific logout files
 if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \

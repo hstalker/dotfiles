@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-export STACK_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/stack"
+STACK_ROOT="${XDG_DATA_HOME:-$HOME/.local/share}/stack"; export STACK_ROOT
 

@@ -8,9 +8,9 @@ if [ -z "$IS_LOGIN_SHELL" ]; then
   # If this is a login sh, then setting up $SHLVL will already have been done.
   # Otherwise, initialize/increment $SHLVL here (see: `sh/login` for details)
   if [ -z "$SHLVL" ]; then
-    export SHLVL=1
+    SHLVL=1; export SHLVL
   else
-    export SHLVL=$((SHLVL+1))
+    SHLVL=$((SHLVL+1)); export SHLVL
   fi
 fi
 

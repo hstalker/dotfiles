@@ -9,11 +9,11 @@
 # We put it before loading other login scripts as they might want its most
 # up-to-date value (for this shell instance) to operate correctly
 if [ -z "$SHLVL" ]; then
-  export SHLVL=1
+  SHLVL=1; export SHLVL
 else
   # There is not guarantee that non-login/non-interactive sh shells will have
   # an appropriate SHLVL
-  export SHLVL=$((SHLVL+1))
+  SHLVL=$((SHLVL+1)); export SHLVL
 fi
 
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"

@@ -25,7 +25,8 @@ path_remove() {
       newpath=$newpath:$dir
     fi
   done
-  export $var=${newpath#:}
+  $var=${newpath#:}
+  export $var
 }
 
 # Prepend $1 to $2 (default: PATH) guaranteeing uniqueness
@@ -36,7 +37,8 @@ path_prepend() {
   path_remove "$1" "$2"
   var="${2:-PATH}"
   value=`indirect_expand "$var"`
-  export ${var}="${1}${value:+:${value}}"
+  ${var}="${1}${value:+:${value}}"
+  export ${var}
 }
 
 # Append $1 to $2 (default: PATH) guaranteeing uniqueness
@@ -45,7 +47,8 @@ path_append() {
   path_remove "${1}" "${2}"
   var=${2:-PATH}
   value=`indirect_expand "$var"`
-  export $var="${value:+${value}:}${1}"
+  $var="${value:+${value}:}${1}"
+  export $var
 }
 
 # Source if file is readable
@@ -62,10 +65,10 @@ try_source() {
 # the way bash loads .bashrc when a non-login interactive shell.
 # Ksh and sh share the variable ENV, so we point to a shared script .shrc which
 # does the appropriate checks for shell, and loads the correct files.
-export ENV=$HOME/.shrc
+ENV=$HOME/.shrc; export ENV
 
 # The path at $BASH_ENV is run when the bash shell is non-interactive
-export BASH_ENV=$HOME/.bashrc
+BASH_ENV=$HOME/.bashrc; export BASH_ENV
 
 # Enable colour support of ls
 if [ -x /usr/bin/dircolors ]; then

@@ -7,7 +7,8 @@
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 # Grab user bash-completion scripts from $XDG_CONFIG_HOME
-export BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
+BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
+export BASH_COMPLETION_USER_FILE
 try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
 
 # For the history

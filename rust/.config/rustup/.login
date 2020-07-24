@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
+RUSTUP_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/rustup"; export RUSTUP_HOME
 
