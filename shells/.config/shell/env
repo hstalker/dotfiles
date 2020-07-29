@@ -25,7 +25,7 @@ path_remove() {
       newpath=$newpath:$dir
     fi
   done
-  $var=${newpath#:}
+  eval $var=${newpath#:}
   export $var
 }
 
@@ -37,7 +37,7 @@ path_prepend() {
   path_remove "$1" "$2"
   var="${2:-PATH}"
   value=`indirect_expand "$var"`
-  ${var}="${1}${value:+:${value}}"
+  eval ${var}="${1}${value:+:${value}}"
   export ${var}
 }
 
@@ -47,7 +47,7 @@ path_append() {
   path_remove "${1}" "${2}"
   var=${2:-PATH}
   value=`indirect_expand "$var"`
-  $var="${value:+${value}:}${1}"
+  eval $var="${value:+${value}:}${1}"
   export $var
 }
 
