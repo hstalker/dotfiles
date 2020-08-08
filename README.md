@@ -26,8 +26,6 @@ General philosophy:
   globally consistent theme selection, package pinning/disabling, package
   selection)
 
----
-
 ## Table of Contents
 * [Prerequisites](#prerequisites)
 * [Configurations](#configurations)
@@ -43,76 +41,71 @@ General philosophy:
   * [Configurations](#configurations-1)
   * [Themes](#themes)
 
----
-
 ## Prerequisites
 * Git (to clone this repo somewhere local).
 * GNU Make (For automating running stow on the packages).
 * GNU Stow (Though technically you can manually copy/symlink).
 
----
-
 ## Configurations
 Currently includes some configuration for the following pieces of software:
 
 * Editors
-  * Vim - Lightweight simple text editing experience
   * Emacs - Preferred highly customized IDE experience
+  * Vim - Lightweight simple text editing experience
 * Shells (These are merged into a single "package" with shared configuration)
-  * Sh - Common everywhere (Unix-likes)
   * Bash - Common on Linux
   * Ksh - Common on BSDs and old Unices
+  * Sh - Common everywhere (Unix-likes)
   * Zsh - Preferred daily driver
 * Terminals
   * URxvt - Lightweight, but lacks good support for a lot of features
   * XTerm - Ubiquitous, but also lacking in some features
-* Tools
+* Dev tooling
   * Ack - Classic search tool
   * Aspell - Spelling aid
   * Docker - Containerization
-  * Vagrant - Virtualization
+  * Git - Distributed VCS
   * GnuPG - Signing and encryption tools
   * Less - Pager that's better than the basic `more` pager
-  * MPV - Media player that knocks the socks off of the competition
-  * Terminfo - Terminal information querying tools
-  * WGet - Fetch files over the internet
-  * WINE - Windows emulation layer
-  * Xorg utilities - Sets up XDG compatible paths for X software
   * Readline - Input configuration for common terminal utilities
-  * Tmux - Terminal multiplexer
-  * Git - Distributed VCS
   * Subversion - Centralized VCS
+  * Terminfo - Terminal information querying tools
+  * Tmux - Terminal multiplexer
+  * Vagrant - Virtualization
+  * WGet - Fetch files over the internet
+  * Xorg utilities - Sets up XDG compatible paths for X software
+* Desktop tooling
+  * MPV - Media player that knocks the socks off of the competition
+  * WINE - Windows emulation layer
 * Language tooling
-  * Ruby
-    * Gem - Package management
-    * Bundle - Package management
-    * IRuby - Interpreter
+  * .NET
+    * NuGet - Package management
+  * C/C++
+    * CCache - Caching compilation by-products
+  * Go
+  * Haskell
+    * Stack - Package management & build tool
+  * Java
+    * Gradle - Build tool
+  * Javascript
+    * NPM - Package management
   * Python
     * IPython - Interpreter
     * Jupyter - Jupyter notebooks
-  * Javascript
-    * NPM - Package management
-  * C/C++
-    * CCache - Caching compilation by-products
+  * Ruby
+    * Bundle - Package management
+    * Gem - Package management
+    * IRuby - Interpreter
   * Rust
-    * Rustup - Installing specific rustc toolchains
     * Cargo - Package management & build tool
-  * Java
-    * Gradle - Build tool
-  * Haskell
-    * Stack - Package management & build tool
-  * Go
-  * .NET
-    * NuGet - Package management
+    * Rustup - Installing specific rustc toolchains
 * Misc.
   * GTK - Gnome GUI toolkit
   * KDE- KDE (and Qt) configuration
 
 And also offers the following themes for all desired software:
-* Halogen - Mishmash of my own making. Warm colours. Primarily light solarized
+* Halogen - Mishmash of my own making. Warm colors. Primarily light solarized
   based.
-
----
 
 ## Directory Structure
 Configuration is placed within a "package" subdirectory. The files in these
@@ -138,15 +131,13 @@ structure will look like:
     * `$APPLICATION/`
       * `$CACHE_FILES`
 
----
-
 ## Theming
-We attempt to keep a global theme set via theme customisation using a themes
+We attempt to keep a global theme set via theme customization using a themes
 from `themes/$THEME_NAME`. The aim of this is to allow consistent theming.
 
 Applications with complex configuration such as emacs or vim have toggles
-(light/dark) and local installation customisation support, and as such will
-not be customised in the global theme for the purposes of simplicity.
+(light/dark) and local installation customization support, and as such will
+not be customized in the global theme for the purposes of simplicity.
 
 Typically various applications will need to load theming configuration files
 from their base configuration file (or otherwise generally assume they're
@@ -166,15 +157,13 @@ you use a simplistic symlink manager like Stow for installation you may end up
 with stray theme files in your `$HOME` for applications for which you have not
 installed other configuration for.
 
----
-
 ## Usage Instructions
 ```shell
 cd directory-of-this-repo
 make make-directories link
 ```
 
-Configuration installation can be customised via setting custom variables
+Configuration installation can be customized via setting custom variables
 for make. For example:
 ```shell
 SOURCE_DIR=$DIRECTORY_OF_REPO/ \
@@ -237,7 +226,7 @@ mentioned rules. These customization points can be found at:
 Due to the complexity of working around various shells' idiosyncrasies.
 Top-level shell scripts (i.e. in `$HOME`) should not need to be modified.
 
-#### Misc: Different Behaviour of Non-Login Non-Interactive Shells
+#### Misc: Different Behavior of Non-Login Non-Interactive Shells
 Running non-interactive non-login shells with sh/ksh will not load any
 configuration. Bash/zsh will always load their respective `env` at a minimum in
 all shell types, however sh/ksh must be at least an interactive shell to load
@@ -246,7 +235,7 @@ env.
 #### Warnings: Linux Distributions May Break the Setup
 It is possible that certain Linux distributions may source shell configuration
 files in their base scripts despite that altering the standard loading
-behaviour. This would break our design. As far as we are aware, all the most
+behavior. This would break our design. As far as we are aware, all the most
 common distros don't do this however.
 
 #### Warnings: This Design is Brittle and Subject to Change
@@ -406,9 +395,7 @@ Currently the way the theme-provided `.Xresources` loads application
 configuration/theming files requires them to always be present on the system.
 As such, all X applications are non-modular and must be installed together
 (see: `xapplications/`. It may be possible to work around this using a more
-complex preprocesser with xrdb (e.g.  m4).
-
----
+complex preprocessor with xrdb (e.g.  m4).
 
 ## Extension
 ### Configurations
@@ -419,7 +406,7 @@ complex preprocesser with xrdb (e.g.  m4).
 
 ### Themes
  * Copy an existing theme from the `themes/` directory.
- * Modify all the files to provide the colour-schemes, fonts and iconography
+ * Modify all the files to provide the color-schemes, fonts and iconography
    you desire (all files are needed, as some applications assume their presence
    at the given directories).
 

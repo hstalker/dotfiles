@@ -1,5 +1,5 @@
-emacs/*.elc
-emacs/.config/emacs/*.elc
-emacs/.config/emacs/transient
-emacs/.config/emacs/auto-save-list
+config/emacs/*.elc
+config/emacs/.config/emacs/*.elc
+config/emacs/.config/emacs/transient
+config/emacs/.config/emacs/auto-save-list
 
