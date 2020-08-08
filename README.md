@@ -2,7 +2,7 @@
 A repo for storing my personal configuration files for software development
 under Linux.
 
-*Not really intended for public consumption*
+***Not really intended for public consumption***
 
 Unfortunately I require the ability to stow or symlink configuration files on
 various Linux distros, so my dotfiles themselves are kept in a form making that
@@ -26,70 +26,93 @@ General philosophy:
   globally consistent theme selection, package pinning/disabling, package
   selection)
 
+---
+
+## Table of Contents
+* [Prerequisites](#prerequisites)
+* [Configurations](#configurations)
+* [Directory Structure](#directory-structure)
+* [Theming](#theming)
+* [Usage Instructions](#usage-instructions)
+  * [Shells](#shells)
+  * [Vim](#vim)
+  * [Emacs](#emacs)
+  * [Tmux](#tmux)
+  * [Xresources applications](#xresources-applications)
+* [Extension](#extension)
+  * [Configurations](#configurations-1)
+  * [Themes](#themes)
+
+---
+
 ## Prerequisites
- * Git (to clone this repo somewhere local).
- * GNU Make (For automating running stow on the packages).
- * GNU Stow (Though technically you can manually copy/symlink).
+* Git (to clone this repo somewhere local).
+* GNU Make (For automating running stow on the packages).
+* GNU Stow (Though technically you can manually copy/symlink).
+
+---
 
 ## Configurations
 Currently includes some configuration for the following pieces of software:
 
 * Editors
-    * Vim - Lightweight simple text editing experience
-    * Emacs - Preferred highly customized IDE experience
+  * Vim - Lightweight simple text editing experience
+  * Emacs - Preferred highly customized IDE experience
 * Shells (These are merged into a single "package" with shared configuration)
-    * Sh - Common everywhere (Unix-likes)
-    * Bash - Common on Linux
-    * Ksh - Common on BSDs and old Unices
-    * Zsh - Preferred daily driver
+  * Sh - Common everywhere (Unix-likes)
+  * Bash - Common on Linux
+  * Ksh - Common on BSDs and old Unices
+  * Zsh - Preferred daily driver
 * Terminals
-    * URxvt - Lightweight, but lacks good support for a lot of features
-    * XTerm - Ubiquitous, but also lacking in some features
+  * URxvt - Lightweight, but lacks good support for a lot of features
+  * XTerm - Ubiquitous, but also lacking in some features
 * Tools
-    * Ack - Classic search tool
-    * Aspell - Spelling aid
-    * Docker - Containerization
-    * Vagrant - Virtualization
-    * GnuPG - Signing and encryption tools
-    * Less - Pager that's better than the basic `more` pager
-    * MPV - Media player that knocks the socks off of the competition
-    * Terminfo - Terminal information querying tools
-    * WGet - Fetch files over the internet
-    * WINE - Windows emulation layer
-    * Xorg utilities - Sets up XDG compatible paths for X software
-    * Readline - Input configuration for common terminal utilities
-    * Tmux - Terminal multiplexer
-    * Git - Distributed VCS
-    * Subversion - Centralized VCS
+  * Ack - Classic search tool
+  * Aspell - Spelling aid
+  * Docker - Containerization
+  * Vagrant - Virtualization
+  * GnuPG - Signing and encryption tools
+  * Less - Pager that's better than the basic `more` pager
+  * MPV - Media player that knocks the socks off of the competition
+  * Terminfo - Terminal information querying tools
+  * WGet - Fetch files over the internet
+  * WINE - Windows emulation layer
+  * Xorg utilities - Sets up XDG compatible paths for X software
+  * Readline - Input configuration for common terminal utilities
+  * Tmux - Terminal multiplexer
+  * Git - Distributed VCS
+  * Subversion - Centralized VCS
 * Language tooling
-    * Ruby
-        * Gem - Package management
-        * Bundle - Package management
-        * IRuby - Interpreter
-    * Python
-        * IPython - Interpreter
-        * Jupyter - Jupyter notebooks
-    * Javascript
-        * NPM - Package management
-    * C/C++
-        * CCache - Caching compilation by-products
-    * Rust
-        * Rustup - Installing specific rustc toolchains
-        * Cargo - Package management & build tool
-    * Java
-        * Gradle - Build tool
-    * Haskell
-        * Stack - Package management & build tool
-    * Go
-    * .NET
-        * NuGet - Package management
+  * Ruby
+    * Gem - Package management
+    * Bundle - Package management
+    * IRuby - Interpreter
+  * Python
+    * IPython - Interpreter
+    * Jupyter - Jupyter notebooks
+  * Javascript
+    * NPM - Package management
+  * C/C++
+    * CCache - Caching compilation by-products
+  * Rust
+    * Rustup - Installing specific rustc toolchains
+    * Cargo - Package management & build tool
+  * Java
+    * Gradle - Build tool
+  * Haskell
+    * Stack - Package management & build tool
+  * Go
+  * .NET
+    * NuGet - Package management
 * Misc.
-    * GTK - Gnome GUI toolkit
-    * KDE- KDE (and Qt) configuration
+  * GTK - Gnome GUI toolkit
+  * KDE- KDE (and Qt) configuration
 
 And also offers the following themes for all desired software:
 * Halogen - Mishmash of my own making. Warm colours. Primarily light solarized
   based.
+
+---
 
 ## Directory Structure
 Configuration is placed within a "package" subdirectory. The files in these
@@ -115,6 +138,7 @@ structure will look like:
     * `$APPLICATION/`
       * `$CACHE_FILES`
 
+---
 
 ## Theming
 We attempt to keep a global theme set via theme customisation using a themes
@@ -142,7 +166,9 @@ you use a simplistic symlink manager like Stow for installation you may end up
 with stray theme files in your `$HOME` for applications for which you have not
 installed other configuration for.
 
-## Install Instructions
+---
+
+## Usage Instructions
 ```shell
 cd directory-of-this-repo
 make make-directories link
@@ -167,6 +193,8 @@ Exactly one theme must be specified in order for the packages to work, as they
 rely on loading from files only provided by the themes.
 
 See the makefile for more targets and customization points.
+
+---
 
 ### Shells
 
@@ -231,6 +259,7 @@ possible. Additionally the way this setup works in convoluted and brittle. As
 such it is a valid concern that this setup may be jettisoned entirely to focus
 on supporting a single shell type, vastly reducing the overhead.
 
+---
 
 ### Vim
 #### Installation
@@ -316,10 +345,12 @@ the ability to fully customize the configuration per-install likely requires a
 more powerful dependency graph mechanism, along with delayed execution hooks,
 both of which are not provided in this implementation for simplicity).
 
+---
 
 ### Emacs
 **TODO**
 
+---
 
 ### Tmux
 #### Overview
@@ -359,8 +390,9 @@ As theming Tmux affects so little visually, the ability to provide both a light
 and dark theme, as well as toggle between them while in a session may be
 removed for simplicity.
 
+---
 
-### Xresources & Xresources configured/themed applications
+### Xresources applications
 You must write an `xinitrc` or `xsession` script for loading the themes via
 `xrdb -merge $HOME/.Xresources`. Themes provide their own `.Xresources` that
 indirectly load all relevant X theming & configuration files, and so should be
@@ -376,6 +408,7 @@ As such, all X applications are non-modular and must be installed together
 (see: `xapplications/`. It may be possible to work around this using a more
 complex preprocesser with xrdb (e.g.  m4).
 
+---
 
 ## Extension
 ### Configurations
