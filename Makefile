@@ -1,8 +1,7 @@
 SOURCE_DIR ?= $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TARGET_DIR ?= $(HOME)
 PACKAGES ?= shells \
-						urxvt \
-						xterm \
+						xapplications \
 						vim \
 						emacs \
 						ack \
