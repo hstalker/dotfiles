@@ -6,8 +6,8 @@
 
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
-if [ ! -d  "${XDG_DATA_HOME:-$HOME/.local/share}/ksh" ]; then
-  mkdir "${XDG_DATA_HOME:-$HOME/.local/share}/ksh"
+if [ ! -d  "${XDG_CACHE_HOME:-$HOME/.cache}/ksh" ]; then
+  mkdir "${XDG_CACHE_HOME:-$HOME/.cache}/ksh"
 fi
 
 # Local installation overrides
