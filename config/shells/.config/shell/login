@@ -18,10 +18,10 @@ EMAIL=$GITHUB_EMAIL; export EMAIL
 ALTERNATE_EDITOR='nano'; export ALTERNATE_EDITOR
 EDITOR='vim'; export EDITOR
 VISUAL="vim-minimal"; export VISUAL
-PAGER='less'; export VISUAL
+PAGER='less'; export PAGER
 
 # Base keyboard layout, language & locale
-export KEYBOARD_LAYOUT=us
+KEYBOARD_LAYOUT=us; export KEYBOARD_LAYOUT
 if $(locale -a | grep -q 'en_GB'); then
   LANG=en_GB.UTF-8; export LANG
 else
