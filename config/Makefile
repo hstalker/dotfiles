@@ -26,7 +26,6 @@ PACKAGES ?= shells \
 						python \
 						ruby \
 						javascript \
-						javascript \
 						dotnet \
 						cpp \
 						rust \
