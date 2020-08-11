@@ -324,7 +324,7 @@ function! core#PluginPostUpdateHook(name, operation)
 endfunction
 
 " Unpin a previously pinned plugin in the delay load registry
-function! core#PluginUnpin(name, commit_hash)
+function! core#PluginUnpin(name)
   if has_key(g:plugin_registry, a:name)
     remove(g:plugin_registry[a:name], 'commit')
   else
