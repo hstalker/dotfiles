@@ -1,3 +1,8 @@
+VERBOSE=0
+VERBOSE ?= 0
+ifneq ($(VERBOSE),0)
+	VERBOSE_FLAG=-v
+endif
 SOURCE_DIR ?= $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TARGET_DIR ?= $(HOME)
 PACKAGES ?= shells \
@@ -40,51 +45,40 @@ USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
 							 $(TARGET_DIR)/.local/share
 
 MKDIR ?= mkdir -p
-GIT ?= git
 STOW ?= stow
 
 all:
-.PHONY: all create-directories link unlink
 
 create-directories:
 	@echo 'Making directories: $(USEFUL_DIRS) with "$(MKDIR)"...'
 	@$(MKDIR) $(USEFUL_DIRS)
 
-link: $(PACKAGES)
-	@echo 'Linking $? with "$(STOW)"...'
-	@echo 'Source directory: "$(SOURCE_DIR)"'
-	@echo 'Target directory: "$(TARGET_DIR)"'
+# STOW_TEMPLATE :: TGT_NAME, DESCRIPTIVE_STRING, STOW_FLAG
+define STOW_TEMPLATE =
+$(1): $$(PACKAGES)
+	@echo '$(2) $$? with "$$(STOW)"...'
+	@echo 'Source directory: "$$(SOURCE_DIR)"'
+	@echo 'Target directory: "$$(TARGET_DIR)"'
 # We need to hack around stow being unable to handle nested package paths
-	@for P in $(PACKAGES); do \
-		if [ "." != "$$(dirname $$P)" ]; then \
-			$(STOW) --no-folding \
-				-d "$(SOURCE_DIR)/$$(dirname $$P)" \
-				-t "$(TARGET_DIR)" \
-				-vS "$$(basename $$P)"; \
+	@for P in $$(PACKAGES); do \
+		if [ "." != "$$$$(dirname $$$$P)" ]; then \
+			$$(STOW) --no-folding \
+				-d "$$(SOURCE_DIR)/$$$$(dirname $$$$P)" \
+				-t "$$(TARGET_DIR)" \
+				$$(VERBOSE_FLAG) $(3) "$$$$(basename $$$$P)"; \
 		else \
-			$(STOW) --no-folding \
-				-d "$(SOURCE_DIR)" \
-				-t "$(TARGET_DIR)" \
-				-vS "$$P"; \
+			$$(STOW) --no-folding \
+				-d "$$(SOURCE_DIR)" \
+				-t "$$(TARGET_DIR)" \
+				$$(VERBOSE_FLAG) $(3) "$$$$P"; \
 		fi; \
 	done
+AUTO_GENERATED_TARGETS+=$(1)
+endef
 
-unlink: $(PACKAGES)
-	@echo 'Unlinking $? with "$(STOW)"...'
-	@echo 'Source directory: $(SOURCE_DIR)'
-	@echo 'Target directory: $(TARGET_DIR)'
-# Same stow workaround as before
-	@for P in $(PACKAGES); do \
-		if [ "." != "$$(dirname $$P)" ]; then \
-			$(STOW) --no-folding \
-				-d "$(SOURCE_DIR)/$$(dirname $$P)" \
-				-t "$(TARGET_DIR)" \
-				-vD "$$(basename $$P)"; \
-		else \
-			$(STOW) --no-folding \
-				-d "$(SOURCE_DIR)" \
-				-t "$(TARGET_DIR)" \
-				-vD "$$P"; \
-		fi; \
-	done
+$(eval $(call STOW_TEMPLATE,link,Linking,-S))
+$(eval $(call STOW_TEMPLATE,unlink,Unlinking,-D))
+$(eval $(call STOW_TEMPLATE,relink,Relinking,-R))
+
+.PHONY: all create-directories $(AUTO_GENERATED_TARGETS)
 
