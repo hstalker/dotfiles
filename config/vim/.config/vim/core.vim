@@ -1,6 +1,22 @@
 scriptencoding utf-8
-set encoding=utf8
 set nocompatible
+" Was vim compiled with unicode support?
+if has('multi_byte')
+  " How your terminal encodes your input (from locale)
+  if &termencoding == ""
+    let &termencoding = &encoding
+  endif
+  " The encoding used in vim's internal representation.
+  set encoding=utf-8
+  " The default encoding to use in buffers for the file on disk. Is buffer
+  " local by default, so use setglobal to set for all buffers.
+  setglobal fileencoding=utf-8
+  " The heuristic list of encodings to try (in order) setting
+  " fileencoding to.  Will use the first one that doesn't cause errors.
+  " UCS-BOM will never get used if after UTF-8.
+  set fileencodings=ucs-bom,utf-8,default,latin1
+  " setglobal bomb " Uncomment to force a byte order mark for all buffers
+endif
 " We want these off until after plugins have all been loaded
 filetype indent plugin off
 syntax off
