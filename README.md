@@ -4,29 +4,9 @@ under Linux.
 
 ***Not really intended for public consumption***
 
-Unfortunately I require the ability to stow or symlink configuration files on
-various Linux distros, so my dotfiles themselves are kept in a form making that
-easy. Current plans are to move to a NixOS configuration, and use these
-dotfiles as-is via home-manager. If the requirement of supporting other distros
-(and shells for that matter) could be dropped, it is likely that this could be
-made considerably simpler, alas the world isn't so simple.
-
-Future Goals:
-* Add emacs configuration
-* Add bspwm/rofi/polybar configuration
-* Move to NixOS, whilst maintaining near full stowability of dotfiles to
-  non-Nix systems.
-
-General philosophy:
-
-* Follow XDG layout where possible.
-* Use generally available tools where possible.
-* Make it modular.
-* Make it highly customizable for local installations (i.e. override points,
-  globally consistent theme selection, package pinning/disabling, package
-  selection)
-
 ## Table of Contents
+* [Philosophy](#philosophy)
+* [Future Goals](#future-goals)
 * [Prerequisites](#prerequisites)
 * [Configurations](#configurations)
 * [Directory Structure](#directory-structure)
@@ -40,6 +20,45 @@ General philosophy:
 * [Extension](#extension)
   * [Configurations](#configurations-1)
   * [Themes](#themes)
+
+## Philosophy
+The aim is to:
+
+* Be modular. Configuration for individual applications should be as separate
+  as possible, and one application should still work (to some extent) without
+  another piece of configuration.
+* Follow XDG layout where possible, even if that requires forcing applications
+  to do so via hackery.
+* Prefer commonly available tools where possible. We have no pretense of
+  supporting non-Linux platforms, but at the very least we should try.
+  Modularity should help.
+* Be highly customizable at a per-machine level. This means providing
+  consistent and simple override points such as many potentially broken aspects
+  in the base layer can be turned off, and extra environment specific
+  functionality can be shoehorned in, as reasonably possible (Things which are
+  fundamentally broken should be fixed in the base layer, but local overrides
+  should allow for stop-gap measures).
+* Be reproducible. Wherever possible, and whenever external packages/plugins
+  are needed, we must make it reproducible across both time and platform. This
+  should be done via mechanisms such as package pinning to commit etc.
+* Allow theming to be somewhat separate from application configuration (i.e.
+  allow theming to be drop-in and reasonably globally consistent).
+
+Unfortunately I require the ability to stow or symlink configuration files on
+various Linux distros, so my dotfiles themselves are kept in a form making that
+easy. Current plans are to move to a NixOS configuration, and use these
+dotfiles as-is via home-manager. If the requirement of supporting other distros
+(and shells for that matter) could be dropped, it is likely that this could be
+made considerably simpler, alas the world isn't so simple.
+
+## Future Goals
+* Add & grow emacs configuration - It's never a good move to try and solve
+  everything from the get-go, so emacs will likely grow from a fairly minimal
+  base configuration into something abiding by the philosophy set out in this
+  repository.
+* Move to NixOS on all my systems, whilst maintaining near full stowability of
+  dotfiles to non-Nix systems.
+* Add WM/DE/rofi configuration.
 
 ## Prerequisites
 * Git (to clone this repo somewhere local).
@@ -301,12 +320,38 @@ are:
 * `core#PluginUnpin(name)`
 
 Local machine configuration additions (including configuration for plugins
-specified in custom.plugins.vim) should be placed in
+specified in custom.plugin.vim) should be placed in
 `$XDG_CONFIG_HOME/vim/custom.config.vim`. The provided operations are:
 
 * `core#PluginIsLoaded(name)`
 
 Typically our core vim functions for configuration are prefixed by `core#`.
+
+##### Example: Custom Per-Install Overrides
+An example `custom.plugin.vim`:
+```vimscript
+" Disable the auto-save plugin because it causes issues on our machine
+core#PluginDisable('907th/vim-auto-save')
+" Allow vim-plug to grab the latest commit in master of vim-airline
+core#PluginUnpin('vim-airline/vim-airline')
+" We want syntax support for more languages because we use them on this machine
+core#PluginAdd('vim-polyglot')
+" We want to use this known, working commit for vim-polyglot
+core#PluginPin('vim-polyglot', '9c3c0bc082e0d58d15dc6f24d8a335931417e2f0')
+```
+
+An example `custom.config.vim`:
+```vimscript
+" Change the airline theme
+if core#PluginIsLoaded('vim-airline/vim-airline')
+  if core#PluginIsLoaded('vim-airline/vim-airline-themes')
+    let g:airline_theme='zenburn'
+  endif
+endif
+
+" We want F5 compiles like an IDE :-)
+nnoremap <F5> :make<CR>
+```
 
 #### Theming
 This configuration has a togglable dual light/dark theme setup. The core
