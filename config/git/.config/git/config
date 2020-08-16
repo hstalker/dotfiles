@@ -6,6 +6,7 @@
 [alias]
     a = add
     s = status
+    l = log
     ci = commit
     co = checkout
     br = branch
@@ -37,4 +38,4 @@
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
 [include]
-    path = ~/.config/git/config.local
+    path = ~/.config/git/custom.config
