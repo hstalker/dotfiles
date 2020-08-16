@@ -192,33 +192,49 @@ if core#PluginIsLoaded('liuchengxu/vim-which-key')
   let g:which_key_map.t.s.h = [':call core#SyntaxHlToggle()', 'syntax-hl']
   let g:which_key_map.t.t = [':call core#ThemeToggle()', 'theme']
 
+  function! plugin#DeleteCurrentFile()
+    call delete(expand("%"))
+  endfunction
+
   function! plugin#RenameCurrentBuffer()
-    let l:new_name = input("New buffer name: ")
+    let l:old_name = expand("%")
+    let l:new_name = input("New buffer name: ", l:old_name, "file")
+    call plugin#DeleteCurrentFile()
     execute ":f " . l:new_name
   endfunction
+
   function! plugin#FindFileLiterally()
-    let l:path = input("Literal file path: ")
+    let l:path = input("Literal file path: ", "", "file")
     execute ":e " . l:path
   endfunction
+
+  function! plugin#YankFileName()
+    let @" = expand("%:p")
+  endfunction
+
+  function! plugin#YankFilePath()
+    let @" = expand("%")
+  endfunction
+
   let g:which_key_map.f = { 'name': '+files' }
-  let g:which_key_map.f.d = [":call delete(expand('%'))", 'delete-current']
+  let g:which_key_map.f.d = [":call plugin#DeleteCurrentFile()", 'delete-current']
   let g:which_key_map.f.t = [":call core#TrimTrailingWhitespace()",
     \ 'trim-trailing-whitespace']
   let g:which_key_map.f.v = { 'name': '+vim' }
-  let g:which_key_map.f.v.d = [':e ' . g:config_dir,
-    \ 'find-dotfile']
-  let g:which_key_map.f.v.r = [':source ' . g:config_dir . '/core.vim', 'source-dotfile']
+  let g:which_key_map.f.v.d = [':e ' . g:config_dir, 'find-dotfile']
+  let g:which_key_map.f.v.r = [':source ' . g:config_dir . '/core.vim',
+    \ 'source-dotfile']
   let g:which_key_map.f.C = { 'name': '+conversion' }
   let g:which_key_map.f.C.d = [':set fileformat=dos', 'unix2dos']
   let g:which_key_map.f.C.u = [':set fileformat=unix', 'dos2unix']
   let g:which_key_map.f.w = [':w', 'write-buffer']
   let g:which_key_map.f.W = [':wa', 'write-all']
-  let g:which_key_map.f.r = [
-    \ ":call delete(expand('%')) \| call plugin#RenameCurrentBuffer()",
-    \ 'rename-current'
-    \ ]
-  let g:which_key_map.f.y = [':let @" = expand("%")', 'yank-file-name']
-  let g:which_key_map.f.l = [':call plugin#FindFileLiterally()', 'find-literally']
+  let g:which_key_map.f.r = [":call plugin#RenameCurrentBuffer()",
+    \ 'rename-current']
+  let g:which_key_map.f.y = [':call plugin#YankFileName', 'yank-file-name']
+  let g:which_key_map.f.Y = [':call plugin#YankFilePath', 'yank-file-path']
+  let g:which_key_map.f.l = [':call plugin#FindFileLiterally()',
+    \ 'find-literally']
   let g:which_key_map.f.S = [':w !sudo tee %', 'sudo-write-buffer']
 
   let g:which_key_map.h = [':h', 'help']
