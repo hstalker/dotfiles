@@ -1,8 +1,9 @@
 scriptencoding utf-8
 set encoding=utf8
 set nocompatible
-filetype indent plugin on
-syntax on
+" We want these off until after plugins have all been loaded
+filetype indent plugin off
+syntax off
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -364,6 +365,10 @@ endfunction
 if !g:minimal_mode
   execute 'source ' . g:config_dir . 'plugin.vim'
 endif
+
+" Load all plugin filetype indent, plugin and syntax scripts now
+filetype indent plugin on
+syntax on
 
 " Load local installation customisations after everything else is done
 call core#TrySource(g:config_dir . 'custom.config.vim')
