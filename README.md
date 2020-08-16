@@ -160,16 +160,16 @@ installed other configuration for.
 ## Usage Instructions
 ```shell
 cd directory-of-this-repo
-make make-directories link
+make create-directories link
 ```
 
 Configuration installation can be customized via setting custom variables
 for make. For example:
 ```shell
-SOURCE_DIR=$DIRECTORY_OF_REPO/ \
+make create-directories link \
+  SOURCE_DIR=$DIRECTORY_OF_REPO/ \
   TARGET_DIR=$CUSTOM-HOME/ \
-  PACKAGES="$PACKAGES $THEME_NAME" \
-  make create-directories link
+  PACKAGES="$PACKAGES $THEME_NAME"
 ```
 
 Configuration symlinks can be uninstalled via:
