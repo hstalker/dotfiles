@@ -156,7 +156,7 @@ augroup MAKEFILE
 augroup END
 
 " Map escape to kj for fast return to normal mode
-imap kj <ESC>
+inoremap kj <ESC>
 
 " Set extra options when running in GUI mode
 if has("gui_running")
@@ -275,6 +275,8 @@ function! core#TrimTrailingWhitespace()
   call winrestview(l:save)
 endfunction
 command! TrimTrailingWhitespace call core#TrimTrailingWhitespace()
+" We want vim to trim trailing whitespace before any save occurs
+autocmd! BufWritePre * call core#TrimTrailingWhitespace()
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

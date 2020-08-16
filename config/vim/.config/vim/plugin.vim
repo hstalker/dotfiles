@@ -202,7 +202,7 @@ if core#PluginIsLoaded('liuchengxu/vim-which-key')
   endfunction
   let g:which_key_map.f = { 'name': '+files' }
   let g:which_key_map.f.d = [":call delete(expand('%'))", 'delete-current']
-  let g:which_key_map.f.t = [":core#TrimTrailingWhitespace",
+  let g:which_key_map.f.t = [":call core#TrimTrailingWhitespace()",
     \ 'trim-trailing-whitespace']
   let g:which_key_map.f.v = { 'name': '+vim' }
   let g:which_key_map.f.v.d = [':e ' . g:config_dir,
@@ -214,11 +214,11 @@ if core#PluginIsLoaded('liuchengxu/vim-which-key')
   let g:which_key_map.f.w = [':w', 'write-buffer']
   let g:which_key_map.f.W = [':wa', 'write-all']
   let g:which_key_map.f.r = [
-    \ ":call delete(expand('%')) \| call core#RenameCurrentBuffer()",
+    \ ":call delete(expand('%')) \| call plugin#RenameCurrentBuffer()",
     \ 'rename-current'
     \ ]
   let g:which_key_map.f.y = [':let @" = expand("%")', 'yank-file-name']
-  let g:which_key_map.f.l = [':call core#FindFileLiterally()', 'find-literally']
+  let g:which_key_map.f.l = [':call plugin#FindFileLiterally()', 'find-literally']
   let g:which_key_map.f.S = [':w !sudo tee %', 'sudo-write-buffer']
 
   let g:which_key_map.h = [':h', 'help']
