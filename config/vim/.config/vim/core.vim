@@ -154,8 +154,14 @@ execute 'set runtimepath+=' . g:config_dir . ','
 set updatetime=100
 
 " Display invisible characters in the editor
-set showbreak=↪\
-set listchars=tab:→\ ,eol:↲,nbsp:␣,trail:·,extends:⟩,precedes:⟨
+" I prefer to use the unicode symbols, but often monospace fonts just don't
+" support them, so we'll put up with the pure ascii + extended ascii for now,
+" as they are supported by, say, consolas.
+"set showbreak=↪\
+" Displaying eol is probably not very helpful
+"set listchars=tab:→\ ,eol:↲,nbsp:␣,trail:·,extends:⟩,precedes:⟨
+set showbreak=\\ " Visualize soft line breaks
+set listchars=tab:..,nbsp:_,trail:·,precedes:«,extends:»
 set list " Necessary to force display
 
 " Tab configuration
