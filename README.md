@@ -384,7 +384,7 @@ vim is entirely reliant on the terminal font. Additionally because the Gnome
 team are geniuses and GTK uses best effort matching for font names, it will
 never fail on the first font, and therefore no alternatives will be attempted.
 
-##### Misc: Lazy Loading
+#### Misc: Lazy Loading
 These scripts do not expose the ability to lazy load plugins despite the
 underlying vim plugin manager `vim-plug` allowing for it, as this causes issues
 with allowing fully flexible customization on a local install via the
@@ -392,6 +392,14 @@ with allowing fully flexible customization on a local install via the
 the ability to fully customize the configuration per-install likely requires a
 more powerful dependency graph mechanism, along with delayed execution hooks,
 both of which are not provided in this implementation for simplicity).
+
+#### Misc: Reconnecting to Existing Process from New X Session Clipboard Issues
+Vim does not adjust to new `$DISPLAY` values, causing X clipboard support to
+break. This issue can be resolved via running `:xrestore`. Under X11, there is
+a timer running every 2 hours with this effect by default in the configuration.
+This timer can be disabled via `timer_stop(g:timer_xrestore)`. The function
+`core#XRestore()` will perform the xrestore also, though offers no additional
+convenience.
 
 ---
 

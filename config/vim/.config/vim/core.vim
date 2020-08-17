@@ -180,6 +180,15 @@ augroup END
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
 
+" Automatically refresh X session details at a 2-hourly interval
+function! core#XRestore(...)
+  xrestore
+endfunction
+if has('timers') && has('x11')
+  let g:timer_xrestore = timer_start(2 * 60 * 60 * 1000, 'core#XRestore',
+    \ {'repeat': -1})
+endif
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Useful core functions
