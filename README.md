@@ -364,11 +364,25 @@ functions are:
 * `core#ThemeToggle(target_theme)`, where `target_theme` is an optional
   parameter for the `'dark'` or `'light'` string. If `target_theme` is not
   provided, then this will behave as a simple toggle.
+* `core#FontSetGui(font_dicts)`, where `font_dicts` is a list of one or more
+  dictionaries containing an unformatted font name string and size number. The
+  function will handle escaping spaces and platform differences in setting
+  `&guifont`. The fonts will be tried in the specified order. Subsequent calls
+  will erase previous font setting changes totally.
+* `core#FontChangeSize(size)`, where size is the point size to change the set
+  font to.
+* `core#FontIncreaseSize()`, which increases the font size by one.
+* `core#FontDecreaseSize()`, which decreases the font size by one.
 
 The configuration uses an in-built pair of themes for light and dark modes when
 run in minimal mode, and uses a solarized pair of truecolor themes when plugins
 are enabled by default. It will use Vim's inferred choice for `background` in
 order to determine the default mode to launch into.
+
+Note that the font altering functions will only work under gvim, as terminal
+vim is entirely reliant on the terminal font. Additionally because the Gnome
+team are geniuses and GTK uses best effort matching for font names, it will
+never fail on the first font, and therefore no alternatives will be attempted.
 
 ##### Misc: Lazy Loading
 These scripts do not expose the ability to lazy load plugins despite the

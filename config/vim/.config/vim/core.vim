@@ -180,40 +180,72 @@ augroup END
 " Map escape to kj for fast return to normal mode
 inoremap kj <ESC>
 
-" Set extra options when running in GUI mode
-if has("gui_running")
-  set guioptions-=T " Toolbar
-  set guioptions-=m " Menu bar
-  set guioptions-=r " Right-hand scroll bar
-  set guioptions-=R " When vertically split window?
-  set guioptions-=l " Left-hand scroll bar
-  set guioptions-=L " When vertically split window?
-  set guioptions-=b " bottom horizontal scroll bar
-  set guioptions+=e " Tab pages
-  set guioptions+=g " Show inactive menu items as greyed out?
-  set guioptions+=i " Use Vim icon
-  set guioptions-=f " Should gvim fork-detach from parent shell?
-  set guioptions+=v " Should prefer vertical button layout for dialogs?
-  " Describes text to use in labels on GUI tab pages line
-  set guitablabel=%M\ %t
-  " Set fonts for different platforms and GUI toolkits
-  if has("gui_gtk3") || has("gui_gtk3")
-    set guifont=DejaVu\ Sans\ Mono\ 12
-  elseif has("gui_macvim")
-    " MacOS
-    set guifont=Menlo\ Regular:h12
-  elseif has("gui_win32")
-    " Windows
-    set guifont=Consolas:h12:cANSI
-  else
-    " No idea what gui we're using, so just wing it
-    set guifont=DejaVu\ Sans\ Mono\ 12
-  endif
-endif
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Useful core functions
+" Set guifont appropriately for multiple platforms, takes a list of
+" dictionaries with name and size keys
+function! core#FontSetGui(font_dicts)
+  " Build up a guifont string from the ordered alternatives given via the list
+  " of font dictionaries.
+  let l:font_string = ''
+  if len(a:font_dicts) == 0
+    echoerr "Expected at least one font!"
+  endif
+  for l:font in a:font_dicts
+    let l:name = font['name']
+    let l:size = string(font['size'])
+    " Escape spaces in font names
+    let l:escaped_name = substitute(l:name, ' ', '\\ ', 'g')
+    " Escape commas in font names
+    let l:escaped_name = substitute(l:escaped_name, ',', '\\\\,', 'g')
+    " Set fonts for different platforms and GUI toolkits
+    if has("gui_gtk3") || has("gui_gtk2") || has('x11')
+      " Linux - NOTE: GTK doesn't support fallbacks because of course
+      let l:font_string = l:font_string . l:escaped_name
+        \ . '\ ' . l:size
+    elseif has("gui_macvim")
+      " MacOS
+      let l:font_string = l:font_string . l:escaped_name
+        \ . ':h' . l:size
+    elseif has("gui_win32")
+      " Windows - c is character set, h is height, q is aa and cleartype
+      " Can be set to bold, italic, underline or strikeout via b, i, u and s
+      " respectively.
+      let l:font_string = l:font_string . l:escaped_name
+        \ . ':h' . l:size . ':cDEFAULT:qDEFAULT'
+    else
+      " No idea what gui we're using, so just wing it
+      let l:font_string = l:font_string . l:escaped_name . l:size
+    endif
+    let l:font_string = l:font_string . ','
+  endfor
+  " Chop off trailing comma
+  let l:font_string = l:font_string[:-2]
+  execute 'set guifont=' . l:font_string
+endfunction
+command! -nargs=1 FontSetGui call core#FontSetGui(<args>)
+
+" Allow dynamic font size alterations
+function! core#FontChangeSize(size)
+  let &guifont = substitute(&guifont, '[1-9][0-9]*', string(a:size), 'g')
+endfunction
+command! -nargs=1 FontChangeSize call core#FontChangeSize(<args>)
+
+function! core#FontIncreaseSize(...)
+  let l:increment = get(a:, 1, 1)
+  let l:current_size = str2nr(substitute(&guifont,
+    \ '^\(.* \)\([1-9][0-9]*\)', '\2', ''))
+  call core#FontChangeSize(current_size + increment)
+endfunction
+command! -nargs=? FontIncreaseSize call core#FontIncreaseSize(<args>)
+
+function! core#FontDecreaseSize(...)
+  let l:decrement = -get(a:, 1, 1)
+  call core#FontIncreaseSize(l:decrement)
+endfunction
+command! -nargs=? FontDecreaseSize call core#FontDecreaseSize(<args>)
+
 " Attempt to source the given file if it's readable on the filesystem
 function! core#TrySource(script_path)
   if filereadable(a:script_path)
@@ -381,6 +413,33 @@ function! core#PluginProcessRegistry()
     endif
   endfor
 endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set extra options when running in GUI mode
+if has("gui_running")
+  set guioptions-=T " Toolbar
+  set guioptions-=m " Menu bar
+  set guioptions-=r " Right-hand scroll bar
+  set guioptions-=R " When vertically split window?
+  set guioptions-=l " Left-hand scroll bar
+  set guioptions-=L " When vertically split window?
+  set guioptions-=b " bottom horizontal scroll bar
+  set guioptions+=e " Tab pages
+  set guioptions+=g " Show inactive menu items as greyed out?
+  set guioptions+=i " Use Vim icon
+  set guioptions-=f " Should gvim fork-detach from parent shell?
+  set guioptions+=v " Should prefer vertical button layout for dialogs?
+  " Describes text to use in labels on GUI tab pages line
+  set guitablabel=%M\ %t
+
+  " Set default fonts
+  call core#FontSetGui([
+    \ {'name': 'DejaVu Sans Mono', 'size': 12},
+    \ {'name': 'Consolas', 'size': 12},
+    \ {'name': 'Menlo Regular', 'size': 12},
+    \ ])
+endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
