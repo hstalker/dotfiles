@@ -348,12 +348,18 @@ endif
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ultisnips configuration
 if core#PluginIsLoaded('SirVer/ultisnips')
-  let g:UltiSnipsSnippetsDirectories = [g:config_dir . "snippets"]
+  let g:UltiSnipsSnippetDirectories = [
+    \ g:config_dir . "UltiSnips", " Personal snippets
+    \ g:config_dir . "snippets",
+    \ "UltiSnips", " Relative path snippets from plugins
+    \ "snippets",
+    \ ]
   if core#PluginIsLoaded('honza/vim-snippets')
-    call add(g:UltiSnipsSnippetsDirectories, g:plug_dir . "vim-snippets/UltiSnips")
+    call add(g:UltiSnipsSnippetDirectories, g:plug_dir . "vim-snippets/UltiSnips")
   endif
   let g:UltiSnipsExpandTrigger = "<tab>"
   let g:UltiSnipsJumpForwardTrigger = "<tab>"
+  let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 endif
 
 
