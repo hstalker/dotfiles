@@ -4,5 +4,5 @@
   (expand-file-name 
     (substitute-env-vars 
       "${XDG_CONFIG_HOME}/emacs/init.el" 
-      (lambda(_) (concat (file-name-as-directory (getenv "HOME")) ".config/emacs/init.el")))))
+      (lambda(_) (concat (file-name-as-directory (getenv "HOME")) ".config")))))
 
