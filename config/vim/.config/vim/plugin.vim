@@ -349,10 +349,8 @@ endif
 " Ultisnips configuration
 if core#PluginIsLoaded('SirVer/ultisnips')
   let g:UltiSnipsSnippetDirectories = [
-    \ g:config_dir . "UltiSnips", " Personal snippets
-    \ g:config_dir . "snippets",
-    \ "UltiSnips", " Relative path snippets from plugins
-    \ "snippets",
+    \ g:config_dir . "UltiSnips",
+    \ "UltiSnips"
     \ ]
   if core#PluginIsLoaded('honza/vim-snippets')
     call add(g:UltiSnipsSnippetDirectories, g:plug_dir . "vim-snippets/UltiSnips")
