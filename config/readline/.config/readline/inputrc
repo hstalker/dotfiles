@@ -36,8 +36,8 @@ set bell-style none
 # We prefer to wrap
 set horizontal-scroll-mode off
 
-# Setup vi style input by default on all readline prompts
-set editing-mode vi
+# Setup emacs style input by default on all readline prompts
+set editing-mode emacs
 # If on changes PS1 prompt between cmd/ins, but we have custom prompt that
 # overrides it, so doesn't work as one might expect
 set show-mode-in-prompt off
