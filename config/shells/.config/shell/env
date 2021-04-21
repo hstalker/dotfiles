@@ -15,6 +15,7 @@ indirect_expand() {
 # Remove an instance of $1 from $2 (default: PATH)
 # Usage: path_remove /path/to/bin [PATH]
 path_remove() {
+  OLD_IFS="$IFS"
   IFS=':'
   newpath=
   dir=
@@ -25,6 +26,7 @@ path_remove() {
       newpath=$newpath:$dir
     fi
   done
+  IFS="$OLD_IFS"
   eval $var=${newpath#:}
   export $var
 }
