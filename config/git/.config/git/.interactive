@@ -14,3 +14,33 @@ alias git-clean-tracked-dir='git ls-tree --name-only -d -r -z HEAD \
   | xargs -0 rmdir'
 alias git-clean-tracked='git-clean-tracked-files; git-clean-tracked-dir'
 
+# Gives a total summary report of changes in a git repo contributed by the
+# given user.
+git-contributions () {
+  if [ $# -gt 1 ]; then
+    echo "git-contributions [GIT-USER-NAME]"
+    return
+  fi
+  git log --author="${1:-$(git config user.name)}" \
+    --pretty=tformat: --numstat \
+    | awk \
+      '{ add += $1; subs += $2; loc += $1 - $2 } \
+       END \
+       { printf "Added: %s lines, Removed: %s lines, Total Added: %s lines\n", \
+                add, subs, loc }'
+}
+
+# Gives a line count report of the given commit
+git-commit-stats () {
+  if [ $# -gt 1 ]; then
+    echo "git-commit-stats [COMMIT-ID]"
+    return
+  fi
+  git show "${1:-HEAD}" --numstat --pretty=tformat: \
+    | awk \
+      '{ add += $1; subs += $2; loc += $1 - $2 } \
+       END \
+       { printf "Added: %s lines, Removed: %s lines, Total Added: %s lines\n", \
+                add, subs, loc }'
+}
+
