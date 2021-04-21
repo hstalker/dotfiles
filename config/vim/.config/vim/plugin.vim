@@ -4,7 +4,7 @@ scriptencoding utf-8
 " Use VimPlug for plugin management
 let g:plug_dir=g:data_dir . 'plug/'
 let g:plug_script=g:plug_dir . 'plug.vim'
-let g:plug_commit_hash='3aa3b5a4e85620dd58302926b571860c92fdbb2f'
+let g:plug_commit_hash='cffcfe'
 let g:plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/'
   \ . g:plug_commit_hash . '/plug.vim'
 " Grab vimplug if not available using curl
@@ -37,72 +37,72 @@ augroup END
 " Theming (solarized8 supports truecolor, whereas old vim-solarized does not)
 call core#PluginAdd('lifepillar/vim-solarized8')
 call core#PluginPin('lifepillar/vim-solarized8',
-  \ '5df7666374ead07a482605b53a0f36c27dc17e8d')
+  \ 'd3ba80')
 " Status line prettification
 call core#PluginAdd('vim-airline/vim-airline')
 call core#PluginPin('vim-airline/vim-airline',
-  \ 'd0aaa061c2b6eb78b9d12a33cd0bbd1fd43f7d83')
+  \ '07ab201')
 call core#PluginAdd('vim-airline/vim-airline-themes')
 call core#PluginPin('vim-airline/vim-airline-themes',
-  \ '04fa4fc40f21d9490954213c1ee06c7fdea66a6d')
+  \ '0f9995d')
 " Spacemacs (which-key) style dynamic keybinding helper menu
 call core#PluginAdd('liuchengxu/vim-which-key')
 call core#PluginPin('liuchengxu/vim-which-key',
-  \ 'b9409149a5a8a386322cc4246d890c8c4c07d11d')
+  \ '4c605b1')
 " Make the `.` command work for more complex actions
 call core#PluginAdd('tpope/vim-repeat')
 call core#PluginPin('tpope/vim-repeat',
-  \ 'c947ad2b6a16983724a0153bdf7f66d7a80a32ca')
+  \ '24afe92')
 " Primitive motions for manipulating surrounded text (''/""/() etc.)
 call core#PluginAdd('tpope/vim-surround')
 call core#PluginPin('tpope/vim-surround',
-  \ 'f51a26d3710629d031806305b6c8727189cd1935')
+  \ 'f51a26d')
 " Commenting blocks
 call core#PluginAdd('tpope/vim-commentary')
 call core#PluginPin('tpope/vim-commentary',
-  \ 'f8238d70f873969fb41bf6a6b07ca63a4c0b82b1')
+  \ '349340d')
 " Autosave documents on hooks
 call core#PluginAdd('907th/vim-auto-save')
 call core#PluginPin('907th/vim-auto-save',
-  \ '8c1d5dc919030aa712ad7201074ffb60961e9dda')
+  \ '8c1d5dc')
 " VCS LHS change display (e.g. additions/changes/deletions)
 if has('nvim') || has('patch-8.0.902')
   call core#PluginAdd('mhinz/vim-signify')
   call core#PluginPin('mhinz/vim-signify',
-    \ 'c3d450eb5f5e76d99d23b10493d4e08c5bb1ae71')
+    \ '2542b64')
 endif
 " Snippets
 if (has('python') || has('python3'))
   call core#PluginAdd('SirVer/ultisnips')
   call core#PluginPin('SirVer/ultisnips',
-    \ 'e83c82099d9bd43dc7895e3cb5b114ee5a2a07c6')
+    \ '204b501')
   call core#PluginAdd('honza/vim-snippets')
   call core#PluginPin('honza/vim-snippets',
-    \ '900bf93c6680e38ce568dba26c3f48b4365ac730')
+    \ '2a28fc3')
 endif
 " Fuzzy buffer/file searching within project
 call core#PluginAdd('ctrlpvim/ctrlp.vim')
 call core#PluginPin('ctrlpvim/ctrlp.vim',
-  \ 'd93d97813dc839ef0782302a0debd7c4877f09f3')
+  \ 'f68f4d0')
 " Filesytem tree explorer
 call core#PluginAdd('preservim/nerdtree')
 call core#PluginPin('preservim/nerdtree',
-  \ '6571452857fd1b14f15a3886f9fffc113c36bbac')
+  \ '81f3eab')
 " 'Dumb' jumping for 40+ languages (as opposed to tags)
 call core#PluginAdd('pechorin/any-jump.vim')
 call core#PluginPin('pechorin/any-jump.vim',
-  \ '5b9c291130f65d8f68dc405aec18b10a1c55e323')
+  \ 'c5c319f')
 " Load editorconfig settings from file in directory
 call core#PluginAdd('editorconfig/editorconfig-vim')
 call core#PluginPin('editorconfig/editorconfig-vim',
-  \ '0a3c1d8082e38a5ebadcba7bb3a608d88a9ff044')
+  \ 'f305bc7')
 " Dynamically display effects of ex commands (e.g. :s etc.)
-if v:version >= 800
+if v:version >= 801
   " Documentation of plugin suggests it only works on 8.1 or above, but this
   " doesn't appear to be true in practice
   call core#PluginAdd('markonm/traces.vim')
   call core#PluginPin('markonm/traces.vim',
-    \ 'd8ff43209d6464d5239db724207d588e4153767d')
+    \ '0f29f8e')
 endif
 
 
