@@ -52,13 +52,14 @@ dotfiles as-is via home-manager. If the requirement of supporting other distros
 made considerably simpler, alas the world isn't so simple.
 
 ## Future Goals
-* Add & grow emacs configuration - It's never a good move to try and solve
-  everything from the get-go, so emacs will likely grow from a fairly minimal
-  base configuration into something abiding by the philosophy set out in this
-  repository.
-* Move to NixOS on all my systems, whilst maintaining near full stowability of
-  dotfiles to non-Nix systems.
+* Move Emacs to selectrum/prescient/consult/embark/marginalia/bufler/lsp.
+* Move Emacs config to support more advanced packaging functionality such as
+  layered lockfiles (core + overrides), package disabling etc.
+* Try to move Vim plug usage to support an automated lockfile mechanism for
+  pinning.
 * Add WM/DE/rofi configuration.
+* Consider move to NixOS on all my systems, whilst maintaining near full
+  stowability of dotfiles to non-Nix systems.
 
 ## Prerequisites
 * Git (to clone this repo somewhere local).
@@ -404,7 +405,47 @@ convenience.
 ---
 
 ### Emacs
-**TODO**
+#### Installation
+Emacs should setup default plugins via git and built-in web capabilities, and
+then configure itself when first run.
+
+#### Overview
+The Emacs configuration is split into two layers: A core layer and an optional
+set of mirroring override points.
+
+The current load order of these scripts is as follows:
+* `$HOME/.emacs` (On older systems - deprecated - forwards to below)
+* `$XDG_CONFIG_HOME/emacs/early-init.el` (On newer systems)
+* `$XDG_CONFIG_HOME/emacs/init.el`
+* `$XDG_CONFIG_HOME/emacs/core-package.el`
+* `$XDG_CONFIG_HOME/emacs/custom-package.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/core-config.el`
+* `$XDG_CONFIG_HOME/emacs/custom-config.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/custom-customization.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/custom-abbreviation.el` (If available)
+
+#### General Configuration
+Per-install configuration overrides should be placed in
+`$XDG_CONFIG_HOME/emacs/custom-config.el`. This is where you should place all
+machine-local customizations that are *not* package declarations (this means
+use-package blocks for said packages *is* fair game here).
+
+#### Package Configuration
+Local machine package additions and overrides (not general configuration)
+should be placed in `$XDG_CONFIG_HOME/emacs/custom-package.el`. The allowed
+operations are:
+
+* `(straight-install-package 'package-name)`
+
+Local machine configuration additions (including configuration for packages
+declared in custom-package.el) should be placed in
+`$XDG_CONFIG_HOME/emacs/custom-config.el`. The provided operations are:
+
+* `(use-package package-name ...)`, where this follows typical third-party
+  use-package usage.
+
+Typically our core emacs functions for configuration are prefixed by either
+`hgs-` or `minmacs-`.
 
 ---
 
