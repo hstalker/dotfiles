@@ -144,12 +144,17 @@ set foldlevelstart=99
 let g:netrw_home=g:cache_dir
 
 " Set swap/backup/undo/viminfo/rtp based on our base paths
-execute 'set directory=' . g:cache_dir . '/swap,~/,/tmp'
-execute 'set backupdir=' . g:cache_dir . '/backup,~/,/tmp'
-execute 'set undodir=' . g:cache_dir . '/undo,~/,/tmp'
-execute 'set viminfo+=n' . g:cache_dir . '/viminfo'
+for missing_directory in ['swap', 'backup', 'backup']
+  if !isdirectory(g:cache_dir . missing_directory)
+    call mkdir(g:cache_dir . missing_directory)
+  endif
+endfor
+execute 'set directory=' . g:cache_dir . 'swap,~/,/tmp'
+execute 'set backupdir=' . g:cache_dir . 'backup,~/,/tmp'
+execute 'set undodir=' . g:cache_dir . 'undo,~/,/tmp'
+execute 'set viminfo+=n' . g:cache_dir . 'viminfo'
 execute 'set runtimepath+=' . g:config_dir . ','
-  \ . g:config_dir . '/after,'
+  \ . g:config_dir . 'after,'
   \ . '$VIM,$VIMRUNTIME'
 
 " Default updatetime of 4000ms is bad for async updates
