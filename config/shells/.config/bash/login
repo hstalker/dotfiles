@@ -4,18 +4,15 @@
 # Shouldn't need much if any further configuration beyond the shared
 # configuration present in $XDG_CONFIG_HOME/shell/.
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 # Grab user bash-completion scripts from $XDG_CONFIG_HOME
-BASH_COMPLETION_USER_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
-export BASH_COMPLETION_USER_FILE
+assign_export BASH_COMPLETION_USER_FILE \
+  "${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
 try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
 
-# For the history
-if [ ! -d  "${XDG_CACHE_HOME:-$HOME/.cache}"/bash ]; then
-  mkdir "${XDG_CACHE_HOME:-$HOME/.cache}/bash"
-fi
+silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/bash"
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.login"
+load_override_module bash login
 

@@ -5,5 +5,5 @@
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.env"
+load_override_module bash env
 

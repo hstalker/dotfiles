@@ -6,14 +6,8 @@
 ###############################################################################
 
 # Load application specific logout files
-if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
-        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
-then
-  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
-    try_source "${p}/.logout"
-  done
-fi
+load_per_application_modules logout
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.logout"
+load_override_module shell logout
 

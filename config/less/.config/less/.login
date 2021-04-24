@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/less"
-LESSHISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/less/history"
-export LESSHISTFILE
-LESSKEY="${XDG_CONFIG_HOME:-$HOME/.config}/less/lesskey"
-export LESSKEY
+silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/less"
+assign_export LESSHISTFILE \
+  "${XDG_CACHE_HOME:-$HOME/.cache}/less/history"
+assign_export LESSKEY \
+  "${XDG_CONFIG_HOME:-$HOME/.config}/less/lesskey"
 

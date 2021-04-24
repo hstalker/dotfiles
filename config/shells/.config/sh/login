@@ -9,15 +9,15 @@
 # We put it before loading other login scripts as they might want its most
 # up-to-date value (for this shell instance) to operate correctly
 if [ -z "$SHLVL" ]; then
-  SHLVL=1; export SHLVL
+  assign_export SHLVL 1
 else
   # There is not guarantee that non-login/non-interactive sh shells will have
   # an appropriate SHLVL
-  SHLVL=$((SHLVL+1)); export SHLVL
+  assign_export SHLVL $((SHLVL+1))
 fi
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/sh/custom.login"
+load_override_module sh login
 

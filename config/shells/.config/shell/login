@@ -6,53 +6,52 @@
 ###############################################################################
 # Setting up environment variables and PATH
 # Personal information
-GITHUB_NAME='Hector Stalker'; export GITHUB_NAME
-GITHUB_EMAIL='1683065+hstalker@users.noreply.github.com'; export GITHUB_EMAIL
-NAME=$GITHUB_NAME; export NAME
-EMAIL=$GITHUB_EMAIL; export EMAIL
+assign_export GITHUB_NAME 'Hector Stalker'
+assign_export GITHUB_EMAIL '1683065+hstalker@users.noreply.github.com'
+assign_export NAME "$GITHUB_NAME"
+assign_export EMAIL "$GITHUB_EMAIL"
 
 # Preferred programs
 # $EDITOR-style variables don't allow for passing flags. If you want that you
 # need to use a wrapper script which things like (sudo)edit can directly
 # execute.
-ALTERNATE_EDITOR='nano'; export ALTERNATE_EDITOR
-EDITOR='vim'; export EDITOR
-VISUAL="vim-minimal"; export VISUAL
-PAGER='less'; export PAGER
+assign_export ALTERNATE_EDITOR 'nano'
+assign_export EDITOR 'vim'
+assign_export VISUAL "vim-minimal"
+assign_export PAGER 'less'
 
 # Base keyboard layout, language & locale
-KEYBOARD_LAYOUT=us; export KEYBOARD_LAYOUT
-LANG=en_US.UTF-8; export LANG
-LANGUAGE=; export LANGUAGE
-LC_CTYPE="$LANG"; export LC_CTYPE
-LC_NUMERIC="$LANG"; export LC_NUMERIC
-LC_TIME="$LANG"; export LC_TIME
-LC_COLLATE="$LANG"; export LC_COLLATE
-LC_MONETARY="$LANG"; export LC_MONETARY
-LC_MESSAGES="$LANG"; export LC_MESSAGES
-LC_PAPER="$LANG"; export LC_PAPER
-LC_NAME="$LANG"; export LC_NAME
-LC_ADDRESS="$LANG"; export LC_ADDRESS
-LC_TELEPHONE="$LANG"; export LC_TELEPHONE
-LC_MEASUREMENT="$LANG"; export LC_MEASUREMENT
-LC_IDENTIFICATION="$LANG"; export LC_IDENTIFICATION
-LC_ALL=; export LC_ALL
+assign_export KEYBOARD_LAYOUT "us"
+assign_export LANG "en_US.UTF-8"
+assign_export LANGUAGE ""
+assign_export LC_CTYPE "$LANG"
+assign_export LC_NUMERIC "$LANG"
+assign_export LC_TIME "$LANG"
+assign_export LC_COLLATE "$LANG"
+assign_export LC_MONETARY "$LANG"
+assign_export LC_MESSAGES "$LANG"
+assign_export LC_PAPER "$LANG"
+assign_export LC_NAME "$LANG"
+assign_export LC_ADDRESS "$LANG"
+assign_export LC_TELEPHONE "$LANG"
+assign_export LC_MEASUREMENT "$LANG"
+assign_export LC_IDENTIFICATION "$LANG"
+assign_export LC_ALL ""
 
 # Set all the XDG path vars
-XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"; export XDG_DATA_HOME
-XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"; export XDG_CONFIG_HOME
-XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"; export XDG_CACHE_HOME
+assign_export XDG_DATA_HOME "${XDG_DATA_HOME:-$HOME/.local/share}"
+assign_export XDG_CONFIG_HOME "${XDG_CONFIG_HOME:-$HOME/.config}"
+assign_export XDG_CACHE_HOME "${XDG_CACHE_HOME:-$HOME/.cache}"
 # Shouldn't set this ourselves as systemd sets it up
-#XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"; export XDG_RUNTIME_DIR
-XDG_DATA_DIRS="${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-export XDG_DATA_DIRS
-XDG_CONFIG_DIRS="${XDG_CONFIG_DIRS:-/etc/xdg}"; export XDG_CONFIG_DIRS
+#assign_export XDG_RUNTIME_DIR "${XDG_RUNTIME_DIR:-/run/user/$UID}"
+assign_export XDG_DATA_DIRS "${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+assign_export XDG_CONFIG_DIRS "${XDG_CONFIG_DIRS:-/etc/xdg}"
 
 # Path settings
 # Local installation overrides should be prioritized
-path_prepend $HOME/.local/bin PATH
-path_prepend $HOME/.local/lib LD_LIBRARY_PATH
-path_prepend $HOME/.local/include CPATH
+path_prepend "$HOME/.local/bin" PATH
+path_prepend "$HOME/.local/lib" LD_LIBRARY_PATH
+path_prepend "$HOME/.local/include" CPATH
 
 # Making sure the current directory isn't in PATH for security & weirdness
 # reasons.
@@ -60,14 +59,8 @@ path_remove . PATH
 path_remove "" PATH
 
 # Load application specific login files
-if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
-        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
-then
-  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
-    try_source "${p}/.login"
-  done
-fi
+load_per_application_modules login
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.login"
+load_override_module shell login
 

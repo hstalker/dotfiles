@@ -7,5 +7,5 @@
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/custom.env"
+load_override_module zsh env
 

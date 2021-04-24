@@ -2,64 +2,619 @@
 ###############################################################################
 # Setup environment for all Posix compatible shells.
 # Is run by all such shells on start.
-# Must be Posix shell compatible.
+# Must be Posix bourne shell compatible.
 
 ###############################################################################
-# Convenience functions for loading files and modifying files.
-# Grab the value of environment variable $1
-# Usage: indirect_expand PATH -> $PATH
+# Collection of convenience and portability functions to be used everywhere
+# shell.
+
+# Run the given command hiding all output
+silence() {
+  "$@" >/dev/null 2>&1
+}
+
+# Run the given command hiding stderr
+silence_output() {
+  "$@" >/dev/null
+}
+
+# Run the given command hiding stderr
+silence_error() {
+  "$@" 2>/dev/null
+}
+
+# Check for whether we have the baseline tools for this script to even work
+# installed.
+_check_for_base_tools() {
+  if [ $# != 0 ]; then
+    echo "USAGE: _check_for_base_tools"
+    return 255
+  fi
+
+  # We don't want to do this *every* time, just once
+  if [ -z "${_HAS_BASE_TOOLS}" ]; then
+    for TOOL in tput grep find echo sed dirname; do
+      if ! silence command -v "${TOOL}"; then
+        echo "[INTERNAL]: Missing required tool '${TOOL}'! Go install it \
+first."
+        exit 1
+      fi
+      _HAS_BASE_TOOLS=1
+    done
+  fi
+
+  return 0
+}
+_check_for_base_tools
+
+# Grab the value of environment variable $1 indirectly
 indirect_expand() {
+  if [ $# != 1 ]; then
+    echo "USAGE: indirect_expand VAR-NAME"
+    return 255
+  fi
+
   env | sed -n "s/^$1=//p"
+
+  return 0
+}
+
+# Matches against tput ANSI escape codes for the given subcommand. Tput
+# subcommand defaults to `setaf`.
+# Usage: echo "$(_text_set_color COLOR-NAME [TPUT-SUBCOMMAND])"
+_text_set_color() {
+  case "$1" in
+    bla*|black)
+      _TEXT_COLOR_VALUE=0
+      ;;
+    r*|red)
+      _TEXT_COLOR_VALUE=1
+      ;;
+    g*|green)
+      _TEXT_COLOR_VALUE=2
+      ;;
+    y*|yellow)
+      _TEXT_COLOR_VALUE=3
+      ;;
+    blu*|blue)
+      _TEXT_COLOR_VALUE=4
+      ;;
+    m*|magenta)
+      _TEXT_COLOR_VALUE=5
+      ;;
+    c*|cyan)
+      _TEXT_COLOR_VALUE=6
+      ;;
+    w*|white)
+      _TEXT_COLOR_VALUE=7
+      ;;
+    *)
+      # Just pass through whatever since terminals support >8 colors :)
+      _TEXT_COLOR_VALUE="$1"
+      ;;
+  esac
+  if [ -n "${_TEXT_COLOR_VALUE}" ]; then
+    printf "$(tput "${2:-setaf}" ${_TEXT_COLOR_VALUE})"
+  fi
+
+  return 0
+}
+
+# Prints a foreground color escape by translating string color names to tput
+# values.
+# Usage: echo "$(text_fg_color COLOR-NAME)"
+text_fg_color() {
+  _text_set_color "$1" "setaf"
+}
+
+# Prints a background color escape by translating string color names to tput
+# values.
+# Usage: echo "$(text_fg_color COLOR-NAME)"
+text_bg_color() {
+  _text_set_color "$1" "setab"
+}
+
+# Emits ANSI escape for toggling underline for text.
+# Usage: echo "$(text_underline_on)I'm underlined$(text_underline_off)I'm not"
+text_underline_on() {
+  printf "$(tput smul)"
+  return 0
+}
+text_underline_off() {
+  printf "$(tput rmul)"
+  return 0
+}
+
+# Emits ANSI escape for toggling standout for text.
+# Usage: echo "$(text_standout_on)I standout$(text_standout_off)I don't"
+text_standout_on() {
+  printf "$(tput rmso)"
+  return 0
+}
+text_standout_off() {
+  printf "$(tput rmso)"
+  return 0
+}
+
+# Emits ANSI escape for turning on bold mode for text.
+# Usage: echo "$(text_standout)I'm bold"
+text_bold() {
+  printf "$(tput bold)"
+  return 0
+}
+
+# Emits ANSI escape for turning on half-bright mode for text.
+# Usage: echo "$(text_standout)I'm bold"
+text_dim() {
+  printf "$(tput bold)"
+  return 0
+}
+
+# Resets all attributes applied to text following it in terminal.
+# Usage: echo "$(text_fg_color red)SOMETEXT$(text_reset)"
+text_reset() {
+  printf "$(tput sgr0)"
+  return 0
+}
+
+# Generic function for printing messages to output with a given color and
+# category.
+# Usage: _report_message TPUT-COLOR-CODE CATEGORY-STRING MESSAGE-STRING
+_report_message() {
+  if [ $# != 3 ]; then
+    echo "USAGE: _report_message TPUT-COLOR-CODE CATEGORY-STRING MESSAGE-STRING"
+    return 255
+  fi
+
+  # Change colour, print message and then reset the color.
+  printf "$(text_fg_color "$1")[$2]: $3$(text_reset)\n"
+  return 0
+}
+
+# Report a colored error message. Also finishes as false, so it can be
+# effectively used in branching.
+# Usage: report_error ERROR-STRING
+report_error() {
+  if [ $# != 1 ]; then
+    echo "USAGE: report_error ERROR-STRING"
+    return 255
+  fi
+
+  _report_message red "ERROR" "$1"
+  return 0
+}
+
+# Report a colored warning message
+# Usage: report_warning WARNING-STRING
+report_warning() {
+  if [ $# != 1 ]; then
+    echo "USAGE: report_warning WARNING-STRING"
+    return 255
+  fi
+
+  _report_message yellow "WARNING" "$1"
+  return 0
+}
+
+# Report a colored status message
+# Usage: report_status STATUS-STRING
+report_status() {
+  if [ $# != 1 ]; then
+    echo "USAGE: report_status STATUS-STRING"
+    return 255
+  fi
+
+  _report_message green "STATUS" "$1"
+  return 0
+}
+
+# Report an error message and then kill the current process.
+# Note that this will not kill the process if it is an interactive shell, as
+# that wouldn't be much help.
+error_and_die() {
+  if [ $# -lt 1 -o $# -gt 2 ]; then
+    echo "USAGE: error_and_die ERROR-STRING [EXIT-VALUE]"
+    return 255
+  fi
+
+  report_error "$1"
+  # We don't want to quit out of interactive shells from this
+  case $- in
+    *i*)
+      exit ${2:-1}
+      ;;
+    *)
+      ;;
+  esac
+
+  return 0
+}
+
+# Will store latest state of set options for restoring them later via a
+# matching pop_set_state. The naming implies a stack nature, but it isn't.
+push_set_state() {
+  if [ $# != 0 ]; then
+    report_error "USAGE: push_set_state"
+    return 255
+  fi
+
+  _OLD_SET_STATE="$(set +x)"
+  return 0
+}
+
+# Reset state of the shell set options from the latest backup.
+pop_set_state() {
+  if [ $# != 0 ]; then
+    report_error "USAGE: pop_set_state"
+    return 255
+  fi
+
+  if [ -n "$_OLD_SET_STATE" ]; then
+    set +vx; eval "${_OLD_SET_STATE}"
+    _OLD_SET_STATE=""
+  fi
+  return 0
+}
+
+# Assigns and exports a variable in a Posix way (no, export VAR1=abc *isn't*
+# Posix). Just reduces duplication of identifiers, which is an annoyingly
+# common source of typos. Will set as empty value if no VALUE argument
+# provided.
+# Usage:
+assign_export() {
+  if [ $# -lt 1 -o $# -gt 2 ]; then
+    report_error "USAGE: assign_export VARIABLE-NAME [VALUE]"
+    return 255
+  fi
+
+  eval "$1='${2:-}'"
+  eval export "$1"
+
+  return 0
 }
 
 # Remove an instance of $1 from $2 (default: PATH)
-# Usage: path_remove /path/to/bin [PATH]
 path_remove() {
-  OLD_IFS="$IFS"
+  if [ $# -lt 1 -o $# -gt 2 ]; then
+    report_error "USAGE: path_remove /path/to/bin [PATH]"
+    return 255
+  fi
+
+  _OLD_IFS="$IFS"
   IFS=':'
-  newpath=
-  dir=
-  var=${2:-PATH}
-  for dir in `indirect_expand "$var"`; do
+  _NEW_PATH=
+  _DIR=
+  _VAR="${2:-PATH}"
+
+  for _DIR in $(indirect_expand "$_VAR"); do
     IFS=''
-    if [ "$dir" != "$1" ]; then
-      newpath=$newpath:$dir
+    if [ "$_DIR" != "$1" ]; then
+      _NEW_PATH="$_NEW_PATH:$_DIR"
     fi
   done
-  IFS="$OLD_IFS"
-  eval $var=${newpath#:}
-  export $var
+  IFS="$_OLD_IFS"
+  eval assign_export "$_VAR" "${_NEW_PATH#:}"
+
+  return 0
 }
 
 # Prepend $1 to $2 (default: PATH) guaranteeing uniqueness
-# Usage: pathprepend /path/to/bin [PATH]
 path_prepend() {
+  if [ $# -lt 1 -o $# -gt 2 ]; then
+    report_error "USAGE: path_prepend PATH-TO-ADD [PATH]"
+    return 255
+  fi
+
   # if the path is already in the variable,
   # remove it so we can move it to the front
   path_remove "$1" "$2"
-  var="${2:-PATH}"
-  value=`indirect_expand "$var"`
-  eval ${var}="${1}${value:+:${value}}"
-  export ${var}
+  _VAR="${2:-PATH}"
+  _VALUE=$(indirect_expand "$_VAR")
+
+  eval assign_export "$_VAR" "${1}${_VALUE:+:${_VALUE}}"
+
+  return 0
 }
 
 # Append $1 to $2 (default: PATH) guaranteeing uniqueness
-# Usage: path_append /path/to/bin [PATH]
 path_append() {
+  if [ $# -lt 1 -o $# -gt 2 ]; then
+    report_error "USAGE: path_append PATH-TO-ADD [PATH]"
+    return 255
+  fi
+
   path_remove "${1}" "${2}"
-  var=${2:-PATH}
-  value=`indirect_expand "$var"`
-  eval $var="${value:+${value}:}${1}"
-  export $var
+  _VAR=${2:-PATH}
+  _VALUE=$(indirect_expand "$_VAR")
+
+  eval assign_export "$_VAR" "${1}${_VALUE:+${_VALUE}:}${1}"
+
+  return 0
 }
 
 # Source if file is readable
-# Usage: try_source filename
 try_source() {
-  if [ -r "$1" ]; then
+  if [ $# != 1 ]; then
+    report_error "USAGE: try_source FILE-NAME"
+    return 255
+  fi
+
+  if [ -r "$1" -a ! -d "$1" ]; then
     . "$1"
   fi
+
+  return 0
 }
+
+# Source file and report error if not available. This is largely to make it
+# clearer what the problem is, as shells are notoriously bad at giving good
+# errors.
+require_source() {
+  if [ $# != 1 ]; then
+    error_and_die "USAGE: require_source FILE-NAME"
+  fi
+
+  if [ -r "$1" ]; then
+    . "$1"
+    return 0
+  else
+    if [ -p "$1" -o -d "$1" -o ]; then
+      error_and_die \
+        "Unable to source required shell script '$1' as it is not a file!"
+    elif [ ! -e "$1" ]; then
+      error_and_die \
+        "Unable to source required shell script '$1' as it does not exist!"
+    else
+      error_and_die \
+        "Unable to source required shell script '$1' as it is unreadable!"
+    fi
+  fi
+}
+
+# Are we on a Systemd machine? This changes how we have to handle things.
+# There are a bunch of ways of doing this, but this is how `sd_booted()` works
+# in systemd itself.
+# Usage: if has_systemd; then echo "We're on systemd!"; fi
+has_systemd() (
+  if [ -x /run/systemd/system ]; then
+    return 0
+  else
+    return 1
+  fi
+)
+
+# Systemd offers the concept of user-level environment.d, where people can
+# store simplified environment variable setting globally across their systemd
+# services etc. Here we offer a function for loading and exporting all the
+# environment variables specified in this directory.
+# Defaults to currently set $XDG_CONFIG_HOME as environment.d path.
+# Note that running this by default can be risky, since we're having to eval
+# arbitrary user code.
+# Usage: load_user_systemd_environment_d [ENVIRONMENT-D-PATH]
+load_user_systemd_environment_d() {
+  report_status "Loading systemd environment.d settings from \
+'${1:-$XDG_CONFIG_HOME}/environment.d/'..."
+  for ENV_SCRIPT in "${1:-$XDG_CONFIG_HOME}/environment.d/*"; do
+    if [ -r "$ENV_SCRIPT" ]; then
+      report_status "Loading '${ENV_SCRIPT}'..."
+      push_set_state
+      set -a
+      try_source "$ENV_SCRIPT"
+      pop_set_state
+    fi
+  done
+
+  return 0
+}
+
+# Allows us to inject all non "^_.+$" format variable names currently exported
+# into all future Systemd service instances. Is a no-op is Systemd isn't in
+# use. Will only inject a single variable if given one rather than scraping
+# from the current session. Probably shouldn't be used, but allows for simple
+# matching of shell environment with Systemd.
+# Usage: inject_user_systemd_environment [VARIABLE-NAME VARIABLE-VALUE]
+inject_user_systemd_environment() (
+  if ! has_systemd; then
+    report_warning "This system is not using Systemd!"
+    return 0
+  fi
+
+  if [ $# -gt 2 ]; then
+    report_error "Expected 0-2 arguments!"
+    return 255
+  fi
+
+  if [ $# -ge 1 -a $# -le 2 ]; then
+    report_status "Injecting variable '$1' as value '$2' into Systemd..."
+    systemctl --user set-environment "$1"
+  else
+    report_status "Injecting variable all known variables into Systemd..."
+    env -0 | while IFS='=' read -r -d '' ENV_VAR_NAME ENV_VAR_VALUE; do
+      if ! echo "${ENV_VAR_NAME}" | grep -Eq "^_.+$"; then
+        report_status "Injecting '${ENV_VAR_NAME}' as value \
+'${ENV_VAR_VALUE}' into Systemd..."
+        systemctl --user set-environment "${ENV_VAR_NAME}=${ENV_VAR_VALUE}"
+      fi
+    done
+  fi
+  # Force systemd to take note of any changes
+  report_status "Reloading Systemd daemon..."
+  systemctl --user daemon-reload
+
+  return 0
+)
+
+
+###############################################################################
+# Useful commands for making declarative assertions about system state
+# Make the assertion that a directory has to exist, with the optional owner and
+# permissions. Ownership and permissions follow chown and chmod syntax
+# respectively.
+assert_directory() (
+  if [ $# -lt 1 -o $# -gt 3 ]; then
+    report_error \
+      "USAGE: assert_directory PATH-TO-DIRECTORY [OWNER] [PERMISSIONS]"
+    return 255
+  fi
+
+  report_status "Asserting existence of directory '$1'..."
+  if [ ! -d "$1" ]; then
+    mkdir -p "$1" || \
+      report_error "Unable to create directory '$1'!"
+  fi
+
+  if [ -n "$2" ]; then
+    report_status "Asserting ownership of directory '$1' as '$2'..."
+    chown "$2" "$1" || \
+      report_error "Unable to change ownership of directory '$1' to '$2'!"
+  fi
+
+  if [ -n "$3" ]; then
+    report_status "Asserting permissions of directory '$1' as '$3'..."
+    chmod "$3" "$1" || \
+      report_error \
+        "Unable to change permissions on directory '$1' to '$3'!"
+  fi
+
+  return 0
+)
+
+# Make the assertion that a file has to exist, with the optional owner and
+# permissions. Ownership and permissions follow chown and chmod syntax
+# respectively.
+assert_file() (
+  if [ $# -lt 1 -o $# -gt 3 ]; then
+    report_error "USAGE: assert_file PATH-TO-FILE [OWNER] [PERMISSIONS]"
+    return 255
+  fi
+
+  report_status "Asserting existence of file '$1'..."
+  assert_directory "$(dirname "$1")" || return 1
+
+  touch "$(dirname "$1")" || \
+    report_error "Unable to assert file '$1'!" && \
+    return 2
+
+  if [ -n "$2" ]; then
+    report_status "Asserting ownership of file '$1' as '$2'..."
+    chown "$2" "$1" || \
+      report_error "Unable to change ownership of file '$1'!" && \
+      return 3
+  fi
+
+  if [ -n "$3" ]; then
+    report_status "Asserting permissions of file '$1' as '$3'..."
+    chmod "$3" "$1" || \
+      report_error "Unable to change permissions on file '$1'!" && \
+      return 4
+  fi
+
+  return 0
+)
+
+# Make the assertion that the specified file must have a line matching the
+# given regex. Optionally perform a replacement operation if missing.
+assert_file_has_line() (
+  if [ $# -lt 1 -o $# -gt 3 ]; then
+    report_error \
+      "USAGE: assert_file_has_line PATH-TO-FILE REGEX [LINE-TO-ADD]"
+    return 255
+  fi
+
+  report_status "Asserting file '$1' has line matching '$2'..."
+
+  [ -e "$1" ] || \
+    report_error "File '$1' does not exist!" && return 2
+
+  [ -r "$1" ] || \
+    report_error "File '$1' is not readable!" && return 2
+
+  if ! cat "$1" | grep -Eq "$2"; then
+    # The file doesn't have a line matching that regex
+    if [ -z "$3" ]; then
+      return 1
+    else
+      report_status "Adding missing line '$3' to end of file '1'..."
+      echo "$2" >> $1 || \
+        report_error "Unable to add missing line '$3' to file! '$1'" && \
+        return 3
+    fi
+  fi
+
+  return 0
+)
+
+# Checks if the given directory is empty of files, folders etc.
+is_directory_empty() {
+  if [ $# != 1 ]; then
+    report_error "USAGE: is_directory_empty PATH-TO-DIRECTORY"
+    return 255
+  fi
+
+  if [ $(find "$1" \
+      -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+# Load every file matching in "$XDG_CONFIG_HOME/*/$1". Primarily used to load
+# modularized per-application login/logout/interactive/env configuration.
+load_per_application_modules() {
+  _ALLOWED_MODULE_NAMES="env login logout interactive"
+  if [ $# != 1 ] || ! echo "${_ALLOWED_MODULE_NAMES}" | grep -wq "$1"; then
+    report_error "USAGE: load_all_per_application MODULE-NAME where \
+MODULE-NAME is one of '${_ALLOWED_MODULE_NAMES}'"
+    return 255
+  fi
+
+  if ! is_directory_empty "${XDG_CONFIG_HOME:-$HOME/.config}"; then
+    for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
+      try_source "${p}/.$1"
+    done
+  fi
+
+  return 0
+}
+
+# Try to load the $XDG_CONFIG_HOME/$1/custom.$2 override module specified.
+load_override_module() {
+  _ALLOWED_SHELL_NAMES="shell sh ksh zsh bash"
+  _ALLOWED_MODULE_NAMES="env login logout interactive"
+  if [ $# != 2 ] || \
+      ! echo "${_ALLOWED_SHELL_NAMES}" | grep -wq "$1" ||
+      ! echo "${_ALLOWED_MODULE_NAMES}" | grep -wq "$2"; then
+    report_error "USAGE: load_override_module SHELL-NAME MODULE-TYPE where \
+SHELL-NAME is one of '${_ALLOWED_SHELL_NAMES}', \
+and MODULE-TYPE is one of '${_ALLOWED_MODULE_NAMES}'"
+    return 255
+  fi
+
+  try_source "${XDG_CONFIG_HOME:-$HOME/.config}/$1/custom.$2"
+
+  return 0
+}
+
+# Setup directory colors
+load_dircolors_config() {
+  if [ $# != 0 ]; then
+    report_error "USAGE: load_dircolors_config"
+    return 255
+  fi
+
+  if [ -x /usr/bin/dircolors ]; then
+    if [ -r "${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors" ]; then
+      eval \
+        "$(dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)"
+    else
+      eval "$(dircolors -b)"
+    fi
+  fi
+
+  return 0
+}
+
 
 ###############################################################################
 # Actual setting up of the environment
@@ -67,35 +622,17 @@ try_source() {
 # the way bash loads .bashrc when a non-login interactive shell.
 # Ksh and sh share the variable ENV, so we point to a shared script .shrc which
 # does the appropriate checks for shell, and loads the correct files.
-ENV=$HOME/.shrc; export ENV
+assign_export ENV "$HOME/.shrc"
 
 # The path at $BASH_ENV is run when the bash shell is non-interactive
-BASH_ENV=$HOME/.bashrc; export BASH_ENV
+assign_export BASH_ENV "$HOME/.bashrc"
 
 # Enable colour support of ls
-if [ -x /usr/bin/dircolors ]; then
-  test -r ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors && \
-    eval "$(dircolors -b \
-      ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)" || \
-    eval "$(dircolors -b)"
-fi
+load_dircolors_config
 
 # Load application specific env files
-# An alternative approach using `eval $(find -exec echo . {}';' \;)` is
-# possible (as show below), but quite frankly messy. Instead we choose to do a
-# guarded glob.
-#eval $(find "${XDG_CONFIG_HOME:-$HOME/.config}" -mindepth 2 -maxdepth 2 \
-#  -type f,l -name '.env' \
-#  -exec echo . \"{}\"';' \;)
-if [ $(find "${XDG_CONFIG_HOME:-$HOME/.config}/" \
-        -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]
-then
-  for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
-    try_source "${p}/.env"
-  done
-fi
-
+load_per_application_modules env
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/custom.env"
+load_override_module shell env
 

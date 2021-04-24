@@ -1,31 +1,33 @@
 #!/usr/bin/env bash
 ###############################################################################
 # Perform configuration for all interactive bash shells
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 
 ###############################################################################
 # Setup environment variables
 # Colors and PS1 setup - for now this is largely shared between shells
 if [ $(id -u) -eq 0 ]; then
   # Special root PS1 colors
-  color_shell=10
-  color_path=10
-  color_git=10
-  color_separator=6
+  color_shell="\[$(text_fg_color 10)\]"
+  color_path="\[$(text_fg_color 10)\]"
+  color_git="\[$(text_fg_color 10)\]"
+  color_separator="\[$(text_fg_color cyan)\]"
+  color_reset="\[$(text_reset)\]"
 else
   # PS1 for other users
-  color_shell=10
-  color_path=1
-  color_git=4
-  color_separator=6
+  color_shell="\[$(text_fg_color 10)\]"
+  color_path="\[$(text_fg_color red)\]"
+  color_git="\[$(text_fg_color blue)\]"
+  color_separator="\[$(text_fg_color cyan)\]"
+  color_reset="\[$(text_reset)\]"
 fi
 # Add a convenient shell name identifier
-PS1="\[$(tput setaf $color_shell)\][\$(whoami)@\$(hostname):bash]"
-PS1+="\[$(tput setaf $color_path)\]<\$(basename \${PWD})/>" # Path
-PS1+="\[$(tput setaf $color_git)\]\$(get_vcs_branch)" # VCS branch
-PS1+="\[$(tput setaf $color_separator)\]λ " # Separator
-PS1+="\[$(tput sgr0)\]" # Color back to normal
-unset color_shell color_path color_git color_separator
+PS1="$(text_reset)${color_shell}[\$(whoami)@\$(hostname):bash]"
+PS1+="${color_path}<\$(basename \${PWD})/>" # Path
+PS1+="${color_git}\$(get_vcs_branch)" # VCS branch
+PS1+="${color_separator}λ " # Separator
+PS1+="${color_reset}" # Color back to normal
+unset color_shell color_path color_git color_separator color_reset
 
 # Place the history in cache
 HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/bash/history-$HOSTNAME-$USER"
@@ -53,11 +55,11 @@ if ! shopt -oq posix; then
 fi
 
 reload_dotfiles() {
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/bash/env"
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/bash/login"
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/bash/interactive"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/env"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/login"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/interactive"
 }
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/custom.interactive"
+load_override_module bash interactive
 

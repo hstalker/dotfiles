@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 
-BUNDLE_USER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/bundle"
-export BUNDLE_USER_CONFIG
-BUNDLE_USER_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/bundle"
-export BUNDLE_USER_CACHE
-BUNDLE_USER_PLUGIN="${XDG_DATA_HOME:-$HOME/.local/share}/bundle"
-export BUNDLE_USER_PLUGIN
+assign_export BUNDLE_USER_CONFIG \
+  "${XDG_CONFIG_HOME:-$HOME/.config}/bundle"
+assign_export BUNDLE_USER_CACHE \
+  "${XDG_CACHE_HOME:-$HOME/.cache}/bundle"
+assign_export BUNDLE_USER_PLUGIN \
+  "${XDG_DATA_HOME:-$HOME/.local/share}/bundle"
 

@@ -4,7 +4,7 @@
 # Shouldn't need much if any further configuration beyond the shared
 # configuration present in $XDG_CONFIG_HOME/shell/.
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 
 autoload -U colors && colors
 setopt prompt_subst
@@ -114,11 +114,11 @@ fi
 _comp_options+=(globdots)
 
 reload_dotfiles() {
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/env"
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/login"
-  . "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/interactive"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/env"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/login"
+  require_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/interactive"
 }
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/custom.interactive"
+load_override_module zsh interactive
 

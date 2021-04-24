@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
-if [ ! -d "${XDG_DATA_HOME:-$HOME/.local/share}"/wineprefixes ]; then
-  mkdir "${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes"
-fi
-WINEPREFIX="${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes/default"
-export WINEPREFIX
+silence_output \
+  assert_directory "${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes"
+assign_export WINEPREFIX \
+  "${XDG_DATA_HOME:-$HOME/.local/share}/wineprefixes/default"
 

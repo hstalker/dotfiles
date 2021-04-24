@@ -4,12 +4,10 @@
 # Shouldn't need much if any further configuration beyond the shared
 # configuration present in $XDG_CONFIG_HOME/shell/.
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
-if [ ! -d  "${XDG_CACHE_HOME:-$HOME/.cache}/zsh" ]; then
-  mkdir "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
-fi
+silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 
 # Local installation overrides
-try_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/custom.login"
+load_override_module zsh login
 
