@@ -72,7 +72,7 @@ bindkey -a ys add-surround
 bindkey -M visual S add-surround
 
 # Place the history in cache
-HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history-$HOST-$USER"
+HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/history-$HOSTNAME-$USER"
 # For setting history length
 SAVEHIST=10000
 HISTSIZE=$SAVEHIST
