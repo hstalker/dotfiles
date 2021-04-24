@@ -22,13 +22,8 @@ PAGER='less'; export PAGER
 
 # Base keyboard layout, language & locale
 KEYBOARD_LAYOUT=us; export KEYBOARD_LAYOUT
-if $(locale -a | grep -q 'en_GB'); then
-  LANG=en_GB.UTF-8; export LANG
-else
-  LANG=en_US.UTF-8; export LANG
-fi
-LANGUAGE=
-export LANGUAGE
+LANG=en_US.UTF-8; export LANG
+LANGUAGE=; export LANGUAGE
 LC_CTYPE="$LANG"; export LC_CTYPE
 LC_NUMERIC="$LANG"; export LC_NUMERIC
 LC_TIME="$LANG"; export LC_TIME
@@ -41,8 +36,7 @@ LC_ADDRESS="$LANG"; export LC_ADDRESS
 LC_TELEPHONE="$LANG"; export LC_TELEPHONE
 LC_MEASUREMENT="$LANG"; export LC_MEASUREMENT
 LC_IDENTIFICATION="$LANG"; export LC_IDENTIFICATION
-LC_ALL=
-export LC_ALL
+LC_ALL=; export LC_ALL
 
 # Set all the XDG path vars
 XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"; export XDG_DATA_HOME
