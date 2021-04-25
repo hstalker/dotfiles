@@ -16,8 +16,10 @@ wrappers."
 
 ;; Define functions for somewhat declaratively managing packages
 (defvar minmacs--base-packages
-  '(use-package
-    bind-key)
+  '((use-package
+     :type git
+     :host github
+     :repo "jwiegley/use-package"))
   "Base set of packages to install immediately when finished bootstrapping
 straight.el")
 
@@ -28,6 +30,7 @@ straight.el")
   "master"
   "Use master instead of develop for stability.")
 (defvar straight-vc-git-default-protocol
+  ;; We should eventially consider moving to ssh
   'https
   "Prefer https over alternative protocols.")
 (defvar straight-vc-git-default-clone-depth

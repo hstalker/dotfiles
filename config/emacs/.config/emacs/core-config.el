@@ -139,9 +139,8 @@
     (put 'narrow-to-defun 'disabled nil)
     (put 'narrow-to-page 'disabled nil)
 
-    :bind
-    (:map global-map
-          ([remap suspend-frame] . #'hgs--suspend-frame))
+    (bind-keys :map global-map
+               ([remap suspend-frame] . hgs--suspend-frame))
 
     :custom
     (cursor-type 'bar "User a bar cursor rather than a box, as bar better suits
@@ -372,7 +371,7 @@ file when it changes on disk.")
      t)
    "Put autosaves in the cache directory.")
   (backup-directory-alist
-   `(".*" . ,(concat (file-name-as-directory hgs-cache-directory) "backup"))
+   `((".*" . ,(concat (file-name-as-directory hgs-cache-directory) "backup")))
    "Put backups in the cache directory.")
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
@@ -384,6 +383,9 @@ file when it changes on disk.")
    "Place the recentf cache into our cache directory."))
 
 (use-package vc
+  :bind-keymap
+  ("C-x v" . vc-prefix-map)
+
   :bind
   (:map vc-prefix-map
         ("=" . #'ediff-revision))
@@ -559,7 +561,7 @@ package."))
   org-clock-goto
 
   :mode
-  (("\\.org\\'" . org-mode))
+  ("\\.org\\'" . org-mode)
 
   :bind
   (:prefix "C-c o"
@@ -781,10 +783,10 @@ package."))
   (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
   (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+
   :custom
-  (projectile-keymap-prefix
-   (kbd "C-c p")
-   "Put projectile commands on this prefix.")
   (projectile-completion-system 'helm "Use Helm as the completion backend.")
   (projectile-project-search-path
    `(,hgs-project-directory ,hgs-user-directory)
@@ -835,6 +837,9 @@ extensions based on the extension of the current file."))
 
 
 (use-package helm
+  ;; We always want to load this if we have it in load-path.
+  :demand t
+
   :diminish
   helm-mode
   helm-autoresize-mode
@@ -848,22 +853,23 @@ extensions based on the extension of the current file."))
   (helm-mode t)
   (helm-autoresize-mode t)
 
-  :bind
-  (:map global-map
-        ;; Replace a bunch of the built-in bindings with helm narrowing
-        ([remap execute-extended-command] . #'helm-M-x)
-        ([remap switch-to-buffer] . #'helm-mini)
-        ([remap bookmark-jump] . #'helm-filtered-bookmarks)
-        ([remap find-file] . #'helm-find-files)
-        ([remap yank-pop] . #'helm-show-kill-ring)
-        ([remap apropos-command] . #'helm-apropos)
-        ([remap jump-to-register] . #'helm-register)
-        ([remap dabbrev-expand] . #'helm-dabbrev))
+  ;; We explicitly don't want to set these up as autoloads, as that would mean
+  ;; starting emacs when unable to load helm leaves us helpless.
+  (bind-keys :map global-map
+             ([remap execute-extended-command] . helm-M-x)
+             ([remap switch-to-buffer] . helm-mini)
+             ([remap bookmark-jump] . helm-filtered-bookmarks)
+             ([remap find-file] . helm-find-files)
+             ([remap yank-pop] . helm-show-kill-ring)
+             ([remap apropos-command] . helm-apropos)
+             ([remap jump-to-register] . helm-register)
+             ([remap dabbrev-expand] . helm-dabbrev))
+
+
+  :bind-keymap
+  ("C-c h" . helm-map)
 
   :custom
-  (helm-command-prefix-key
-   "C-c h"
-   "Place Helm commands under a different prefix.")
   (helm-lisp-fuzzy-completion t "Enable Lisp fuzzy completion.")
   (helm-apropos-fuzzy-match t "Enable fuzzy matching in apropos.")
   (helm-locate-fuzzy-match t "Enable fuzzy matching in locate.")
@@ -1092,6 +1098,12 @@ delimiters."
               "snippets"))
    "Where to find snippet definitions."))
 
+(use-package yasnippet-snippets
+  :after yasnippet
+
+  :config
+  (yasnippet-snippets-initialize))
+
 (use-package company
   :hook
   (prog-mode . company-mode)
@@ -1129,10 +1141,8 @@ delimiters."
   :commands
   flycheck-mode
 
-  :custom
-  (flycheck-keymap-prefix
-   (kbd "C-c !")
-   "Make the flycheck key prefix explicit.")
+  :bind-keymap
+  ("C-c !" . flycheck-keymap-prefix)
 
   :hook
   ((prog-mode) . flycheck-mode))
