@@ -45,13 +45,18 @@ git_contributions() {
     return 255
   fi
 
-  git log --author="${1:-$(git config user.name)}" \
-    --pretty=tformat: --numstat \
-    | awk \
-      '{ add += $1; subs += $2; loc += $1 - $2 } \
-       END \
-       { printf "Added: %s lines, Removed: %s lines, Total Added: %s lines\n", \
-                add, subs, loc }'
+  git log \
+    --author="${1:-$(git config user.name)}" --pretty=tformat: --numstat \
+    | awk '
+{
+  add += $1;
+  subs += $2;
+  loc += $1 - $2;
+} END {
+  printf("Added: %s lines, ", add);
+  printf("Removed: %s lines, ", subs);
+  printf("Total Added: %s lines\n", loc);
+}'
 
   return 0
 }
@@ -63,12 +68,18 @@ git_commit_stats() {
     return 255
   fi
 
-  git show "${1:-HEAD}" --numstat --pretty=tformat: \
-    | awk \
-      '{ add += $1; subs += $2; loc += $1 - $2 } \
-       END \
-       { printf "Added: %s lines, Removed: %s lines, Total Added: %s lines\n", \
-                add, subs, loc }'
+  git show \
+    "${1:-HEAD}" --numstat --pretty=tformat: \
+    | awk '
+{
+  add += $1;
+  subs += $2;
+  loc += $1 - $2;
+} END {
+  printf("Added: %s lines, ", add);
+  printf("Removed: %s lines, ", subs);
+  printf("Total Added: %s lines\n", loc)
+}'
 
   return 0
 }
