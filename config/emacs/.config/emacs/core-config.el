@@ -7,10 +7,25 @@
 
 ;;; Code:
 
-(require 'bind-key)
-(require 'use-package)
+(require 'cl-lib)
 (require 'files)
 (require 'custom)
+
+;; Just make clear that these variables and functions do, in fact, exist.
+;; Perhaps we can restructure this configuration to make it use Emacs
+;; require/provide etc. mechanisms instead in future, which would obviate the
+;; need for this.
+(declare-function use-package "use-package")
+
+(defvar hgs-config-directory)
+(defvar hgs-cache-directory)
+(defvar hgs-data-directory)
+(defvar hgs-project-directory)
+(defvar hgs-org-directory)
+(defvar hgs-is-bsd)
+(defvar hgs-is-linux)
+(defvar hgs-is-mac)
+(defvar hgs-is-windows)
 
 ;; Personal functions
 
@@ -21,7 +36,7 @@
     (indent-region (point-min) (point-max) nil)))
 
 (defun hgs-byte-compile-configuration ()
-  "Byte compile our dotfiles."
+  "Byte compile our configuration scripts."
   (interactive)
   (byte-recompile-directory hgs-config-directory 0))
 
@@ -44,8 +59,9 @@
   (interactive)
   (when custom-file
     (let ((custom-files
-            (mapcar #'(lambda (x) (concat (file-name-sans-extension custom-file) x))
-                    '(".el" ".elc"))))
+           (mapcar #'(lambda (x) (concat (file-name-sans-extension custom-file)
+                                         x))
+                   '(".el" ".elc"))))
       (mapcar #'(lambda (x)
                   (message "Deleting %s" x)
                   (delete-file x))
@@ -56,7 +72,7 @@
 ;; If you aren't sure where something goes, prefer to put it here instead of in
 ;; global scope.
 (use-package emacs
-  :no-require t ; Don't load emacs.el (obviously - it won't work)
+  :no-require t ; Don't load `emacs.el' (obviously - it won't work)
 
   :init
   (defun hgs--new-frame-setup (&optional frame)
@@ -92,136 +108,140 @@
           (progn
             ;; Setup block for terminal Emacs
             )))))
-    ;; For non daemon run, as init file runs after the initial frame is created
-    (hgs--new-frame-setup)
-    ;; Add hook for any future frames
-    (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
-    (scroll-bar-mode -1)
-    (horizontal-scroll-bar-mode -1)
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
+  ;; For non daemon run, as init file runs after the initial frame is created
+  (hgs--new-frame-setup)
+  ;; Add hook for any future frames
+  (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
+  (scroll-bar-mode -1)
+  (horizontal-scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
 
-    (defun hgs--suspend-frame ()
-      "In a GUI environment, do nothing; otherwise `suspend-frame'."
-      (interactive)
-      (if (display-graphic-p)
-          (message "suspend-frame disabled for graphical displays.")
-        (suspend-frame)))
+  (defun hgs--suspend-frame ()
+    "In a GUI environment, do nothing; otherwise `suspend-frame'."
+    (interactive)
+    (if (display-graphic-p)
+        (message "suspend-frame disabled for graphical displays.")
+      (suspend-frame)))
 
-    :config
-    ;; Set standard encodings
-    (when (fboundp 'set-charset-priority)
-      (set-charset-priority 'unicode))
-    (prefer-coding-system 'utf-8)
-    (setq locale-coding-system 'utf-8)
-    ;; We prefer to default to utf-8 with unix line endings
-    (setq-default buffer-file-coding-system 'prefer-utf-8-unix)
+  :config
+  ;; Set standard encodings
+  (when (fboundp 'set-charset-priority)
+    (set-charset-priority 'unicode))
+  (prefer-coding-system 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  ;; We prefer to default to utf-8 with unix line endings
+  (setq-default buffer-file-coding-system 'prefer-utf-8-unix)
 
-    ;; We always want to use the short form for confirmation prompts
-    (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; We always want to use the short form for confirmation prompts
+  (defalias 'yes-or-no-p 'y-or-n-p)
 
-    ;; Change the string displayed in the frame title to be more informative
-    (setq frame-title-format
-          `((:eval (if (buffer-file-name)
-                       (abbreviate-file-name (buffer-file-name))
-                     "%b"))
-            (:eval (if (buffer-modified-p)
+  ;; Change the string displayed in the frame title to be more informative
+  (setq frame-title-format
+        `((:eval (if (buffer-file-name)
+                     (abbreviate-file-name (buffer-file-name))
+                   "%b"))
+          (:eval (if (buffer-modified-p)
                      "[*]"))
-            " - "
-            ,(user-login-name) "@" ,(system-name)))
+          " - "
+          ,(user-login-name) "@" ,(system-name)))
 
-    ;; Put game scores directories under cache
-    (setq shared-game-score-directory
-          (concat (file-name-as-directory hgs-cache-directory) "games/shared"))
+  ;; Put game scores directories under cache
+  (setq shared-game-score-directory
+        (concat (file-name-as-directory hgs-cache-directory) "games/shared"))
 
-    ;; Enable narrow-to-* family of functions, as they're disabled by default
-    (put 'narrow-to-region 'disabled nil)
-    (put 'narrow-to-defun 'disabled nil)
-    (put 'narrow-to-page 'disabled nil)
+  ;; Enable narrow-to-* family of functions, as they're disabled by default
+  (put 'narrow-to-region 'disabled nil)
+  (put 'narrow-to-defun 'disabled nil)
+  (put 'narrow-to-page 'disabled nil)
 
-    (bind-keys :map global-map
-               ([remap suspend-frame] . hgs--suspend-frame))
+  (bind-keys :map global-map
+             ([remap suspend-frame] . hgs--suspend-frame))
 
-    :custom
-    (cursor-type 'bar "User a bar cursor rather than a box, as bar better suits
+  :custom
+  (cursor-type 'bar "User a bar cursor rather than a box, as bar better suits
 Emacs marking.")
-    (enable-recursive-minibuffers t "Allow for minibuffer usage inside
+  (enable-recursive-minibuffers t "Allow for minibuffer usage inside
 minibuffers.")
-    (visible-bell nil "Don't show visual bell.")
-    (fill-column 80 "Set the fill column to a general standard of 80.")
-    (indent-tabs-mode nil "We don't want to use tabs for indentation.")
-    (tab-width 2 "Set the default tab width to 2")
-    (inhibit-startup-message t "Don't show a startup message.")
-    (inhibit-startup-echo-area-message nil "Don't show a startup message in the
+  (visible-bell nil "Don't show visual bell.")
+  (fill-column 80 "Set the fill column to a general standard of 80.")
+  (indent-tabs-mode nil "We don't want to use tabs for indentation.")
+  (tab-width 2 "Set the default tab width to 2")
+  (inhibit-startup-message t "Don't show a startup message.")
+  (inhibit-startup-echo-area-message nil "Don't show a startup message in the
 echo area.")
-    (inhibit-default-init t "Don't load the default library.")
-    (initial-scratch-message nil "Don't show an initial message in the scratch
+  (inhibit-default-init t "Don't load the default library.")
+  (initial-scratch-message nil "Don't show an initial message in the scratch
 buffer.")
-    (auto-save-list-file-prefix (concat
-                                  (file-name-as-directory hgs-cache-directory)
-                                  "auto-save-list")
-                                "Put autosaves in our cache directory.")
-    (sentence-end-double-space nil "Tell Emacs that we don't use double spacing
+  (auto-save-list-file-prefix (concat
+                               (file-name-as-directory hgs-cache-directory)
+                               "auto-save-list")
+                              "Put autosaves in our cache directory.")
+  (sentence-end-double-space nil "Tell Emacs that we don't use double spacing
 for sentences.")
-    (bidi-paragraph-direction 'left-to-right "We don't use Emacs for
+  (bidi-paragraph-direction 'left-to-right "We don't use Emacs for
 non-left-to-right text, so this gives a nice performance boost.")
-    (ring-bell-function #'ignore "We don't want bell audio.")
-    (display-buffer-alist
-      ;; Attempt to tame Emacs' tendency towards randomly replacing/creating
-      ;; windows for predictability's sake. Generally you want this to be as simple
-      ;; as possible, to allow for maximum flexibility at usage time.
+  (ring-bell-function #'ignore "We don't want bell audio.")
+  (history-delete-duplicates
+   t
+   "Make sure we don't have duplicates in the command history.")
+  (display-buffer-alist
+   ;; Attempt to tame Emacs' tendency towards randomly replacing/creating
+   ;; windows for predictability's sake. Generally you want this to be as simple
+   ;; as possible, to allow for maximum flexibility at usage time.
 
-      ;; Note: Be very careful about this structure. Breaking it breaks Emacs'
-      ;; mutliplexing.
+   ;; Note: Be very careful about this structure. Breaking it breaks Emacs'
+   ;; mutliplexing.
 
-      ;; General Structure:
-      ;; (REGULAR-EXPRESSION-STRING
-      ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
-      ;;  OPTIONS...)
-      '(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
-         (window-width . 0.25)
-         (side . right)
-         (slot . 0))
-        ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
-         (window-height . 0.25)
-         (side . bottom)
-         (slot . -1)
-         (inhibit-same-window . t))
-        ("^\\*[Mm]essages.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
-         (window-height . 0.25)
-         (side . bottom)
-         (slot . 1)
-         (inhibit-same-window . t))
+   ;; General Structure:
+   ;; (REGULAR-EXPRESSION-STRING
+   ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
+   ;;  OPTIONS...)
+   '(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
+      (display-buffer-reuse-mode-window
+       display-buffer-in-side-window)
+      (window-width . 0.25)
+      (side . right)
+      (slot . 0))
+     ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
+      (display-buffer-reuse-mode-window
+       display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . -1)
+      (inhibit-same-window . t))
+     ("^\\*[Mm]essages.*"
+      (display-buffer-reuse-mode-window
+       display-buffer-in-side-window)
+      (window-height . 0.25)
+      (side . bottom)
+      (slot . 1)
+      (inhibit-same-window . t))
 
-        ;; Helm uses windows rather than the mini-buffer, so we need a workaround
-        ;; to prevent the `display-buffer-base-action' causing things like
-        ;; `helm-M-x' to take up the entire window. TO be honest, it's
-        ;; probably preferable to control Helm windowing through this rather than
-        ;; Helm itself, since it's centralized, but we're going to avoid touching
-        ;; any additional configuration and letting Helm do its thing.
-        ("^\\*[Hh]elm.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-at-bottom)))
-      "Custom overrides for window placement of specific buffers.")
-    (display-buffer-base-action
-      ;; Defaults to make Emacs let us control most of the window layout. This
-      ;; makes Emacs prefer to use existing windows or the same window rather
-      ;; than creating new splits by default.
-      '((display-buffer-reuse-window
-         display-buffer-reuse-mode-window
-         display-buffer-same-window
-         display-buffer-in-previous-window)
-        . ())
-      "Default action for window placement in order to make Emacs multiplexing more
+     ;; Helm uses windows rather than the mini-buffer, so we need a workaround
+     ;; to prevent the `display-buffer-base-action' causing things like
+     ;; `helm-M-x' to take up the entire window. TO be honest, it's
+     ;; probably preferable to control Helm windowing through this rather than
+     ;; Helm itself, since it's centralized, but we're going to avoid touching
+     ;; any additional configuration and letting Helm do its thing.
+     ("^\\*[Hh]elm.*"
+      (display-buffer-reuse-mode-window
+       display-buffer-at-bottom)))
+   "Custom overrides for window placement of specific buffers.")
+  (display-buffer-base-action
+   ;; Defaults to make Emacs let us control most of the window layout. This
+   ;; makes Emacs prefer to use existing windows or the same window rather
+   ;; than creating new splits by default.
+   '((display-buffer-reuse-window
+      display-buffer-reuse-mode-window
+      display-buffer-same-window
+      display-buffer-in-previous-window)
+     . ())
+   "Default action for window placement in order to make Emacs multiplexing more
 predictable."))
 
-;; Only needed for stopping some Emacs games from littering configuration directory
+;; Only needed for stopping some Emacs games from littering configuration
+;; directory
 (use-package gamegrid
   :config
   (setq gamegrid-user-score-file-directory
@@ -249,8 +269,8 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
       (goto-char compilation-filter-start)
       (while (let ((clip-length 400))
                (re-search-forward
-                 (format "\\(.\\{%d\\}\\).*?\\(\"\\)" clip-length)
-                 nil 'noerror))
+                (format "\\(.\\{%d\\}\\).*?\\(\"\\)" clip-length)
+                nil 'noerror))
         (replace-match "\\1\n\\2")))
     (read-only-mode))
   (add-hook 'compilation-filter-hook #'hgs--filter-compilation-buffer)
@@ -303,14 +323,14 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
       :hook
       ((prog-mode text-mode) . linum-mode)) ; Slow & old
-    ;; Fast & shiny
-    (use-package display-line-numbers
-      :diminish
-      global-display-line-numbers-mode
-      display-line-numbers-mode
+  ;; Fast & shiny
+  (use-package display-line-numbers
+    :diminish
+    global-display-line-numbers-mode
+    display-line-numbers-mode
 
-      :hook
-      ((prog-mode text-mode) . display-line-numbers-mode)))
+    :hook
+    ((prog-mode text-mode) . display-line-numbers-mode)))
 
 ;; Displays the whitespace
 (use-package whitespace
@@ -479,17 +499,17 @@ package."))
     (require 'vc-git)
     (let ((path (file-name-nondirectory (eshell/pwd))))
       (concat
-        (format (propertize "[%s:%s]")
-                (propertize user-login-name 'face '(:inherit eshell-prompt))
-                (propertize "eshell" 'face '(:inherit eshell-prompt)))
-        (format (propertize "<%s>" 'face '(:foreground "red"))
-                path)
-        (when-let ((branch (and (executable-find "git")
-                                (car (vc-git-branches)))))
-          (format (propertize "(%s)" 'face '(:foreground "blue"))
-                  branch))
-        (propertize "λ" 'face '(:foreground "teal"))
-        " ")))
+       (format (propertize "[%s:%s]")
+               (propertize user-login-name 'face '(:inherit eshell-prompt))
+               (propertize "eshell" 'face '(:inherit eshell-prompt)))
+       (format (propertize "<%s>" 'face '(:foreground "red"))
+               path)
+       (when-let ((branch (and (executable-find "git")
+                               (car (vc-git-branches)))))
+         (format (propertize "(%s)" 'face '(:foreground "blue"))
+                 branch))
+       (propertize "λ" 'face '(:foreground "teal"))
+       " ")))
 
   :custom
   (eshell-buffer-maximum-lines
@@ -591,23 +611,23 @@ package."))
   (org-capture-templates
    `(("n" "Notes" entry
       (file
-        (lambda ()
-          org-default-notes-file))
+       (lambda ()
+         org-default-notes-file))
       "* NOTES %? %^G\n%U" :empty-lines 1)
      ("t" "Todo" entry
       (file
-        (lambda ()
-          (concat (file-name-as-directory org-directory) "todo.org")))
+       (lambda ()
+         (concat (file-name-as-directory org-directory) "todo.org")))
       "* TODO %? %^G\n%U" :empty-lines 1)
      ("s" "Scheduled Todo" entry
       (file
-        (lambda ()
-          (concat (file-name-as-directory org-directory) "todo.org")))
+       (lambda ()
+         (concat (file-name-as-directory org-directory) "todo.org")))
       "* TODO %? %^G\nSCHEDULED: %^t\n%U" :empty-lines 1)
      ("d" "Deadline" entry
       (file
-        (lambda ()
-          (concat (file-name-as-directory org-directory) "todo.org")))
+       (lambda ()
+         (concat (file-name-as-directory org-directory) "todo.org")))
       "* TODO %? %^G\nDEADLINE: %^t" :empty-lines 1))
    "Basic entry templates for org-capture.")
   (org-babel-load-languages
@@ -725,7 +745,8 @@ package."))
   (clang-format+-offset-modified-region 0 "")
   (clang-format+-always-enable
    nil
-   "If we can't find a .clang-format, then we should not enable this automation."))
+   "If we can't find a .clang-format, then we should not enable this
+automation."))
 
 (use-package exec-path-from-shell
   :functions
@@ -764,7 +785,7 @@ package."))
      "LANG"
      "LC_ALL"
      ;; User-defined variables
-    )
+     )
    "All the shell variables Emacs should be attempting to source."))
 
 (use-package hydra)
@@ -975,7 +996,24 @@ project with deeply nested and repetitive structure."))
   ((after-init . async-bytecomp-package-mode)
    (dired-mode . dired-async-mode)))
 
+(use-package transient
+  :custom
+  (transient-levels-file
+   (concat (file-name-as-directory hgs-cache-directory)
+           "transient/levels.el")
+   "Where to place the Transient levels cache file.")
+  (transient-values-file
+   (concat (file-name-as-directory hgs-cache-directory)
+           "transient/values.el")
+   "Where to place the Transient values cache file.")
+  (transient-history-file
+   (concat (file-name-as-directory hgs-cache-directory)
+           "transient/history.el")
+   "Where to place the Transient history cache file."))
+
 (use-package magit
+  :after transient
+
   :commands
   magit-status
   magit-dispatch

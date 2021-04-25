@@ -15,6 +15,7 @@
 
 ;; Stop package.el from starting by default
 (customize-set-variable 'package-enable-at-startup nil)
+(declare-function package--ensure-init-file "package")
 (advice-add #'package--ensure-init-file :override #'ignore)
 
 ;; Hide GUI emacs remnants early
@@ -23,7 +24,7 @@
 (push '(vertical-scroll-bars . nil) default-frame-alist)
 (push '(horizontal-scroll-bars . nil) default-frame-alist)
 
-;; We don't want to use xresources for theming
+;; We don't want to use xresources for themes
 (advice-add #'x-apply-session-resources :override #'ignore)
 
 ;; Local Variables:
