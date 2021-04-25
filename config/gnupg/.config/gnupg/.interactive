@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-assign_export GPG_TTY "$(tty)"
-silence_output gpg-connect-agent updatestartuptty /bye
-assign_export SSH_AUTH_SOCK "$(gpgconf --list-dirs agent-ssh-socket)"
