@@ -941,7 +941,9 @@ project with deeply nested and repetitive structure."))
   (load-theme 'solarized-light 'no-confirm)
   ;; Disable background theming if in terminal as this causes breakage.
   ;; This means the terminal itself must be appropriately themed.
-  (if (not (display-graphic-p))
+  ;; Be careful about not doing this if we are in daemon mode though, since
+  ;; it'll break GUI emacsclient (invalid argument stringp errors).
+  (if (not (or (daemonp) (display-graphic-p)))
       (add-to-list 'default-frame-alist '(background-color . nil)))
 
   :custom
