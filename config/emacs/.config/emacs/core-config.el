@@ -1149,23 +1149,28 @@ delimiters."
 
   :custom
   (company-backends
-   '((company-files
-      company-keywords
+   '((company-keywords
       company-capf
+      company-files
+      company-etags
+      company-cmake
+      company-ispell
       company-yasnippet
       company-dabbrev-code
       company-abbrev))
    "Set default company backends to use.")
+  (company-echo-delay 0.5 "How long to wait before echoing.")
   (company-idle-delay 0.5 "How long to wait before offering completion.")
   (company-show-numbers t "Number the completion options.")
-  (company-tooltip-limit 15 "Cap the number of candidates on display.")
+  (company-tooltip-limit 20 "Cap the number of candidates on display.")
   (company-minimum-prefix-length
    2
    "Minimum length of prefix before completion.")
   (company-tooltip-align-annotations t "Align candidates to the right.")
   (company-tooltip-flip-when-above
    nil
-   "Don't invert navigation direction when near the bottom of the page."))
+   "Don't invert navigation direction when near the bottom of the page.")
+  (company-dabbrev-downcase nil "Don't downcase return value of dabbrev."))
 
 (use-package undo-tree
   :diminish
