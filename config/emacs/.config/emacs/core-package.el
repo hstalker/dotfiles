@@ -43,25 +43,50 @@
    :host github
    :repo "bbatsov/projectile"))
 (straight-use-package
- '(helm
+ '(selectrum
    :type git
    :host github
-   :repo "emacs-helm/helm"))
+   :repo "raxod502/selectrum"))
 (straight-use-package
- '(helm-projectile
+ '(prescient
    :type git
    :host github
-   :repo "bbatsov/helm-projectile"))
+   :repo "raxod502/prescient.el"))
 (straight-use-package
- '(helm-descbinds
+ '(selectrum-prescient
    :type git
    :host github
-   :repo "emacs-helm/helm-descbinds"))
+   :repo "raxod502/prescient.el"))
 (straight-use-package
- '(helm-swoop
+ '(company-prescient
    :type git
    :host github
-   :repo "emacsorphanage/helm-swoop"))
+   :repo "raxod502/prescient.el"))
+(straight-use-package
+ '(consult
+   :type git
+   :host github
+   :repo "minad/consult"))
+(straight-use-package
+ '(marginalia
+   :type git
+   :host github
+   :repo "minad/marginalia"))
+(straight-use-package
+ '(embark
+   :type git
+   :host github
+   :repo "oantolin/embark"))
+(straight-use-package
+ '(selectrum
+   :type git
+   :host github
+   :repo "raxod502/selectrum"))
+(straight-use-package
+ '(flyspell-correct
+   :type git
+   :host github
+   :repo "d12frosted/flyspell-correct"))
 (straight-use-package
  '(solarized-theme
    :type git

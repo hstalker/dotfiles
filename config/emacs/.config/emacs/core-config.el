@@ -201,7 +201,7 @@ non-left-to-right text, so this gives a nice performance boost.")
       (display-buffer-reuse-mode-window
        display-buffer-in-side-window)
       (window-width . 0.25)
-      (side . right)
+      (side . bottom)
       (slot . 0))
      ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
       (display-buffer-reuse-mode-window
@@ -217,16 +217,9 @@ non-left-to-right text, so this gives a nice performance boost.")
       (side . bottom)
       (slot . 1)
       (inhibit-same-window . t))
-
-     ;; Helm uses windows rather than the mini-buffer, so we need a workaround
-     ;; to prevent the `display-buffer-base-action' causing things like
-     ;; `helm-M-x' to take up the entire window. TO be honest, it's
-     ;; probably preferable to control Helm windowing through this rather than
-     ;; Helm itself, since it's centralized, but we're going to avoid touching
-     ;; any additional configuration and letting Helm do its thing.
-     ("^\\*[Hh]elm.*"
-      (display-buffer-reuse-mode-window
-       display-buffer-at-bottom)))
+     ("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+      ()
+      (window-parameters (mode-line-format . none))))
    "Custom overrides for window placement of specific buffers.")
   (display-buffer-base-action
    ;; Defaults to make Emacs let us control most of the window layout. This
@@ -808,10 +801,12 @@ automation."))
   ("C-c p" . projectile-command-map)
 
   :custom
-  (projectile-completion-system 'helm "Use Helm as the completion backend.")
+  (projectile-completion-system
+   'auto
+   "Use Selectrum as the completion backend.")
   (projectile-project-search-path
    `(,hgs-project-directory ,hgs-user-directory)
-   "Where shoudl projectile search?")
+   "Where should projectile search?")
   (projectile-known-projects-file
    (concat (file-name-as-directory hgs-cache-directory)
            "projectile-bookmarks.eld")
@@ -856,112 +851,219 @@ automation."))
    "Alist of extensions for switching to file with the same name, using other
 extensions based on the extension of the current file."))
 
-
-(use-package helm
-  ;; We always want to load this if we have it in load-path.
-  :demand t
-
+(use-package selectrum
   :diminish
-  helm-mode
-  helm-autoresize-mode
+  selectrum-mode
+
+  :init
+  (selectrum-mode +1))
+
+(use-package prescient
+  :diminish
+  prescient-persist-mode
 
   :functions
-  helm-mode
-  helm-autoresize-mode
+  prescient-persist-mode
 
   :config
-  (require 'helm-config)
-  (helm-mode t)
-  (helm-autoresize-mode t)
-
-  ;; We explicitly don't want to set these up as autoloads, as that would mean
-  ;; starting emacs when unable to load helm leaves us helpless.
-  (bind-keys :map global-map
-             ([remap execute-extended-command] . helm-M-x)
-             ([remap switch-to-buffer] . helm-mini)
-             ([remap bookmark-jump] . helm-filtered-bookmarks)
-             ([remap find-file] . helm-find-files)
-             ([remap yank-pop] . helm-show-kill-ring)
-             ([remap apropos-command] . helm-apropos)
-             ([remap jump-to-register] . helm-register)
-             ([remap dabbrev-expand] . helm-dabbrev))
-
-
-  :bind-keymap
-  ("C-c h" . helm-map)
+  (prescient-persist-mode +1)
 
   :custom
-  (helm-lisp-fuzzy-completion t "Enable Lisp fuzzy completion.")
-  (helm-apropos-fuzzy-match t "Enable fuzzy matching in apropos.")
-  (helm-locate-fuzzy-match t "Enable fuzzy matching in locate.")
-  (helm-imenu-fuzzy-match t "Enable fuzzy matching in imenu listings.")
-  (helm-buffers-fuzzy-matching t "Enable fuzzy matching for buffer search.")
-  (helm-recentf-fuzzy-match t "Enable fuzzy matching for recentf search.")
-  (helm-google-suggest-use-curl-p
-   (not (not (executable-find "curl")))
-   "use Curl to fetch web data when available.")
-  (helm-scroll-amount 8 "Amount of lines to scroll in other window.")
-  (helm-ff-search-library-in-sexp
-   t
-   "Try to find the library inside a sexp at point.")
-  (helm-move-to-line-cycle-in-source t "Cycle lists when reaching extents.")
-  (helm-split-window-inside-p
-   t
-   "Force Helm to open a split inside current window.")
-  (helm-autoresize-min-height 25 "Minimum height for the Helm window as %.")
-  (helm-autoresize-max-height 50 "Minimum height for the Helm window as %.")
-  (helm-grep-file-path-style
-   'relative
-   "Show the relative path of the file in results. Extremely useful in a
-project with deeply nested and repetitive structure."))
+  (prescient-history-length
+   100
+   "Number of recently selected candidates to show at the top of the list.")
+  (prescient-frequency-decay
+   0.997
+   "How much to decrease candidates' priorities for subsequent non-selections.")
+  (prescient-save-file
+   (concat (file-name-as-directory hgs-cache-directory)
+           "prescient-statistics")
+   "Where to save Prescient statistics to on disk.")
+  (prescient-filter-method
+   '(literal
+     regexp
+     initialism)
+   "List of algorithms to use for filtering candidates. This is the power of
+Prescient")
+  (prescient-filter-alist
+   '((literal . prescient-literal-regexp)
+     (literal-prefix . prescient-literal-prefix-regexp)
+     (initialism . prescient-initials-regexp)
+     (regexp . prescient-regexp-regexp)
+     (fuzzy . prescient-fuzzy-regexp)
+     (prefix . prescient-prefix-regexp)
+     (anchored . prescient-anchored-regexp))
+   "Alist for associating symbols with custom filter methods.")
+  (prescient-sort-full-matches-first t "Put full matches ahead of partial in the
+list.")
+  (prescient-use-char-folding t "Whether the literal and literal-prefix
+filters use character folding.")
+  (prescient-use-case-folding 'smart "Whether filters should be
+case-insensitive. Smart disables case insensitivity when upper case is used."))
 
-(use-package helm-projectile
+(use-package selectrum-prescient
   :after
-  helm
-  projectile
-
-  :functions
-  helm-projectile-grep
-
-  :bind
-  (:map projectile-command-map
-        ("s g" . #'helm-projectile-grep)))
-
-(use-package helm-descbinds
-  :after helm
+  selectrum
+  prescient
 
   :diminish
-  helm-descbinds-mode
+  selectrum-prescient-mode
 
-  :hook
-  ((prog-mode text-mode) . helm-descbinds-mode))
+  :functions
+  selectrum-prescient-mode
 
-(use-package helm-swoop
-  :after helm
-
-  :commands
-  helm-swoop
-
-  :bind
-  ((:map helm-command-prefix
-         ("M-s s" . #'helm-swoop))
-   (:map isearch-mode-map
-         ("M-s s" . #'helm-swoop)))
+  :init
+  (selectrum-prescient-mode +1)
 
   :custom
-  (helm-multi-swoop-edit-save
-   t
-   "Save the buffer when a swoop edit completes.")
-  (helm-swoop-split-with-multiple-windows
-   t
-   "Split window inside the current window.")
-  (helm-swoop-split-direction
-   'split-window-vertically
-   "Split vertically not horizontally.")
-  (helm-swoop-speed-or-color t "We prefer pretty colors over speed.")
-  (helm-swoop-move-to-line-cycle t "Cycle inside lines (beginning/end).")
-  (helm-swoop-use-line-number-face t "Use optional face for line numbers.")
-  (helm-swoop-use-fuzzy-match t "Enable fuzzy matching for helm swoop."))
+  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
+  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
+
+(use-package selectrum-prescient
+  :after
+  company
+  prescient
+
+  :diminish
+  company-prescient-mode
+
+  :functions
+  company-prescient-mode
+
+  :init
+  (company-prescient-mode +1)
+
+  :custom
+  (company-prescient-sort-length-enable nil "Don't resort company's already
+partially sorted lists by length, as this ruins the sort order."))
+
+(use-package consult
+  :after
+  projectile                            ; For `projectile-project-root'
+
+  :demand t
+
+  :functions
+  consult-register-window
+
+  :bind
+  (:map global-map
+        ([remap repeat-complex-command] . consult-complex-command)
+        ([remap yank-pop] . consult-yank-pop)
+        ("C-c H" . consult-history)
+        ("M-s e" . consult-isearch))
+  (:map kmacro-keymap
+        ("K" . consult-kmacro))
+  (:map help-map
+        ([remap apropos-command] . consult-apropos)
+        ("M" . consult-man)
+        ([remap describe-mode] . consult-mode-command))
+  (:map ctl-x-r-map
+        ("x" . consult-register)
+        ("M-\"" . consult-register-load)
+        ("M-'" . consult-register-store))
+  (:map bookmark-map
+        ([remap bookmark-jump] . consult-bookmark))
+  (:map ctl-x-map
+        ([remap switch-to-buffer] . consult-buffer)
+        ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
+        ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame))
+  (:map goto-map
+        ("g" . consult-goto-line)
+        ("M-g" . consult-goto-line) ;; For some reason remap doesn't work here
+        ("e" . consult-compile-error)
+        ("o" . consult-outline)
+        ("m" . consult-mark)
+        ("k" . consult-global-mark)
+        ("i" . consult-imenu)
+        ("I" . consult-project-imenu))
+  (:map search-map
+        ("f" . consult-find)
+        ("L" . consult-locate)
+        ("g" . consult-grep)
+        ("G" . consult-git-grep)
+        ("r" . consult-ripgrep)
+        ("l" . consult-line)
+        ("m" . consult-multi-occur)
+        ("k" . consult-keep-lines)
+        ("u" . consult-focus-lines))
+  (:map isearch-mode-map
+        ([remap isearch-edit-string] . consult-isearch)
+        ("M-s l" . consult-line))
+
+  :config
+  ;; Add thin lines, sorting and hide the mode line of the register preview
+  ;; window
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  :custom
+  (xref-show-xrefs-function #'consult-xref "Use Consult for xref.")
+  (xref-show-definitions-function #'consult-xref "Use Consult for xref.")
+  (register-preview-delay 0 "Set no delay for the register preview for speed.")
+  (register-preview-function
+   #'consult-register-format
+   "Use Consult for register preview.")
+  (consult-narrow-key "<" "Specify the key used for explicit narrowing.")
+  (consult-preview-key 'any "Trigger Consult previews with any key press.")
+  (consult-project-root-function
+   #'projectile-project-root
+   "Use Projectile for finding the project root."))
+
+(use-package consult-flycheck
+  :after
+  consult
+  flycheck
+
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
+
+(use-package marginalia
+  :after
+  selectrum
+
+  :functions
+  marginalia-mode
+
+  :diminish
+  marginalia-mode
+
+  :bind
+  (:map global-map
+        ("M-A" . marginalia-cycle))
+  (:map minibuffer-local-map
+        ("M-A" . marginalia-cycle))
+
+  :init
+  (marginalia-mode +1)
+
+  :custom
+  (marginalia-annotators
+   '(marginalia-annotators-heavy
+     marginalia-annotators-light
+     nil)
+   "Prefer richer, heavier annotations over lighter alternatives."))
+
+(use-package embark
+  :defines
+  embark-file-map
+
+  :bind
+  (:map global-map
+        ("C-c e a" . embark-act))
+  (:map minibuffer-local-map
+        ("C-o" . embark-act)
+        ("C-S-o" . embark-act-noexit))
+  (:map embark-file-map
+        ("j" . dired-jump)))
+
+(use-package embark-consult
+  :after
+  embark
+  consult
+
+  :hook
+  (embark-collect-mode . embark-consult-preview-minor-mode))
 
 (use-package solarized-theme
   :config
@@ -1207,6 +1309,17 @@ delimiters."
    '("--sug-mode=ultra" "--lang=en_US")
    "Change the default lookup mode for performance, and force language to
 American English."))
+
+(use-package flyspell-correct
+  :after
+  flyspell
+
+  :bind
+  (:map flyspell-mode-map
+        ("C-c $" . flyspell-correct-at-point))
+
+  :custom
+  (flyspell-correct-highlight t "Highlight word being corrected."))
 
 (use-package which-key
   :diminish

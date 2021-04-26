@@ -52,7 +52,7 @@ dotfiles as-is via home-manager. If the requirement of supporting other distros
 made considerably simpler, alas the world isn't so simple.
 
 ## Future Goals
-* Move Emacs to selectrum/prescient/consult/embark/marginalia/bufler/lsp.
+* Move Emacs to bufler/lsp.
 * Move Emacs config to support more advanced packaging functionality such as
   layered lockfiles (core + overrides), package disabling etc.
 * Try to move Vim plug usage to support an automated lockfile mechanism for
