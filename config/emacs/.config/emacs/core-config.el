@@ -919,7 +919,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
   (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
 
-(use-package selectrum-prescient
+(use-package company-prescient
   :after
   company
   prescient
