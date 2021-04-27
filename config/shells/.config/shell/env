@@ -208,7 +208,7 @@ report_status() {
 # Note that this will not kill the process if it is an interactive shell, as
 # that wouldn't be much help.
 error_and_die() {
-  if [ $# -lt 1 -o $# -gt 2 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     echo "USAGE: error_and_die ERROR-STRING [EXIT-VALUE]"
     return 255
   fi
@@ -257,7 +257,7 @@ pop_set_state() {
 # common source of typos. Will set as empty value if no VALUE argument
 # provided.
 assign_export() {
-  if [ $# -lt 1 -o $# -gt 2 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     report_error "USAGE: assign_export VARIABLE-NAME [VALUE]"
     return 255
   fi
@@ -270,7 +270,7 @@ assign_export() {
 
 # Remove an instance of $1 from $2 (default: PATH)
 path_remove() {
-  if [ $# -lt 1 -o $# -gt 2 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     report_error "USAGE: path_remove /path/to/bin [PATH]"
     return 255
   fi
@@ -295,7 +295,7 @@ path_remove() {
 
 # Prepend $1 to $2 (default: PATH) guaranteeing uniqueness
 path_prepend() {
-  if [ $# -lt 1 -o $# -gt 2 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     report_error "USAGE: path_prepend PATH-TO-ADD [PATH]"
     return 255
   fi
@@ -313,7 +313,7 @@ path_prepend() {
 
 # Append $1 to $2 (default: PATH) guaranteeing uniqueness
 path_append() {
-  if [ $# -lt 1 -o $# -gt 2 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
     report_error "USAGE: path_append PATH-TO-ADD [PATH]"
     return 255
   fi
@@ -452,7 +452,7 @@ inject_user_systemd_environment() (
 # permissions. Ownership and permissions follow chown and chmod syntax
 # respectively.
 assert_directory() (
-  if [ $# -lt 1 -o $# -gt 3 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 3 ]; then
     report_error \
       "USAGE: assert_directory PATH-TO-DIRECTORY [OWNER] [PERMISSIONS]"
     return 255
@@ -484,7 +484,7 @@ assert_directory() (
 # permissions. Ownership and permissions follow chown and chmod syntax
 # respectively.
 assert_file() (
-  if [ $# -lt 1 -o $# -gt 3 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 3 ]; then
     report_error "USAGE: assert_file PATH-TO-FILE [OWNER] [PERMISSIONS]"
     return 255
   fi
@@ -516,7 +516,7 @@ assert_file() (
 # Make the assertion that the specified file must have a line matching the
 # given regex. Optionally perform a replacement operation if missing.
 assert_file_has_line() (
-  if [ $# -lt 1 -o $# -gt 3 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 3 ]; then
     report_error \
       "USAGE: assert_file_has_line PATH-TO-FILE REGEX [LINE-TO-ADD]"
     return 255
