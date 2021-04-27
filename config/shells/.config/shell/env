@@ -454,27 +454,29 @@ inject_user_systemd_environment() (
 assert_directory() (
   if [ $# -lt 1 ] || [ $# -gt 3 ]; then
     report_error \
-      "USAGE: assert_directory PATH-TO-DIRECTORY [OWNER] [PERMISSIONS]"
+      "USAGE: assert_directory PATH-TO-DIRECTORY [PERMISSIONS] [OWNER]"
     return 255
   fi
 
   report_status "Asserting existence of directory '$1'..."
   if [ ! -d "$1" ]; then
     mkdir -p "$1" || \
-      report_error "Unable to create directory '$1'!"
+      report_error "Unable to create directory '$1'!" && return 1
   fi
 
   if [ -n "$2" ]; then
-    report_status "Asserting ownership of directory '$1' as '$2'..."
-    chown "$2" "$1" || \
-      report_error "Unable to change ownership of directory '$1' to '$2'!"
+    report_status "Asserting permissions of directory '$1' as '$2'..."
+    chmod "$2" "$1" || \
+      report_error \
+        "Unable to change permissions on directory '$1' to '$2'!" && \
+      return 2
   fi
 
   if [ -n "$3" ]; then
-    report_status "Asserting permissions of directory '$1' as '$3'..."
-    chmod "$3" "$1" || \
-      report_error \
-        "Unable to change permissions on directory '$1' to '$3'!"
+    report_status "Asserting ownership of directory '$1' as '$3'..."
+    chown "$3" "$1" || \
+      report_error "Unable to change ownership of directory '$1' to '$3'!" && \
+      return 3
   fi
 
   return 0
@@ -485,28 +487,28 @@ assert_directory() (
 # respectively.
 assert_file() (
   if [ $# -lt 1 ] || [ $# -gt 3 ]; then
-    report_error "USAGE: assert_file PATH-TO-FILE [OWNER] [PERMISSIONS]"
+    report_error "USAGE: assert_file PATH-TO-FILE [PERMISSIONS] [OWNER]"
     return 255
   fi
 
   report_status "Asserting existence of file '$1'..."
   assert_directory "$(dirname "$1")" || return 1
 
-  touch "$(dirname "$1")" || \
+  touch "$1" || \
     report_error "Unable to assert file '$1'!" && \
     return 2
 
   if [ -n "$2" ]; then
-    report_status "Asserting ownership of file '$1' as '$2'..."
-    chown "$2" "$1" || \
-      report_error "Unable to change ownership of file '$1'!" && \
+    report_status "Asserting permissions of file '$1' as '$2'..."
+    chmod "$2" "$1" || \
+      report_error "Unable to change permissions on file '$1' to '$2'!" && \
       return 3
   fi
 
   if [ -n "$3" ]; then
-    report_status "Asserting permissions of file '$1' as '$3'..."
-    chmod "$3" "$1" || \
-      report_error "Unable to change permissions on file '$1'!" && \
+    report_status "Asserting ownership of file '$1' as '$3'..."
+    chown "$3" "$1" || \
+      report_error "Unable to change ownership of file '$1' to '$3'!" && \
       return 4
   fi
 
@@ -514,7 +516,7 @@ assert_file() (
 )
 
 # Make the assertion that the specified file must have a line matching the
-# given regex. Optionally perform a replacement operation if missing.
+# given regex. Optionally add a given line if missing.
 assert_file_has_line() (
   if [ $# -lt 1 ] || [ $# -gt 3 ]; then
     report_error \
