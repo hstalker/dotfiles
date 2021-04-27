@@ -18,7 +18,6 @@ assign_export EMAIL "$GITHUB_EMAIL"
 assign_export ALTERNATE_EDITOR 'nano'
 assign_export EDITOR 'vim'
 assign_export VISUAL "vim-minimal"
-assign_export PAGER 'less'
 
 # Base keyboard layout, language & locale
 assign_export KEYBOARD_LAYOUT "us"
