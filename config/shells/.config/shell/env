@@ -518,7 +518,7 @@ assert_file() (
 # Make the assertion that the specified file must have a line matching the
 # given regex. Optionally add a given line if missing.
 assert_file_has_line() (
-  if [ $# -lt 1 ] || [ $# -gt 3 ]; then
+  if [ $# -lt 2 ] || [ $# -gt 3 ]; then
     report_error \
       "USAGE: assert_file_has_line PATH-TO-FILE REGEX [LINE-TO-ADD]"
     return 255
