@@ -11,13 +11,8 @@ assign_export GITHUB_EMAIL '1683065+hstalker@users.noreply.github.com'
 assign_export NAME "$GITHUB_NAME"
 assign_export EMAIL "$GITHUB_EMAIL"
 
-# Preferred programs
-# $EDITOR-style variables don't allow for passing flags. If you want that you
-# need to use a wrapper script which things like (sudo)edit can directly
-# execute.
+# Use Nano as a sane default alternative editor
 assign_export ALTERNATE_EDITOR 'nano'
-assign_export EDITOR 'vim'
-assign_export VISUAL "vim-minimal"
 
 # Base keyboard layout, language & locale
 assign_export KEYBOARD_LAYOUT "us"
