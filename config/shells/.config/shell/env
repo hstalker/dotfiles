@@ -353,7 +353,7 @@ require_source() {
     . "$1"
     return 0
   else
-    if [ -p "$1" -o -d "$1" -o ]; then
+    if [ -p "$1" ] || [ -d "$1" ]; then
       error_and_die \
         "Unable to source required shell script '$1' as it is not a file!"
     elif [ ! -e "$1" ]; then
