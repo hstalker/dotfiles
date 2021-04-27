@@ -128,7 +128,7 @@ text_underline_off() {
 # Emits ANSI escape for toggling standout for text.
 # Usage: echo "$(text_standout_on)I standout$(text_standout_off)I don't"
 text_standout_on() {
-  printf "$(tput rmso)"
+  printf "$(tput smso)"
   return 0
 }
 text_standout_off() {
@@ -137,16 +137,16 @@ text_standout_off() {
 }
 
 # Emits ANSI escape for turning on bold mode for text.
-# Usage: echo "$(text_standout)I'm bold"
+# Usage: echo "$(text_bold)I'm bold"
 text_bold() {
   printf "$(tput bold)"
   return 0
 }
 
 # Emits ANSI escape for turning on half-bright mode for text.
-# Usage: echo "$(text_standout)I'm bold"
+# Usage: echo "$(text_dim)I'm dim"
 text_dim() {
-  printf "$(tput bold)"
+  printf "$(tput dim)"
   return 0
 }
 
