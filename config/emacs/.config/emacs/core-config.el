@@ -26,6 +26,9 @@
 (defvar hgs-is-linux)
 (defvar hgs-is-mac)
 (defvar hgs-is-windows)
+(defvar hgs-frame-customization-hook)
+(defvar hgs-frame-customization-gui-hook)
+(defvar hgs-frame-customization-tui-hook)
 
 ;; Personal functions
 
@@ -88,47 +91,47 @@ tall. This won't work as expected under daemon mode."
   :no-require t ; Don't load `emacs.el' (obviously - it won't work)
 
   :init
-  (defun hgs--new-frame-setup (&optional frame)
-    "Configure the given frame. Should be attached to
-`after-make-frame-functions' hook."
-    (unless frame
-      (setq frame (selected-frame)))
-    (unless (daemonp)
-      (with-selected-frame frame
-        ;; Setup block for all Emacs instances with frame
-        ;; Set a default font
-        (cl-flet ((get-font-family (lambda (font) (car font)))
-                  (get-font-size (lambda (font) (cadr font))))
-          (let ((latin-font '("7x13" 12))
-                (unicode-font '("DejaVu Sans" 12)))
-            (set-face-attribute 'default nil
-                                :family (get-font-family latin-font))
-            (set-fontset-font t 'unicode
-                              (font-spec :family (get-font-family unicode-font)
-                                         :size (get-font-size unicode-font))
-                              nil)
-            (set-fontset-font t 'latin
-                              (font-spec :family (get-font-family latin-font)
-                                         :size (get-font-size latin-font))
-                              nil 'prepend)))
-        (if (display-graphic-p frame)
-            (progn
-              ;; Setup block for GUI Emacs
-              (modify-frame-parameters frame
-                                       '((fullscreen . nil)
-                                         (vertical-scroll-bar . nil)
-                                         (horizontal-scroll-bar . nil))))
-          (progn
-            ;; Setup block for terminal Emacs
-            )))))
-  ;; For non daemon run, as init file runs after the initial frame is created
-  (hgs--new-frame-setup)
-  ;; Add hook for any future frames
-  (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
-  (scroll-bar-mode -1)
-  (horizontal-scroll-bar-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
+  (defun hgs--setup-default-fonts (frame)
+    "Setup default fonts for the given frame."
+    (cl-flet ((get-font-family (lambda (font) (car font)))
+              (get-font-size (lambda (font) (cadr font))))
+      (let ((latin-font '("7x13" 12))
+            (unicode-font '("DejaVu Sans" 12)))
+        (set-face-attribute 'default frame
+                            :family (get-font-family latin-font))
+        (set-fontset-font t 'unicode
+                          (font-spec :family (get-font-family unicode-font)
+                                     :size (get-font-size unicode-font))
+                          frame)
+        (set-fontset-font t 'latin
+                          (font-spec :family (get-font-family latin-font)
+                                     :size (get-font-size latin-font))
+                          frame 'prepend))))
+
+  (defun hgs--setup-default-gui (frame)
+    "Set default graphical UI for the given frame."
+    (scroll-bar-mode -1)
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (modify-frame-parameters frame
+                             '((fullscreen . nil)
+                               (vertical-scroll-bar . nil)
+                               (horizontal-scroll-bar . nil)))
+
+    ;; HACK: Work around a bug in GUI emacs 26 causing rendering issues
+    ;; Bug report: https://lists.gnu.org/r/bug-gnu-emacs/2018-04/msg00658.html
+    (when (eq emacs-major-version 26)
+      (modify-frame-parameters frame
+                               '((inhibit-double-buffering . t)))))
+
+  (defun hgs--setup-default-tui (frame)
+    "Set default terminal UI for the given frame."
+    ;; Do nothing for now
+    frame)
+
+  (add-hook 'hgs-frame-customization-hook #'hgs--setup-default-fonts -50)
+  (add-hook 'hgs-frame-customization-gui-hook #'hgs--setup-default-gui -50)
+  (add-hook 'hgs-frame-customization-tui-hook #'hgs--setup-default-tui -50)
 
   (defun hgs--suspend-frame ()
     "In a GUI environment, do nothing; otherwise `suspend-frame'."
@@ -472,9 +475,8 @@ open."))
   winner-undo
   winner-redo
 
-  :config
-  ;; Enable winnder mdoe for undo/redo of window layout changes
-  (winner-mode t))
+  :hook
+  ((prog-mode text-mode special-mode) . winner-mode))
 
 (use-package desktop
   :config
@@ -823,8 +825,8 @@ automation."))
 
   :custom
   (projectile-completion-system
-   'auto
-   "Use Selectrum as the completion backend.")
+   'default
+   "Use Selectrum (or rather: `completing-read') as the completion backend.")
   (projectile-project-search-path
    `(,hgs-project-directory ,hgs-user-directory)
    "Where should projectile search?")
@@ -880,13 +882,16 @@ extensions based on the extension of the current file."))
   (selectrum-mode +1))
 
 (use-package prescient
+  :after
+  selectrum
+
   :diminish
   prescient-persist-mode
 
   :commands
   prescient-persist-mode
 
-  :config
+  :init
   (prescient-persist-mode +1)
 
   :custom
@@ -923,39 +928,39 @@ filters use character folding.")
 case-insensitive. Smart disables case insensitivity when upper case is used."))
 
 (use-package selectrum-prescient
-  :after
-  selectrum
-  prescient
+ :after
+ selectrum
+ prescient
 
-  :diminish
-  selectrum-prescient-mode
+ :diminish
+ selectrum-prescient-mode
 
-  :commands
-  selectrum-prescient-mode
+ :commands
+ selectrum-prescient-mode
 
-  :init
-  (selectrum-prescient-mode +1)
+ :init
+ (selectrum-prescient-mode +1)
 
-  :custom
-  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
-  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
+ :custom
+ (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
+ (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
 
 (use-package company-prescient
-  :after
-  company
-  prescient
+ :after
+ company
+ prescient
 
-  :diminish
-  company-prescient-mode
+ :diminish
+ company-prescient-mode
 
-  :commands
-  company-prescient-mode
+ :commands
+ company-prescient-mode
 
-  :init
-  (company-prescient-mode +1)
+ :init
+ (company-prescient-mode +1)
 
-  :custom
-  (company-prescient-sort-length-enable nil "Don't resort company's already
+ :custom
+ (company-prescient-sort-length-enable nil "Don't resort company's already
 partially sorted lists by length, as this ruins the sort order."))
 
 (use-package consult
@@ -969,29 +974,23 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :bind
   (:map global-map
-        ([remap repeat-complex-command] . consult-complex-command)
         ([remap yank-pop] . consult-yank-pop)
-        ("C-c H" . consult-history)
-        ("M-s e" . consult-isearch))
-  (:map kmacro-keymap
-        ("K" . consult-kmacro))
-  (:map help-map
         ([remap apropos-command] . consult-apropos)
-        ("M" . consult-man)
-        ([remap describe-mode] . consult-mode-command))
-  (:map ctl-x-r-map
-        ("x" . consult-register)
-        ("M-\"" . consult-register-load)
-        ("M-'" . consult-register-store))
-  (:map bookmark-map
+        ("C-h M" . consult-man)
+        ("C-c H" . consult-history)
+        ("M-s e" . consult-isearch)
+        ("C-x K" . consult-kmacro)
+        ("C-x r M-\"" . consult-register-load)
+        ("C-x r M-'" . consult-register-store)
         ([remap bookmark-jump] . consult-bookmark))
   (:map ctl-x-map
+        ([remap repeat-complex-command] . consult-complex-command)
         ([remap switch-to-buffer] . consult-buffer)
         ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
         ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame))
   (:map goto-map
         ("g" . consult-goto-line)
-        ("M-g" . consult-goto-line) ;; For some reason remap doesn't work here
+        ("M-g" . consult-goto-line)
         ("e" . consult-compile-error)
         ("o" . consult-outline)
         ("m" . consult-mark)
@@ -1031,13 +1030,16 @@ partially sorted lists by length, as this ruins the sort order."))
    "Use Projectile for finding the project root."))
 
 (use-package consult-flycheck
-  :after
-  consult
-  flycheck
+ :after
+ consult
+ flycheck
 
-  :bind
-  (:map flycheck-command-map
-        ("!" . consult-flycheck)))
+ :commands
+ consult-flycheck
+
+ :bind
+ (:map flycheck-command-map
+       ("!" . consult-flycheck)))
 
 (use-package marginalia
   :after
@@ -1089,12 +1091,18 @@ partially sorted lists by length, as this ruins the sort order."))
 (use-package solarized-theme
   :config
   (load-theme 'solarized-light 'no-confirm)
-  ;; Disable background theming if in terminal as this causes breakage.
-  ;; This means the terminal itself must be appropriately themed.
-  ;; Be careful about not doing this if we are in daemon mode though, since
-  ;; it'll break GUI emacsclient (invalid argument stringp errors).
-  (if (not (or (daemonp) (display-graphic-p)))
-      (add-to-list 'default-frame-alist '(background-color . nil)))
+
+  (defun hgs--solarized-tui-bg-removal (frame)
+    "Disable background theming if in terminal as this causes breakage. This
+means the terminal itself must be appropriately themed. Be careful about
+not doing this if we are in daemon mode though, since it'll break GUI
+emacsclient (invalid argument stringp errors)."
+    (modify-frame-parameters frame '((background-color . nil))))
+
+  ;; Add this at a high depth so that it runs last
+  (add-hook 'hgs-frame-customization-tui-hook
+            #'hgs--solarized-tui-bg-removal
+            50)
 
   :custom
   (solarized-distinct-fringe-background t "Make the fringe stand out.")
@@ -1358,8 +1366,11 @@ American English."))
   :diminish
   which-key-mode
 
+  :commands
+  which-key-mode
+
   :hook
-  ((prog-mode text-mode) . which-key-mode)
+  ((prog-mode text-mode special-mode) . which-key-mode)
 
   :custom
   (which-key-popup-type 'minibuffer "Use the minibuffer for the key display.")

@@ -7,17 +7,13 @@
 
 ;;; Code:
 
-;; HACK: Work around a bug in GUI emacs 26 causing rendering issues
-;; Bug report: https://lists.gnu.org/r/bug-gnu-emacs/2018-04/msg00658.html
-(when (eq emacs-major-version 26)
-  (push '(inhibit-double-buffering . t) default-frame-alist))
-
 ;; Needed to force emacs to not use stale bytecode
 (setq load-prefer-newer t)
 
 ;; Stop package.el from starting by default
 (customize-set-variable 'package-enable-at-startup nil)
 ;; Stop is from littering our init
+(declare-function package--ensure-init-file "package")
 (advice-add #'package--ensure-init-file :override #'ignore)
 
 (require 'cl-lib)
@@ -92,6 +88,42 @@
   :type 'directory
   :group 'personal)
 
+(defcustom hgs-frame-customization-hook '()
+  "Hook called when customizing the frame appearance of any Emacs. Takes
+the frame being created as an argument."
+  :type 'hook
+  :group 'personal)
+
+(defcustom hgs-frame-customization-tui-hook '()
+  "Hook called when customizing the frame appearance of terminal Emacs. Takes
+the frame being created as an argument."
+  :type 'hook
+  :group 'personal)
+
+(defcustom hgs-frame-customization-gui-hook '()
+  "Hook called when customizing the frame appearance of graphical Emacs. Takes
+the frame being created as an argument."
+  :type 'hook
+  :group 'personal)
+
+;; Run frame customization hooks all in one place
+(defun hgs--new-frame-setup (&optional frame)
+  "Configure the given frame. Should be attached to
+`after-make-frame-functions' hook."
+  (let ((frame-setup-progress
+          (make-progress-reporter "Configuring new frame"))
+        (this-frame
+          (or frame (selected-frame))))
+    (with-selected-frame this-frame
+        (run-hook-with-args 'hgs-frame-customization-hook this-frame)
+
+        (if (display-graphic-p)
+            (run-hook-with-args 'hgs-frame-customization-gui-hook this-frame)
+          (run-hook-with-args 'hgs-frame-customization-tui-hook this-frame)))
+    (progress-reporter-done frame-setup-progress)))
+
+(add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
+
 ;; Chnage the built-in init directories for old emacs versions using ~/.emacs
 (setq user-init-file load-file-name)
 (setq user-emacs-directory (file-name-as-directory hgs-config-directory))
@@ -144,6 +176,11 @@ This passes through the passed `NOERROR', `NOMESSAGE', `NOSUFFIX' and
                         (concat (file-name-as-directory hgs-config-directory)
                                 "custom-abbreviation.el"))
 (load-if-exists abbrev-file-name)
+
+;; For non daemon run we want to manually run frame setup hooks that have been
+;; configured, as init file runs after the initial frame is created.
+(unless (daemonp)
+  (hgs--new-frame-setup))
 
 ;; Reset GC threshold to 100MB
 (customize-set-variable 'gc-cons-threshold (* 1024 1024 100))

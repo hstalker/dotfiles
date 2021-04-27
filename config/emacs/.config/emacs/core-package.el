@@ -11,6 +11,21 @@
 (declare-function straight-use-package "straight")
 
 (straight-use-package
+ '(dash
+   :type git
+   :host github
+   :repo "magnars/dash.el"))
+(straight-use-package
+ '(s
+   :type git
+   :host github
+   :repo "magnars/s.el"))
+(straight-use-package
+ '(f
+   :type git
+   :host github
+   :repo "rejeep/f.el"))
+(straight-use-package
  '(org-bullets
    :type git
    :host github
@@ -68,6 +83,11 @@
    :host github
    :repo "minad/consult"))
 (straight-use-package
+ '(consult-flycheck
+   :type git
+   :host github
+   :repo "minad/consult"))
+(straight-use-package
  '(marginalia
    :type git
    :host github
@@ -78,10 +98,10 @@
    :host github
    :repo "oantolin/embark"))
 (straight-use-package
- '(selectrum
+ '(embark-consult
    :type git
    :host github
-   :repo "raxod502/selectrum"))
+   :repo "oantolin/embark"))
 (straight-use-package
  '(flyspell-correct
    :type git
@@ -97,6 +117,16 @@
    :type git
    :host github
    :repo "jwiegley/emacs-async"))
+(straight-use-package
+ '(with-editor
+   :type git
+   :host github
+   :repo "magit/with-editor"))
+(straight-use-package
+ '(transient
+   :type git
+   :host github
+   :repo "magit/transient"))
 (straight-use-package
  '(magit
    :type git

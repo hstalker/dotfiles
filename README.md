@@ -434,15 +434,20 @@ use-package blocks for said packages *is* fair game here).
 Local machine package additions and overrides (not general configuration)
 should be placed in `$XDG_CONFIG_HOME/emacs/custom-package.el`. The allowed
 operations are:
-
-* `(straight-install-package 'package-name)`
+* `(straight-use-package '(PACKAGE-NAME ...RECIPE...)`
 
 Local machine configuration additions (including configuration for packages
 declared in custom-package.el) should be placed in
 `$XDG_CONFIG_HOME/emacs/custom-config.el`. The provided operations are:
+* `(use-package PACKAGE-NAME ...CONFIGURATION-BODY...)`, where this follows
+  typical third-party use-package usage.
 
-* `(use-package package-name ...)`, where this follows typical third-party
-  use-package usage.
+We provide three core hooks taking the frame being created for customizing frame
+appearance:
+ * `hgs-frame-customization-hook`, which is run always, regardless of Emacs
+   flavor.
+ * `hgs-frame-customization-gui-hook`, which is run only for GUI Emacs.
+ * `hgs-frame-customization-tui-hook`, which is run only for terminal Emacs.
 
 Typically our core emacs functions for configuration are prefixed by either
 `hgs-` or `minmacs-`.
