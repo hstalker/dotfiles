@@ -159,7 +159,6 @@ text_reset() {
 
 # Generic function for printing messages to output with a given color and
 # category.
-# Usage: _report_message TPUT-COLOR-CODE CATEGORY-STRING MESSAGE-STRING
 _report_message() {
   if [ $# != 3 ]; then
     echo "USAGE: _report_message TPUT-COLOR-CODE CATEGORY-STRING MESSAGE-STRING"
@@ -173,7 +172,6 @@ _report_message() {
 
 # Report a colored error message. Also finishes as false, so it can be
 # effectively used in branching.
-# Usage: report_error ERROR-STRING
 report_error() {
   if [ $# != 1 ]; then
     echo "USAGE: report_error ERROR-STRING"
@@ -185,7 +183,6 @@ report_error() {
 }
 
 # Report a colored warning message
-# Usage: report_warning WARNING-STRING
 report_warning() {
   if [ $# != 1 ]; then
     echo "USAGE: report_warning WARNING-STRING"
@@ -197,7 +194,6 @@ report_warning() {
 }
 
 # Report a colored status message
-# Usage: report_status STATUS-STRING
 report_status() {
   if [ $# != 1 ]; then
     echo "USAGE: report_status STATUS-STRING"
@@ -260,7 +256,6 @@ pop_set_state() {
 # Posix). Just reduces duplication of identifiers, which is an annoyingly
 # common source of typos. Will set as empty value if no VALUE argument
 # provided.
-# Usage:
 assign_export() {
   if [ $# -lt 1 -o $# -gt 2 ]; then
     report_error "USAGE: assign_export VARIABLE-NAME [VALUE]"
@@ -390,8 +385,10 @@ has_systemd() (
 # Defaults to currently set $XDG_CONFIG_HOME as environment.d path.
 # Note that running this by default can be risky, since we're having to eval
 # arbitrary user code.
-# Usage: load_user_systemd_environment_d [ENVIRONMENT-D-PATH]
 load_user_systemd_environment_d() {
+  if [ $# -gt 1 ]; then
+    report_error "Usage: load_user_systemd_environment_d [ENVIRONMENT-D-PATH]"
+  fi
   report_status "Loading systemd environment.d settings from \
 '${1:-$XDG_CONFIG_HOME}/environment.d/'..."
   for ENV_SCRIPT in "${1:-$XDG_CONFIG_HOME}/environment.d/*"; do
@@ -412,8 +409,12 @@ load_user_systemd_environment_d() {
 # use. Will only inject a single variable if given one rather than scraping
 # from the current session. Probably shouldn't be used, but allows for simple
 # matching of shell environment with Systemd.
-# Usage: inject_user_systemd_environment [VARIABLE-NAME VARIABLE-VALUE]
 inject_user_systemd_environment() (
+  if [ $# != 0 ]; then
+    report_error "Usage: inject_user_systemd_environment \
+[VARIABLE-NAME VARIABLE-VALUE]"
+  fi
+
   if ! has_systemd; then
     report_warning "This system is not using Systemd!"
     return 0
