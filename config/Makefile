@@ -40,6 +40,7 @@ PACKAGES ?= shells \
 	haskell \
 	go \
 	java \
+	dircolors \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
 	$(TARGET_DIR)/.local/bin \

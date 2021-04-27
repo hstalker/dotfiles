@@ -599,25 +599,6 @@ and MODULE-TYPE is one of '${_ALLOWED_MODULE_NAMES}'"
   return 0
 }
 
-# Setup directory colors
-load_dircolors_config() {
-  if [ $# != 0 ]; then
-    report_error "USAGE: load_dircolors_config"
-    return 255
-  fi
-
-  if [ -x /usr/bin/dircolors ]; then
-    if [ -r "${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors" ]; then
-      eval \
-        "$(dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)"
-    else
-      eval "$(dircolors -b)"
-    fi
-  fi
-
-  return 0
-}
-
 
 ###############################################################################
 # Actual setting up of the environment
@@ -629,9 +610,6 @@ assign_export ENV "$HOME/.shrc"
 
 # The path at $BASH_ENV is run when the bash shell is non-interactive
 assign_export BASH_ENV "$HOME/.bashrc"
-
-# Enable colour support of ls
-load_dircolors_config
 
 # Load application specific env files
 load_per_application_modules env
