@@ -67,6 +67,19 @@
                   (delete-file x))
               custom-files))))
 
+;; Some convenient functions for figuring out current monitor dimensions
+(defun hgs-monitor-is-portrait ()
+  "Predicate returning `t' if the current display monitor is of portrait
+dimensions. This won't work as expected under daemon mode."
+  (if (< (display-pixel-width) (display-pixel-height))
+      t
+    nil))
+
+(defun hgs-monitor-is-horizontal ()
+  "Predicate returning `t' if the current display monitor is wider than it is
+tall. This won't work as expected under daemon mode."
+  (not (hgs-monitor-is-portrait)))
+
 ;; Internal/built-in package configuration
 ;; Configure things defined in the core-most Emacs C code.
 ;; If you aren't sure where something goes, prefer to put it here instead of in
@@ -191,16 +204,19 @@ non-left-to-right text, so this gives a nice performance boost.")
    ;; as possible, to allow for maximum flexibility at usage time.
 
    ;; Note: Be very careful about this structure. Breaking it breaks Emacs'
-   ;; mutliplexing.
+   ;; multiplexing.
 
    ;; General Structure:
    ;; (REGULAR-EXPRESSION-STRING
    ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
    ;;  OPTIONS...)
-   '(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
+   `(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
       (display-buffer-reuse-mode-window
        display-buffer-in-side-window)
       (window-width . 0.25)
+      ;; Would like to make this dynamic and based on monitor proportions, but
+      ;; this won't work properly under daemon mode, and we can't really pass in
+      ;; functions.
       (side . bottom)
       (slot . 0))
      ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
