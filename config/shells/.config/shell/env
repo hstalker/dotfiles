@@ -217,9 +217,9 @@ error_and_die() {
   # We don't want to quit out of interactive shells from this
   case $- in
     *i*)
-      exit ${2:-1}
       ;;
     *)
+      exit ${2:-1}
       ;;
   esac
 
