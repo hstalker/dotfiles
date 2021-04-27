@@ -322,7 +322,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :hook
   (((prog-mode text-mode) . line-number-mode)
    ((prog-mode text-mode) . column-number-mode)
-   ((text-mode) . #'turn-on-auto-fill)))
+   ((text-mode) . turn-on-auto-fill)))
 
 (if (version<= emacs-version "26.0.50")
     (use-package linum
@@ -369,7 +369,7 @@ to be taken into account inside `WHITESPACE-MODE'."
               nil 'local))
 
   :hook
-  ((prog-mode text-mode) . #'hgs--reset-whitespace-mode-local-hack)
+  ((prog-mode text-mode) . hgs--reset-whitespace-mode-local-hack)
 
   :config
   (put 'whitespace-line-column 'safe-local-variable #'integerp)
@@ -420,7 +420,7 @@ file when it changes on disk.")
 
   :bind
   (:map vc-prefix-map
-        ("=" . #'ediff-revision))
+        ("=" . ediff-revision))
 
   :custom
   (vc-follow-symlinks t "Make the version control functionality automatically
@@ -447,9 +447,9 @@ follow symlinks to files potentially outside of the VCS (or inside another)."))
 
   :bind
   ((:map global-map
-         ("C-x d" . #'dired))
+         ("C-x d" . dired))
    (:map dired-mode-map
-         ("^" . #'hgs--dired-up-directory-clean)))
+         ("^" . hgs--dired-up-directory-clean)))
 
   :config
   ;; Emacs disables this by default, but it's the only real way to use dired w/o
@@ -601,10 +601,10 @@ package."))
   (:prefix "C-c o"
            :prefix-map hgs--org-prefix-map
            :prefix-docstring "Org commands"
-           ("l" . #'org-store-link)
-           ("c" . #'org-capture)
-           ("a" . #'org-agenda)
-           ("j" . #'org-clock-goto))
+           ("l" . org-store-link)
+           ("c" . org-capture)
+           ("a" . org-agenda)
+           ("j" . org-clock-goto))
 
   :custom
   (org-directory
@@ -750,7 +750,7 @@ package."))
   (use-package clang-format)
 
   :hook
-  ((c-mode- c++-mode objc-mode) . #'clang-format+-mode)
+  ((c-mode c++-mode objc-mode) . clang-format+-mode)
 
   :custom
   (clang-format+-context
@@ -1155,8 +1155,8 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :bind
   (:map global-map
-        ("C-x g" . #'magit-status)
-        ("C-x M-g" . #'magit-dispatch)))
+        ("C-x g" . magit-status)
+        ("C-x M-g" . magit-dispatch)))
 
 ;; Trim whitespace on touched lines only automatically when saving
 (use-package ws-butler
@@ -1183,7 +1183,7 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :bind
   (:map global-map
-        ("C-=" . #'er/expand-region)))
+        ("C-=" . er/expand-region)))
 
 (use-package smartparens
   :diminish
@@ -1380,8 +1380,8 @@ American English."))
 
   :bind
   (:map global-map
-        ("C-c <up>" . #'transpose-frame)
-        ("C-c <down>" . #'rotate-frame-clockwise)))
+        ("C-c <up>" . transpose-frame)
+        ("C-c <down>" . rotate-frame-clockwise)))
 
 (use-package rainbow-delimiters
   :diminish
