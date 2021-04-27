@@ -331,8 +331,11 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   global-whitespace-mode
   whitespace-mode
 
-  :functions
+  :commands
+  global-whitespace-mode
   whitespace-mode
+
+  :functions
   hgs--reset-whitespace-mode-local-hack
 
   :init
@@ -448,8 +451,10 @@ open."))
   :diminish
   winner-mode
 
-  :functions
+  :commands
   winner-mode
+  winner-undo
+  winner-redo
 
   :config
   ;; Enable winnder mdoe for undo/redo of window layout changes
@@ -722,7 +727,7 @@ package."))
    "Unicode bullets to use."))
 
 (use-package clang-format+
-  :functions
+  :commands
   clang-format+-mode
 
   :init
@@ -742,7 +747,7 @@ package."))
 automation."))
 
 (use-package exec-path-from-shell
-  :functions
+  :commands
   exec-path-from-shell-initialize
 
   :config
@@ -784,7 +789,7 @@ automation."))
 (use-package hydra)
 
 (use-package projectile
-  :functions
+  :commands
   projectile-mode
 
   :config
@@ -862,7 +867,7 @@ extensions based on the extension of the current file."))
   :diminish
   prescient-persist-mode
 
-  :functions
+  :commands
   prescient-persist-mode
 
   :config
@@ -909,7 +914,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   :diminish
   selectrum-prescient-mode
 
-  :functions
+  :commands
   selectrum-prescient-mode
 
   :init
@@ -927,7 +932,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   :diminish
   company-prescient-mode
 
-  :functions
+  :commands
   company-prescient-mode
 
   :init
@@ -1022,7 +1027,7 @@ partially sorted lists by length, as this ruins the sort order."))
   :after
   selectrum
 
-  :functions
+  :commands
   marginalia-mode
 
   :diminish
@@ -1216,6 +1221,11 @@ delimiters."
   :diminish
   yas-global-mode
   yas-minor-mode
+
+  :commands
+  yas-global-mode
+  yas-minor-mode
+  snippet-mode
 
   :functions
   yas-reload-all
