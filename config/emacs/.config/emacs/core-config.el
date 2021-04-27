@@ -1279,8 +1279,15 @@ delimiters."
   global-undo-tree-mode
   undo-tree-mode
 
+  :commands
+  global-undo-tree-mode
+  undo-tree-mode
+  undo-tree-undo
+  undo-tree-redo
+  undo-tree-visualize
+
   :hook
-  ((prog-mod text-mode) . undo-tree-mode))
+  ((prog-mode text-mode) . undo-tree-mode))
 
 (use-package flycheck
   :commands
