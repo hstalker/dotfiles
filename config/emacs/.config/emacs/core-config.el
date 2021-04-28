@@ -22,6 +22,7 @@
 (defvar hgs-data-directory)
 (defvar hgs-project-directory)
 (defvar hgs-org-directory)
+(defvar hgs-force-load-packages)
 (defvar hgs-is-bsd)
 (defvar hgs-is-linux)
 (defvar hgs-is-mac)
@@ -313,6 +314,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 ;; Enable xterm mouse mode by default if running in the terminal
 (use-package xt-mouse
   :if (not (display-graphic-p))
+
   :hook
   ((prog-mode text-mode) . xterm-mouse-mode))
 
@@ -343,6 +345,26 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
     :hook
     ((prog-mode text-mode) . display-line-numbers-mode)))
+
+(when (version<= "27.1" emacs-version)
+  (use-package so-long
+    :demand t
+
+    :commands
+    global-so-long-mode
+    so-long-minor-mode
+    so-long
+
+    :config
+    ;; so-long will automatically figure out when to activate with the global
+    ;; mode on.
+    (global-so-long-mode +1)
+
+    :custom
+    (so-long-action #'so-long-minor-mode "Action to perform when
+long lines are detected.")
+    (so-long-threshold 1000 "Threshold for what length is considered long.")
+    (so-long-max-lines 100 "Number of non-blank lines to test for length.")))
 
 ;; Displays the whitespace
 (use-package whitespace
@@ -698,7 +720,6 @@ package."))
    "Maintain all visible empty lines whilst cycling visibility.")
   (org-ellipsis "▼" "The ellipsis symbol to show for folds and the like."))
 
-
 (use-package org-indent
   :after org
 
@@ -743,6 +764,59 @@ package."))
      ;; ► ★ ▸
      )
    "Unicode bullets to use."))
+
+(use-package page-break-lines)
+
+(use-package all-the-icons)
+
+(use-package dashboard
+  :after
+  all-the-icons
+  page-break-lines
+
+  :demand t
+
+  :diminish
+  dashboard-mode
+  page-break-lines-mode
+
+  :commands
+  dashboard-setup-startup-hook
+
+  :config
+  (dashboard-setup-startup-hook)
+
+  :custom
+  (dashboard-banner-logo-title "Welcome to Emacs!" "The title message.")
+  (dashboard-startup-banner
+   ;; Straight doesn't seem to like grabbing the banner from here
+   (concat (file-name-as-directory hgs-config-directory)
+           "data/banner.txt")
+   "Can be nil, 'official for the Emacs logo, 1, 2 or 3 for the
+text banners, or a path to an image or text file.")
+  (dashboard-center-content t "Center the dashboard content.")
+  (dashboard-show-shortcuts t "Show the per section jump indicators.")
+  (dashboard-set-heading-icons t "Show widget heading icons.")
+  (dashboard-set-file-icons t "Show file icons.")
+  (dashboard-items
+   '((recents . 5)
+     (bookmarks . 5)
+     (projects . 5)
+     (agenda . 5)
+     (registers . 5))
+   "Show these widgets in format `(SELECTOR-SYMBOL . ENTRY-COUNT)'.")
+  (dashboard-set-navigator t "Show the navigator below the banner.")
+  (dashboard-set-init-info t "Show packages loaded and initialization time.")
+  (dashboard-set-footer t "Enable the randomly selected footnote.")
+  (dashboard-projects-switch-function
+   #'projectile-switch-project-by-name
+   "Which function to use for switching projects from the dashboard.")
+  (dashboard-week-agenda t "Show upcoming seven days' agenda.")
+
+  (initial-buffer-choice
+   (lambda ()
+     (get-buffer "*dashboard*"))
+   "Show the dashboard as the initial buffer even for the Emacs client."))
 
 (use-package clang-format+
   :commands
@@ -809,6 +883,7 @@ automation."))
 (use-package projectile
   :commands
   projectile-mode
+  projectile-switch-project-by-name
 
   :config
   (projectile-mode t)
@@ -875,15 +950,19 @@ automation."))
 extensions based on the extension of the current file."))
 
 (use-package selectrum
+  :demand t
+
   :diminish
   selectrum-mode
 
-  :init
+  :config
   (selectrum-mode +1))
 
 (use-package prescient
   :after
   selectrum
+
+  :demand t
 
   :diminish
   prescient-persist-mode
@@ -891,7 +970,7 @@ extensions based on the extension of the current file."))
   :commands
   prescient-persist-mode
 
-  :init
+  :config
   (prescient-persist-mode +1)
 
   :custom
@@ -928,39 +1007,43 @@ filters use character folding.")
 case-insensitive. Smart disables case insensitivity when upper case is used."))
 
 (use-package selectrum-prescient
- :after
- selectrum
- prescient
+  :after
+  selectrum
+  prescient
 
- :diminish
- selectrum-prescient-mode
+  :demand t
 
- :commands
- selectrum-prescient-mode
+  :diminish
+  selectrum-prescient-mode
 
- :init
- (selectrum-prescient-mode +1)
+  :commands
+  selectrum-prescient-mode
 
- :custom
- (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
- (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
+  :config
+  (selectrum-prescient-mode +1)
+
+  :custom
+  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
+  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
 
 (use-package company-prescient
- :after
- company
- prescient
+  :after
+  company
+  prescient
 
- :diminish
- company-prescient-mode
+  :demand t
 
- :commands
- company-prescient-mode
+  :diminish
+  company-prescient-mode
 
- :init
- (company-prescient-mode +1)
+  :commands
+  company-prescient-mode
 
- :custom
- (company-prescient-sort-length-enable nil "Don't resort company's already
+  :config
+  (company-prescient-mode +1)
+
+  :custom
+  (company-prescient-sort-length-enable nil "Don't resort company's already
 partially sorted lists by length, as this ruins the sort order."))
 
 (use-package consult
@@ -1030,20 +1113,22 @@ partially sorted lists by length, as this ruins the sort order."))
    "Use Projectile for finding the project root."))
 
 (use-package consult-flycheck
- :after
- consult
- flycheck
+  :after
+  consult
+  flycheck
 
- :commands
- consult-flycheck
+  :commands
+  consult-flycheck
 
- :bind
- (:map flycheck-command-map
-       ("!" . consult-flycheck)))
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
 
 (use-package marginalia
   :after
   selectrum
+
+  :demand t
 
   :commands
   marginalia-mode
@@ -1057,7 +1142,7 @@ partially sorted lists by length, as this ruins the sort order."))
   (:map minibuffer-local-map
         ("M-A" . marginalia-cycle))
 
-  :init
+  :config
   (marginalia-mode +1)
 
   :custom

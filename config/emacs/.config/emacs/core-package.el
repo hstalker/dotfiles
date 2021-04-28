@@ -11,6 +11,21 @@
 (declare-function straight-use-package "straight")
 
 (straight-use-package
+ '(page-break-lines
+   :type git
+   :host github
+   :repo "purcell/page-break-lines"))
+(straight-use-package
+ '(all-the-icons
+   :type git
+   :host github
+   :repo "domtronn/all-the-icons.el"))
+(straight-use-package
+ '(emacs-dashboard
+   :type git
+   :host github
+   :repo "emacs-dashboard/emacs-dashboard"))
+(straight-use-package
  '(dash
    :type git
    :host github

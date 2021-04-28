@@ -8,7 +8,7 @@
 ;;; Code:
 
 ;; Needed to force emacs to not use stale bytecode
-(setq load-prefer-newer t)
+(customize-set-variable 'load-prefer-newer t)
 
 ;; Stop package.el from starting by default
 (customize-set-variable 'package-enable-at-startup nil)
