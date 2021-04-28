@@ -1153,6 +1153,9 @@ partially sorted lists by length, as this ruins the sort order."))
    "Prefer richer, heavier annotations over lighter alternatives."))
 
 (use-package embark
+  :after
+  which-key
+
   :defines
   embark-file-map
 
@@ -1161,9 +1164,30 @@ partially sorted lists by length, as this ruins the sort order."))
         ("C-c e a" . embark-act))
   (:map minibuffer-local-map
         ("C-o" . embark-act)
-        ("C-S-o" . embark-act-noexit))
+        ("C-S-b" . embark-become))
   (:map embark-file-map
-        ("j" . dired-jump)))
+        ("j" . dired-jump))
+
+  :custom
+  (embark-quit-after-action
+   t
+   "Leave the minibuffer etc. after acting. Use prefix to keep
+acting on the same items.")
+  (embark-collect-initial-view-alist
+   '((file . list)
+     (buffer . list)
+     (symbol . list)
+     (line . list)
+     (xref-location . list)
+     (kill-ring . zebra)
+     (t . list))
+   "Setup default view per item category.")
+  (embark-collect-live-update-delay
+   0.5
+   "Delay between input and collect update.")
+  (embark-collect-initial-delay
+   0.8
+   "Delay before popping up collection."))
 
 (use-package embark-consult
   :after
