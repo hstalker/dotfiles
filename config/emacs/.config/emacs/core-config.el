@@ -1430,7 +1430,12 @@ delimiters."
   undo-tree-visualize
 
   :hook
-  ((prog-mode text-mode) . undo-tree-mode))
+  ((prog-mode text-mode) . undo-tree-mode)
+
+  :custom
+  (undo-tree-history-directory-alist
+   `(("." . ,(concat (file-name-as-directory hgs-cache-directory) "undo-tree")))
+   "Put history backups in the cache directory."))
 
 (use-package flycheck
   :commands
