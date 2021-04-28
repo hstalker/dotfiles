@@ -303,7 +303,13 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 (use-package gud)
 
 (use-package ediff
+  :config
+  ;; Attempt to undo the window configuration change when exiting an Ediff
+  ;; session.
+  (add-hook 'ediff-after-quit-hook-internal #'winner-undo)
+
   :custom
+  (ediff-keep-variants nil "Kill Ediff buffers on exit by default.")
   (ediff-window-setup-function
    #'ediff-setup-windows-plain
    "User a single frame for ediff rather than multiple.")
