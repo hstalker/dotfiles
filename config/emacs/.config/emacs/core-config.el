@@ -1115,7 +1115,8 @@ partially sorted lists by length, as this ruins the sort order."))
   (register-preview-function
    #'consult-register-format
    "Use Consult for register preview.")
-  (consult-narrow-key "<" "Specify the key used for explicit narrowing.")
+  (consult-narrow-key ">" "Specify the key used for explicit narrowing.")
+  (consult-widen-key "<" "Specify key used for explicit widening.")
   (consult-preview-key 'any "Trigger Consult previews with any key press.")
   (consult-project-root-function
    #'projectile-project-root
@@ -1450,10 +1451,99 @@ delimiters."
    "Don't invert navigation direction when near the bottom of the page.")
   (company-dabbrev-downcase nil "Don't downcase return value of dabbrev."))
 
+(use-package lsp-mode
+  :after
+  which-key
+
+  :commands
+  lsp
+  lsp-deferred
+  lsp-install-server
+
+  :defines
+  lsp-mode-map
+
+  :mode
+  ("\\.vim\\(rc\\)?\\'" . lsp-deferred)
+
+  :hook
+  ((c++-modec-mode objc-mode) . lsp-deferred)
+  (python-mode . lsp-deferred)
+  ((html-mode css-mode xml-mode) . lsp-deferred)
+  ((yaml-mode json-mode) . lsp-deferred)
+  (sh-mode . lsp-deferred)
+  ;; For which-key integration
+  (lsp-mode . lsp-enable-which-key-integration)
+  (lsp-mode . lsp-ui-mode)
+
+  :custom
+  (lsp-keymap-prefix "C-c l" "Prefix key-binding for LSP mappings.")
+  (lsp-server-install-dir
+   (concat (file-name-as-directory hgs-data-directory)
+           "lsp")
+   "Directory in which to install automatically installed LSP servers."))
+
+(use-package lsp-ui
+  :after
+  lsp-mode
+
+  :commands
+  lsp-ui-mode
+
+  :custom
+  (lsp-ui-sideline-enable t "Turn on the sideline.")
+  (lsp-ui-sideline-show-diagnostics t "Show diagnostics in the sideline.")
+  (lsp-ui-sideline-show-hover nil "Don't show hover messages in the sideline.")
+  (lsp-ui-sideline-show-code-actions t "Show code actions in the sideline.")
+  (lsp-ui-sideline-update-mode
+   'point
+   "'line to update when changing line, 'point to update when changing point.")
+  (lsp-ui-sideline-delay 0.2)
+
+  (lsp-peek-enable nil "Don't use peek. Prefer to use the narrowing framework.")
+
+  (lsp-ui-doc-enable t "Show documentation in frame.")
+  (lsp-ui-doc-position 'top "Where to display the documentation.
+'top, 'bottom or 'at-point.")
+  (lsp-ui-doc-delay 0.2 "Seconds delay before showing the documentation.")
+  (lsp-ui-doc-show-with-cursor
+   nil
+   "When non-nil, move the cursor over a symbol to show the documentation.")
+  (lsp-ui-doc-show-with-mouse
+   nil
+   "When non-nil, show documentation when hovering over a releveant symbol with
+the mouse."))
+
+(use-package consult-lsp
+  :after
+  lsp-mode
+
+  :commands
+  consult-lsp-diagnostics
+  consult-lsp-symbols
+
+  :bind
+  (:map lsp-mode-map
+        ([remap xref-find-apropos] . consult-lsp-symbols)))
+
+(use-package dap-mode
+  ;; (use-package dap-LANGUAGE) ; To load dap adapter for LANGUAGE
+
+  :hook
+  (dap-mode . tooltip-mode)
+  (dap-mode . dap-ui-mode)
+  (dap-mode . dap-tooltip-mode)
+  (dap-mode . dap-ui-controls-mode)
+
+  :custom
+  (dap-auto-configure-features
+   '(sessions locals controls tooltip)
+   "Which DAP features should be auto-configured by default."))
+
 (use-package undo-tree
   :diminish
   global-undo-tree-mode
-  undo-tree-mode
+  undo-tree-mode-hook
 
   :commands
   global-undo-tree-mode

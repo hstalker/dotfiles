@@ -227,6 +227,31 @@
    :type git
    :host github
    :repo "jrblevin/markdown-mode"))
+(straight-use-package
+ '(ht
+   :type git
+   :host github
+   :repo "wilfred/ht.el"))
+(straight-use-package
+ '(lsp-mode
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-mode"))
+(straight-use-package
+ '(lsp-ui
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-ui"))
+(straight-use-package
+ '(consult-lsp
+   :type git
+   :host github
+   :repo "gagbo/consult-lsp"))
+(straight-use-package
+ '(dap-mode
+   :type git
+   :host github
+   :repo "emacs-lsp/dap-mode"))
 
 ;; Local Variables:
 ;; coding: utf-8-unix
