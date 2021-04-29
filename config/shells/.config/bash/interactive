@@ -31,8 +31,8 @@ PS1+="\[${color_separator}\]λ " # Separator
 PS1+="\[${color_reset}\]" # Color back to normal
 unset color_shell color_path color_git color_separator color_reset
 
-# Place the history in cache
-HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/bash/history-$HOSTNAME-$USER"
+# Place the history in data
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash/history-$HOSTNAME-$USER"
 # Don't put duplicate lines or lines starting with space in the history
 HISTCONTROL=ignoreboth:erasedups
 # For setting history length

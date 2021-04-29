@@ -31,7 +31,7 @@ PS1+="${color_reset}" # Color back to normal
 unset color_shell color_path color_git color_separator color_reset
 
 # Place the history in data
-HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/ksh/history-$HOSTNAME-$USER"
+HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/ksh/history-$HOSTNAME-$USER"
 HISTSIZE=10000
 
 reload_dotfiles() {

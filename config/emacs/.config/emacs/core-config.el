@@ -556,6 +556,9 @@ package."))
        " ")))
 
   :custom
+  (eshell-directory-name
+   (concat (file-name-as-directory hgs-data-directory) "eshell")
+   "Use cache directory for storing files (e.g. aliases, history etc.)")
   (eshell-buffer-maximum-lines
    20000
    "Truncate eshell buffers to something reasonable.")
