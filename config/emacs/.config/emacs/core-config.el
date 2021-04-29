@@ -1257,6 +1257,30 @@ emacsclient (invalid argument stringp errors)."
            "transient/history.el")
    "Where to place the Transient history cache file."))
 
+(use-package with-editor
+  :init
+  (defun hgs--with-editor-export-editor ()
+    "Run `with-editor-export-editor' once for each possible editor variable."
+    (dolist (var '("EDITOR"
+                   "VISUAL"
+                   "GIT_EDITOR"
+                   "HG_EDITOR"))
+      (with-editor-export-editor var)))
+
+  :commands
+  with-editor-export-editor
+  with-editor-async-shell-command
+  with-editor-shell-command
+
+  :hook
+  ((shell-mode term-exec eshell-mode vterm-mode)
+   . hgs--with-editor-export-editor)
+
+  :bind
+  (:map global-map
+        ([remap async-shell-command] . with-editor-async-shell-command)
+        ([remap shell-command] . with-editor-shell-command)))
+
 (use-package magit
   :after transient
 
