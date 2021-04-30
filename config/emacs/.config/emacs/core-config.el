@@ -438,6 +438,9 @@ file when it changes on disk.")
    "Put backups in the cache directory.")
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
+(use-package subword
+  :hook
+  ((prog-mode text-mode special-mode) . subword-mode))
 
 (use-package recentf
   :custom
