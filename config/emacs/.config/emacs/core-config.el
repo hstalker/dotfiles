@@ -22,7 +22,6 @@
 (defvar hgs-data-directory)
 (defvar hgs-project-directory)
 (defvar hgs-org-directory)
-(defvar hgs-force-load-packages)
 (defvar hgs-is-bsd)
 (defvar hgs-is-linux)
 (defvar hgs-is-mac)
@@ -829,6 +828,66 @@ text banners, or a path to an image or text file.")
    (lambda ()
      (get-buffer "*dashboard*"))
    "Show the dashboard as the initial buffer even for the Emacs client."))
+
+(use-package string-inflection
+  :init
+  (defun hgs-restyle-dwim ()
+    "Completing read enabled restyling of the specified region or current word.
+Allows for converting the given region between lowercase, uppercase, kebab-case,
+snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
+    (interactive)
+    ;; We don't want to move the point
+    (save-excursion
+      (let* ((selection (progn
+                          ;; If we are relying on DWIM behavior
+                          (if (not (region-active-p))
+                              (progn
+                                ;; Mark the sexp at point.
+                                ;; NOTE: Broken when at beginning of sexp
+                                (backward-sexp)
+                                (set-mark (point))
+                                (forward-sexp)
+                                (activate-mark)))
+                          ;; Grab the string under point
+                          (buffer-substring-no-properties (region-beginning)
+                                                          (region-end))))
+             (choices `(("UPPER CASE" . ,(lambda ()
+                                           (upcase selection)))
+                        ("lower case" . ,(lambda ()
+                                           (downcase selection)))
+                        ("Capitalized" . ,(lambda ()
+                                            (capitalize selection)))
+                        ("snake_case" .
+                         ,(lambda ()
+                            (string-inflection-underscore-function selection)))
+                        ("Snake_Case" .
+                         ,(lambda ()
+                            (string-inflection-capital-underscore-function
+                             selection)))
+                        ("PascalCase" .
+                         ,(lambda ()
+                            (string-inflection-pascal-case-function selection)))
+                        ("camelCase" .
+                         ,(lambda ()
+                            (string-inflection-camelcase-function selection)))
+                        ("kebab-case" .
+                         ,(lambda ()
+                            (string-inflection-kebab-case-function selection)))))
+             (choice (completing-read "Select target style: "
+                                      choices
+                                      nil                  ; Predicate?
+                                      'require-match))
+             (result (funcall (alist-get choice choices nil nil 'string-equal))))
+        ;; Replace region with result of restyle
+        (kill-region (region-beginning) (region-end))
+        (insert result))))
+
+  :commands
+  string-inflection-capital-underscore-function
+  string-inflection-underscore-function
+  string-inflection-camelcase-function
+  string-inflection-pascal-case-function
+  string-inflection-kebab-case-function)
 
 (use-package clang-format+
   :commands

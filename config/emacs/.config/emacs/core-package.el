@@ -252,6 +252,11 @@
    :type git
    :host github
    :repo "emacs-lsp/dap-mode"))
+(straight-use-package
+ '(string-inflection
+   :type git
+   :host github
+   :repo "akicho8/string-inflection"))
 
 ;; Local Variables:
 ;; coding: utf-8-unix
