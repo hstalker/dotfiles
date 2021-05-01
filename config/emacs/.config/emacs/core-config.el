@@ -440,6 +440,10 @@ file when it changes on disk.")
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
 (use-package subword
+  :diminish
+  global-subword-mode
+  subword-mode
+
   :hook
   ((prog-mode text-mode special-mode) . subword-mode))
 
@@ -769,7 +773,12 @@ history etc.)")
      )
    "Unicode bullets to use."))
 
-(use-package page-break-lines)
+(use-package page-break-lines
+  :diminish
+  page-break-lines-mode
+
+  :commands
+  page-break-lines-mode)
 
 (use-package memoize)
 
