@@ -56,6 +56,25 @@ Should match an entry in `straight-profiles'. Bind this to different values over
 different parts of `core-package.el' in order to have that profile be in
 effect.")
 
+(defmacro minmacs--with-no-default-repositories (&rest body)
+  "Disable default ELPA/MELPA etc. repositories for `BODY'."
+  (declare (indent defun))
+  `(let ((straight-recipe-repositories nil)
+         (straight-recipe-overrides nil))
+     ,@body))
+
+(defmacro minmacs-as-core-packages (&rest body)
+  "Make all package declarations inside `BODY' be specified as core packages."
+  (declare (indent defun))
+  `(minmacs--with-no-default-repositories
+     (let ((straight-current-profile 'core))
+       ,@body)))
+
+(defmacro minmacs-as-custom-packages (&rest body)
+  "Make all package declarations inside `BODY' be specified as custom packages."
+  (declare (indent defun))
+  `(let ((straight-current-profile 'custom))
+     ,@body))
 
 (defun minmacs-bootstrap ()
   "Bootstrap necessary package management libraries."
@@ -87,21 +106,22 @@ effect.")
     ;; in our configuration in order to be maximally reproducible.")
     ;; (customize-set-variable 'straight-recipe-overrides nil)
     (declare-function straight-use-package "straight")
-    (straight-use-package
-     '(diminish
-        :type git
-        :host github
-        :repo "jwiegley/use-package"))
-    (straight-use-package
-     '(bind-key
-        :type git
-        :host github
-        :repo "jwiegley/use-package"))
-    (straight-use-package
-     '(use-package
-        :type git
-        :host github
-        :repo "jwiegley/use-package"))
+    (minmacs-as-core-packages
+      (straight-use-package
+       '(diminish
+         :type git
+         :host github
+         :repo "jwiegley/use-package"))
+      (straight-use-package
+       '(bind-key
+         :type git
+         :host github
+         :repo "jwiegley/use-package"))
+      (straight-use-package
+       '(use-package
+          :type git
+          :host github
+          :repo "jwiegley/use-package")))
     (require 'use-package)
     (progress-reporter-done bootstrap-progress)))
 
