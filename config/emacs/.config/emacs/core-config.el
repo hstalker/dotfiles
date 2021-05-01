@@ -804,9 +804,6 @@ history etc.)")
   dashboard-mode
   page-break-lines-mode
 
-  :commands
-  dashboard-setup-startup-hook
-
   :config
   (dashboard-setup-startup-hook)
 
@@ -1155,12 +1152,11 @@ partially sorted lists by length, as this ruins the sort order."))
         ("C-x K" . consult-kmacro)
         ("C-x r M-\"" . consult-register-load)
         ("C-x r M-'" . consult-register-store)
-        ([remap bookmark-jump] . consult-bookmark))
-  (:map ctl-x-map
-        ([remap repeat-complex-command] . consult-complex-command)
-        ([remap switch-to-buffer] . consult-buffer)
-        ([remap switch-to-buffer-other-window] . consult-buffer-other-window)
-        ([remap switch-to-buffer-other-frame] . consult-buffer-other-frame))
+        ([remap bookmark-jump] . consult-bookmark)
+        ("C-x M-:" . consult-complex-command)
+        ("C-x b" . consult-buffer)
+        ("C-x 4 b" . consult-buffer-other-window)
+        ("C-x 5 b" . consult-buffer-other-frame))
   (:map goto-map
         ("g" . consult-goto-line)
         ("M-g" . consult-goto-line)
