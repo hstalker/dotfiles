@@ -52,9 +52,6 @@ dotfiles as-is via home-manager. If the requirement of supporting other distros
 made considerably simpler, alas the world isn't so simple.
 
 ## Future Goals
-* Move Emacs to bufler/lsp.
-* Move Emacs config to support more advanced packaging functionality such as
-  layered lockfiles (core + overrides), package disabling etc.
 * Try to move Vim plug usage to support an automated lockfile mechanism for
   pinning.
 * Add WM/DE/rofi configuration.
@@ -417,8 +414,10 @@ The current load order of these scripts is as follows:
 * `$HOME/.emacs` (On older systems - deprecated - forwards to below)
 * `$XDG_CONFIG_HOME/emacs/early-init.el` (On newer systems)
 * `$XDG_CONFIG_HOME/emacs/init.el`
-* `$XDG_CONFIG_HOME/emacs/core-package.el`
-* `$XDG_CONFIG_HOME/emacs/custom-package.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/core-package.el` and
+  `$XDG_CONFIG_HOME/emacs/core-lock.el` for package versions.
+* `$XDG_CONFIG_HOME/emacs/custom-package.el` (If available) and
+  `$XDG_CONFIG_HOME/emacs/custom-lock.el` for package versions.
 * `$XDG_CONFIG_HOME/emacs/core-config.el`
 * `$XDG_CONFIG_HOME/emacs/custom-config.el` (If available)
 * `$XDG_CONFIG_HOME/emacs/custom-customization.el` (If available)
@@ -436,11 +435,26 @@ should be placed in `$XDG_CONFIG_HOME/emacs/custom-package.el`. The allowed
 operations are:
 * `(straight-use-package '(PACKAGE-NAME ...RECIPE...)`
 
+It should be preferred that all packages are managed via explicit recipes as
+opposed to using straight's automatic features in order to be fully
+reproducible. This should also be done for transitive dependencies. Pinning
+should be fully managed via straight's versioning functions (e.g.
+`straight-fetch-all`, `straight-freeze-versions` and `straight-thaw-versions`.
+
+All custom package specifications should be done under the `'custom` straight
+profile (i.e. `straight-current-profile` should be set to `'custom`).
+
 Local machine configuration additions (including configuration for packages
 declared in custom-package.el) should be placed in
 `$XDG_CONFIG_HOME/emacs/custom-config.el`. The provided operations are:
 * `(use-package PACKAGE-NAME ...CONFIGURATION-BODY...)`, where this follows
   typical third-party use-package usage.
+
+With `use-package`, we prefer to be as explicit as possible, and to design under
+the assumption that any package can be lazily loaded (which may not happen in
+practice due to inter-package dependencies, but the `use-package` blocks should
+be written with that in mind). We also prefer hooks + buffer-local modes to
+global modes in almost all cases.
 
 We provide three core hooks taking the frame being created for customizing frame
 appearance:

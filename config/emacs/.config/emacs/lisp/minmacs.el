@@ -37,6 +37,25 @@ wrappers."
 (defvar straight-use-package-by-default
   nil
   "We don't want use-package integration by default.")
+(defvar straight-fix-flycheck
+  t
+  "Install a workaround for a problem with flycheck.")
+(defvar straight-fix-org
+  t
+  "Install a workaround for a problem with org.")
+(defvar straight-profiles
+  `((core . ,(concat hgs-config-directory "core-lock.el"))
+    (custom . ,(concat hgs-config-directory "custom-lock.el")))
+  "Alist of `'(PROFILE-NAME . LOCK-FILE-NAME)'.
+Lock file names are either relative to \"straight/versions/\" or absolute
+paths.")
+(defvar straight-current-profile
+  'core
+  "Current profile.
+Should match an entry in `straight-profiles'. Bind this to different values over
+different parts of `core-package.el' in order to have that profile be in
+effect.")
+
 
 (defun minmacs-bootstrap ()
   "Bootstrap necessary package management libraries."
@@ -59,7 +78,25 @@ wrappers."
           (eval-print-last-sexp)))
       (load bootstrap-file nil 'nomessage))
     (progress-reporter-update bootstrap-progress 1)
+    ;; (customize-set-variable
+    ;;  'straight-recipe-repositories
+    ;;  nil
+    ;;  "Default repositories to use for recipe-less package
+    ;; declarations. We don't want to use things like MELPA by
+    ;; default, and much prefer to manually specify ALL dependencies
+    ;; in our configuration in order to be maximally reproducible.")
+    ;; (customize-set-variable 'straight-recipe-overrides nil)
     (declare-function straight-use-package "straight")
+    (straight-use-package
+     '(diminish
+        :type git
+        :host github
+        :repo "jwiegley/use-package"))
+    (straight-use-package
+     '(bind-key
+        :type git
+        :host github
+        :repo "jwiegley/use-package"))
     (straight-use-package
      '(use-package
         :type git

@@ -766,7 +766,18 @@ package."))
 
 (use-package page-break-lines)
 
-(use-package all-the-icons)
+(use-package memoize)
+
+(use-package all-the-icons
+  :after
+  memoize
+
+  :config
+  ;; Try to automatically install the fonts if they appear missing
+  (when (and (not (member "all-the-icons" (font-family-list)))
+             (not (daemonp))
+             (window-system))
+    (all-the-icons-install-fonts t)))
 
 (use-package dashboard
   :after
@@ -1554,6 +1565,48 @@ delimiters."
    "When non-nil, show documentation when hovering over a releveant symbol with
 the mouse."))
 
+(use-package lsp-treemacs
+  :after
+  lsp-mode
+  treemacs
+
+  :diminish
+  lsp-treemacs-sync-mode
+
+  :hook
+  ((lsp-mode) . lsp-treemacs-sync-mode)
+
+  :bind
+  (:map lsp-mode-map
+	("C-c l T s" . hgs--toggle-lsp-treemacs-symbols))
+
+  :init
+  (defun hgs--toggle-lsp-treemacs-symbols (&optional state)
+    "Toggle the `lsp-treemacs-symbols' window.
+Can be forced on by supplying >0 or t, and off via <0."
+    (interactive)
+    (save-selected-window
+      (let* ((symbols-buffer (get-buffer "*LSP Symbols List*"))
+	     (symbols-window (get-buffer-window symbols-buffer))
+	     (open #'lsp-treemacs-symbols)
+	     (close (lambda ()
+		      (delete-window symbols-window)))
+	     (toggle (lambda ()
+		       (if (and
+			    (not (null symbols-buffer))
+			    (not (null symbols-window)))
+			   (funcall close)
+			 (lsp-treemacs-symbols)))))
+	;; If we haven't been passed an argument
+	(if (null state)
+	    (funcall toggle)
+	  ;; If we have been passed an argument
+	  (if (or (eq state t) (> state 0))
+	      ;; If it's trying to be toggled on
+	      (funcall open)
+	    ;; If it's trying to be toggled off
+	    (funcall close)))))))
+
 (use-package consult-lsp
   :after
   lsp-mode
@@ -1579,6 +1632,166 @@ the mouse."))
   (dap-auto-configure-features
    '(sessions locals controls tooltip)
    "Which DAP features should be auto-configured by default."))
+
+(use-package avy
+  :defines
+  avy-order-closest
+
+  :commands
+  avy-goto-char
+  avy-goto-char-2
+  avy-goto-char-timer
+  avy-isearch
+  avy-goto-word
+  avy-goto-line
+
+  :bind
+  (:map global-map
+        ("C-'" . avy-goto-char))
+  (:map isearch-mode-map
+        ("C-'". avy-isearch))
+
+  :custom
+  (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
+  (avy-keys-alist '() "Alist of Avy commands to keys to use for prompts. Falls
+back to `avy-keys'")
+  (avy-style 'at "Overlay display style.")
+  (avy-styles-alist '() "Alist of Avy commands to overlay display styles.")
+  (avy-background nil "Use a gray background during selection.")
+  (avy-all-windows t "Scan all windows on the selected for selection.")
+  (avy-case-fold-search t "Ignore case for search.")
+  (avy-highlight-first nil "Don't highlight the first decision character, only
+first non-terminating decision characters.")
+  (avy-timeout-seconds 0.5 "How long `*-timer' commands should wait.")
+  (avy-orders-alist
+   '((avy-goto-char . avy-order-closest))
+   "Alist allowing for specifying commands to use fewer characters when closer
+to point."))
+
+(use-package treemacs
+  :commands
+  treemacs
+  treemacs-find-file
+  treemacs-find-tag
+  treemacs-select-window
+  treemacs-delete-other-windows
+  treemacs-bookmark
+  treemacs-filewatch-mode
+  treemacs-follow-mode
+  treemacs-git-mode
+  treemacs-fringe-indicator-mode
+
+  :bind
+  (:prefix "C-c t"
+           :prefix-map hgs--treemacs-prefix-map
+           :prefix-docstring "Treemacs commands"
+           ("t" . treemacs)
+           ("g" . treemacs-select-window)
+           ("1" . treemacs-delete-other-windows)
+           ("B" . treemacs-bookmark)
+           ("f" . treemacs-find-file)
+           ("T" . treemacs-find-tag))
+
+  :hook
+  ((treemacs-mode) . treemacs-follow-mode)
+  ((treemacs-mode) . treemacs-filewatch-mode)
+  ((treemacs-mode) . hgs--treemacs-fringe-indicator-mode)
+  ((treemacs-mode) . hgs--treemacs-git-mode)
+
+  :init
+  (defun hgs--treemacs-fringe-indicator-mode ()
+    (treemacs-fringe-indicator-mode 'always))
+  (defun hgs--treemacs-git-mode ()
+    (unless (null (executable-find "git"))
+      (if (null treemacs-python-executable)
+          (treemacs-git-mode 'simple)
+        (treemacs-git-mode 'deferred))))
+
+  ;; Force treemacs toggling to *not* focus the treemacs window
+  (define-advice treemacs
+      (:around (orig-fn &rest args) treemacs-no-select)
+    (save-selected-window
+      (apply orig-fn args)))
+
+  :config
+  ;;(treemacs-resize-icons 44) ; Doubles icon size for Hi-DPI
+
+  :custom
+  (treemacs-persist-file
+   (concat hgs-cache-directory "treemacs-persist")
+   "Place Treemacs persistence file in the cache.")
+  (treemacs-sorting 'alphabetic-asc "Sort entries by alphabetical ordering.")
+  (treemacs-position 'left "Put the Treemacs window on the left.")
+  (treemacs-display-in-side-window t "Put the Treemacs window in a side window.")
+  (treemacs-width 35 "Width of the Treemacs window as a percentage.")
+  (treemacs-is-never-other-window nil "Should be selectable via other window.")
+  (treemacs-no-delete-other-windows
+   t
+   "Don't delete when running delete other windows.")
+  (treemacs-eldoc-display t "Show eldoc.")
+  (treemacs-show-hidden-files t "Show hidden files in Treemacs.")
+  (treemacs-follow-after-init t "Don't follow after initialization.")
+  (treemacs-directory-name-transformer
+   #'identity
+   "Function to use for transforming directory names.")
+  (treemacs-file-event-delay 5000 "Delay between monitoring for file events.")
+  (treemacs-file-follow-delay 0.2 "Delay between following files.")
+  (treemacs-tag-follow-delay 1.5 "Delay between following tags.")
+  (treemacs-deferred-git-apply-delay 0.5 "Delay before running git for updates.")
+  (treemacs-max-git-entries 5000 "Cap out the number of Git entries.")
+  (treemacs-goto-tag-strategy
+   'refetch-index
+   "Strategy to use for jumping to tag.")
+  (treemacs-indentation 2 "Set Treemacs indentation amount.")
+  (treemacs-indentation-string " " "String to use for Treemacs indentation.")
+  (treemacs-missing-project-action 'ask "Prompt when missing project.")
+  (treemacs-file-extension-regex
+   treemacs-last-period-regex-value
+   "Regex to use to match file extension.")
+  (treemacs-read-string-input 'from-child-frame "Use child frame for input.")
+  (treemacs-show-cursor nil "Don't show the cursor in the Treemacs window.")
+  (treemacs-silent-filewatch nil "Watch files loudly.")
+  (treemacs-silent-refresh nil "Refresh Treemacs loudly.")
+  (treemacs-space-between-root-nodes t "Add space between root nodes.")
+  (treemacs-user-mode-line-format nil "Don't format.")
+  (treemacs-user-header-line-format nil "Don't format.")
+  (treemacs-workspace-switch-cleanup nil "Don't cleanup on workspace switch")
+  (treemacs-tag-follow-cleanup t "Cleanup when following a tag.")
+  (treemacs-project-follow-cleanup
+   nil
+   "Don't cleanup when following project switch")
+  (treemacs-recenter-distance 0.1 "Amount to recenter.")
+  (treemacs-recenter-after-file-follow nil "Don't recenter.")
+  (treemacs-recenter-after-tag-follow nil "Don't recenter.")
+  (treemacs-recenter-after-project-jump 'always "Always recenter.")
+  (treemacs-recenter-after-project-expand 'on-distance "Sometimes recenter.")
+  (treemacs-move-forward-on-expand
+   nil
+   "Don't move selection forward on expansion.")
+  (treemacs-no-png-images nil "Use PNG images if available."))
+
+(use-package treemacs-magit
+  :after
+  treemacs
+  magit)
+
+(use-package treemacs-projectile
+  :after
+  treemacs
+  projectile)
+
+(use-package treemacs-all-the-icons
+  :after
+  treemacs
+  all-the-icons)
+
+(use-package treemacs-icons-dired
+  :after
+  treemacs
+  dired
+
+  :hook
+  ((dired-mode) . treemacs-icons-dired-mode))
 
 (use-package undo-tree
   :diminish

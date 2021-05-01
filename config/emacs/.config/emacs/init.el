@@ -156,7 +156,10 @@ This passes through the passed `NOERROR', `NOMESSAGE', `NOSUFFIX' and
 ;; Declaratively specify packages
 (load (concat  hgs-config-directory "core-package")
       nil 'nomessage)
-(load-if-exists (concat hgs-config-directory "custom-package"))
+(let (;; (straight-recipe-repositories nil)
+      ;; (straight-recipe-overrides nil)
+      (straight-current-profile 'custom))
+  (load-if-exists (concat hgs-config-directory "custom-package")))
 
 ;; Load core configuration modules
 (load (concat hgs-config-directory "core-config")
