@@ -1915,6 +1915,23 @@ American English."))
         ("C-c <up>" . transpose-frame)
         ("C-c <down>" . rotate-frame-clockwise)))
 
+(use-package wgrep
+  :commands
+  wgrep-mode
+
+  :bind
+  (:map grep-mode-map
+        ("C-c C-p" . wgrep-mode))
+
+  :custom
+  (wgrep-auto-save-buffer
+   nil
+   "Don't save buffer automatically when `wgrep-finish-edit'.")
+  ;; (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
+  (wgrep-change-readonly-file
+   nil
+   "Don't apply changes regardless of whether the buffer is read-only."))
+
 (use-package rainbow-delimiters
   :diminish
   rainbow-delimiters-mode

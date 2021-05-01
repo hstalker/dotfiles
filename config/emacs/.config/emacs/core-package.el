@@ -454,6 +454,13 @@
      :host github
      :repo "editorconfig/editorconfig-emacs"))
 
+  ;; Wgrep - for editing grep(-like) buffers
+  (straight-use-package
+   '(wgrep
+     :type git
+     :host github
+     :repo "mhayashi1120/Emacs-wgrep"))
+
   (progress-reporter-done core-packages-progress))
 
 ;; Local Variables:
