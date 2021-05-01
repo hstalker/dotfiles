@@ -39,9 +39,13 @@
     (indent-region (point-min) (point-max) nil)))
 
 (defun hgs-byte-compile-configuration ()
-  "Byte compile our configuration scripts."
+  "Byte (re)compile our configuration scripts."
   (interactive)
-  (byte-recompile-directory hgs-config-directory 0))
+  (dolist (file (directory-files-recursively hgs-config-directory ".*.el$"))
+    ;; Skip the lock files
+    (unless (member (file-name-sans-extension (file-name-base file))
+                    '("core-lock" "custom-lock"))
+      (byte-recompile-file file nil 0))))
 
 (defun hgs-reload-configuration ()
   "Reload our Emacs configuration."
@@ -442,7 +446,7 @@ file when it changes on disk.")
 (use-package recentf
   :custom
   (recentf-save-file (concat hgs-cache-directory "recentf")
-   "Place the recentf cache into our cache directory."))
+                     "Place the recentf cache into our cache directory."))
 
 (use-package vc
   :bind-keymap
@@ -553,7 +557,8 @@ package."))
 
   :custom
   (eshell-directory-name (concat hgs-data-directory "eshell")
-   "Use cache directory for storing files (e.g. aliases, history etc.)")
+                         "Use cache directory for storing files (e.g. aliases,
+history etc.)")
   (eshell-buffer-maximum-lines
    20000
    "Truncate eshell buffers to something reasonable.")
@@ -632,7 +637,7 @@ package."))
 
   :custom
   (org-directory hgs-org-directory
-   "Base path to store org files inside by default.")
+                 "Base path to store org files inside by default.")
   (org-default-notes-file
    (concat hgs-org-directory "notes.org")
    "Put org notes into the appropriate file & directory by default.")
@@ -1578,7 +1583,7 @@ the mouse."))
 
   :bind
   (:map lsp-mode-map
-	("C-c l T s" . hgs--toggle-lsp-treemacs-symbols))
+        ("C-c l T s" . hgs--toggle-lsp-treemacs-symbols))
 
   :init
   (defun hgs--toggle-lsp-treemacs-symbols (&optional state)
@@ -1587,25 +1592,25 @@ Can be forced on by supplying >0 or t, and off via <0."
     (interactive)
     (save-selected-window
       (let* ((symbols-buffer (get-buffer "*LSP Symbols List*"))
-	     (symbols-window (get-buffer-window symbols-buffer))
-	     (open #'lsp-treemacs-symbols)
-	     (close (lambda ()
-		      (delete-window symbols-window)))
-	     (toggle (lambda ()
-		       (if (and
-			    (not (null symbols-buffer))
-			    (not (null symbols-window)))
-			   (funcall close)
-			 (lsp-treemacs-symbols)))))
-	;; If we haven't been passed an argument
-	(if (null state)
-	    (funcall toggle)
-	  ;; If we have been passed an argument
-	  (if (or (eq state t) (> state 0))
-	      ;; If it's trying to be toggled on
-	      (funcall open)
-	    ;; If it's trying to be toggled off
-	    (funcall close)))))))
+             (symbols-window (get-buffer-window symbols-buffer))
+             (open #'lsp-treemacs-symbols)
+             (close (lambda ()
+                      (delete-window symbols-window)))
+             (toggle (lambda ()
+                       (if (and
+                            (not (null symbols-buffer))
+                            (not (null symbols-window)))
+                           (funcall close)
+                         (lsp-treemacs-symbols)))))
+        ;; If we haven't been passed an argument
+        (if (null state)
+            (funcall toggle)
+          ;; If we have been passed an argument
+          (if (or (eq state t) (> state 0))
+              ;; If it's trying to be toggled on
+              (funcall open)
+            ;; If it's trying to be toggled off
+            (funcall close)))))))
 
 (use-package consult-lsp
   :after
@@ -1722,7 +1727,9 @@ to point."))
    "Place Treemacs persistence file in the cache.")
   (treemacs-sorting 'alphabetic-asc "Sort entries by alphabetical ordering.")
   (treemacs-position 'left "Put the Treemacs window on the left.")
-  (treemacs-display-in-side-window t "Put the Treemacs window in a side window.")
+  (treemacs-display-in-side-window
+   t
+   "Put the Treemacs window in a side window.")
   (treemacs-width 35 "Width of the Treemacs window as a percentage.")
   (treemacs-is-never-other-window nil "Should be selectable via other window.")
   (treemacs-no-delete-other-windows
@@ -1737,7 +1744,9 @@ to point."))
   (treemacs-file-event-delay 5000 "Delay between monitoring for file events.")
   (treemacs-file-follow-delay 0.2 "Delay between following files.")
   (treemacs-tag-follow-delay 1.5 "Delay between following tags.")
-  (treemacs-deferred-git-apply-delay 0.5 "Delay before running git for updates.")
+  (treemacs-deferred-git-apply-delay
+   0.5
+   "Delay before running git for updates.")
   (treemacs-max-git-entries 5000 "Cap out the number of Git entries.")
   (treemacs-goto-tag-strategy
    'refetch-index
