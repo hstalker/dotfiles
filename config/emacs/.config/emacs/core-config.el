@@ -912,6 +912,16 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
    "If we can't find a .clang-format, then we should not enable this
 automation."))
 
+(use-package editorconfig
+  :diminish
+  editorconfig-mode
+
+  :commands
+  editorconfig-mode
+
+  :hook
+  ((prog-mode) . editorconfig-mode))
+
 (use-package exec-path-from-shell
   :commands
   exec-path-from-shell-initialize

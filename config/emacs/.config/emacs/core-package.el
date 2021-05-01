@@ -447,6 +447,13 @@
      :host github
      :repo "akicho8/string-inflection"))
 
+  ;; Editor-config
+  (straight-use-package
+   '(editor-config
+     :type git
+     :host github
+     :repo "editorconfig/editorconfig-emacs"))
+
   (progress-reporter-done core-packages-progress))
 
 ;; Local Variables:
