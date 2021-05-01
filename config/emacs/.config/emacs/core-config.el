@@ -647,6 +647,10 @@ history etc.)")
            ("a" . org-agenda)
            ("j" . org-clock-goto))
 
+  :init
+  (which-key-add-key-based-replacements
+    "C-c o" "Org")
+
   :custom
   (org-directory hgs-org-directory
                  "Base path to store org files inside by default.")
@@ -985,6 +989,10 @@ automation."))
   :bind-keymap
   ("C-c p" . projectile-command-map)
 
+  :init
+  (which-key-add-key-based-replacements
+    "C-c p" "Projectile")
+
   :config
   ;; Make setting the projectile build-related variables via local variables
   ;; safe.
@@ -1242,9 +1250,6 @@ partially sorted lists by length, as this ruins the sort order."))
    "Prefer richer, heavier annotations over lighter alternatives."))
 
 (use-package embark
-  :after
-  which-key
-
   :defines
   embark-file-map
 
@@ -1256,6 +1261,10 @@ partially sorted lists by length, as this ruins the sort order."))
         ("C-S-b" . embark-become))
   (:map embark-file-map
         ("j" . dired-jump))
+
+  :init
+  (which-key-add-key-based-replacements
+    "C-c e" "Embark")
 
   :custom
   (embark-quit-after-action
@@ -1477,6 +1486,13 @@ delimiters."
 
   :hook
   ((prog-mode text-mode) . yas-minor-mode)
+
+  :bind-keymap
+  ("C-c &" . yas-keymap)
+
+  :init
+  (which-key-add-key-based-replacements
+    "C-c &" "Yasnippet")
 
   :config
   ;; Needed to force Emacs to load up all snippets given in our personal
@@ -1740,6 +1756,9 @@ to point."))
     (save-selected-window
       (apply orig-fn args)))
 
+  (which-key-add-key-based-replacements
+    "C-c t" "Treemacs")
+
   :config
   ;;(treemacs-resize-icons 44) ; Doubles icon size for Hi-DPI
 
@@ -1852,7 +1871,11 @@ to point."))
   ("C-c !" . flycheck-keymap-prefix)
 
   :hook
-  ((prog-mode) . flycheck-mode))
+  ((prog-mode) . flycheck-mode)
+
+  :init
+  (which-key-add-key-based-replacements
+    "C-c !" "Flycheck"))
 
 (use-package flyspell
   :if (executable-find "aspell")
