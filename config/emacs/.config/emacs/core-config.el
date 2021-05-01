@@ -448,9 +448,17 @@ file when it changes on disk.")
   ((prog-mode text-mode special-mode) . subword-mode))
 
 (use-package recentf
+  :diminish
+  recentf
+
+  :hook
+  ((prog-mode text-mode special-mode) . recentf-mode)
+
   :custom
   (recentf-save-file (concat hgs-cache-directory "recentf")
-                     "Place the recentf cache into our cache directory."))
+                     "Place the recentf cache into our cache directory.")
+  (recentf-max-menu-items 25 "Maximum number of menu items to show.")
+  (recentf-max-saved-items 25 "Maximum number of items to save."))
 
 (use-package vc
   :bind-keymap
@@ -1257,9 +1265,8 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :custom
   (embark-quit-after-action
-   t
-   "Leave the minibuffer etc. after acting. Use prefix to keep
-acting on the same items.")
+   nil
+   "Don't leave the minibuffer etc. after acting.")
   (embark-collect-initial-view-alist
    '((file . list)
      (buffer . list)
