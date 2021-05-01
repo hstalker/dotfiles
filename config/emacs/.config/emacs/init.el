@@ -47,43 +47,44 @@
 
 (defcustom hgs-config-directory
   (file-name-as-directory
-    (concat (file-name-as-directory
-              (or (getenv "XDG_CONFIG_HOME")
-                  (concat hgs-user-directory ".config")))
-            "emacs"))
+   (concat (file-name-as-directory
+            (or (getenv "XDG_CONFIG_HOME")
+                (concat hgs-user-directory ".config")))
+           "emacs"))
   "XDG directory specification's config directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-cache-directory
   (file-name-as-directory
-    (concat (file-name-as-directory
-              (or (getenv "XDG_CACHE_HOME")
-                  (concat hgs-user-directory ".cache")))
-            "emacs"))
+   (concat (file-name-as-directory
+            (or (getenv "XDG_CACHE_HOME")
+                (concat hgs-user-directory ".cache")))
+           "emacs"))
   "XDG directory specification's cache directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-data-directory
   (file-name-as-directory
-    (concat (file-name-as-directory
-              (or (getenv "XDG_DATA_HOME")
-                  (concat hgs-user-directory ".local" "share")))
-            "emacs"))
+   (concat (file-name-as-directory
+            (or (getenv "XDG_DATA_HOME")
+                (concat hgs-user-directory ".local/share")))
+           "emacs"))
   "XDG directory specification's data directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-project-directory
-  (concat (file-name-as-directory hgs-user-directory) "project")
+  (file-name-as-directory
+   (concat (file-name-as-directory hgs-user-directory) "project"))
   "Directory in which our user's projects should be found by default."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-org-directory
   (file-name-as-directory
-    (concat (file-name-as-directory hgs-user-directory) "org"))
+   (concat (file-name-as-directory hgs-user-directory) "org"))
   "Directory in which our user's org files should be placed."
   :type 'directory
   :group 'personal)
@@ -111,25 +112,25 @@ the frame being created as an argument."
   "Configure the given frame. Should be attached to
 `after-make-frame-functions' hook."
   (let ((frame-setup-progress
-          (make-progress-reporter "Configuring new frame"))
+         (make-progress-reporter "Configuring new frame"))
         (this-frame
-          (or frame (selected-frame))))
+         (or frame (selected-frame))))
     (with-selected-frame this-frame
-        (run-hook-with-args 'hgs-frame-customization-hook this-frame)
+      (run-hook-with-args 'hgs-frame-customization-hook this-frame)
 
-        (if (display-graphic-p)
-            (run-hook-with-args 'hgs-frame-customization-gui-hook this-frame)
-          (run-hook-with-args 'hgs-frame-customization-tui-hook this-frame)))
+      (if (display-graphic-p)
+          (run-hook-with-args 'hgs-frame-customization-gui-hook this-frame)
+        (run-hook-with-args 'hgs-frame-customization-tui-hook this-frame)))
     (progress-reporter-done frame-setup-progress)))
 
 (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
 
 ;; Chnage the built-in init directories for old emacs versions using ~/.emacs
 (setq user-init-file load-file-name)
-(setq user-emacs-directory (file-name-as-directory hgs-config-directory))
+(setq user-emacs-directory hgs-config-directory)
 ;; Stop emacs from littering our $HOME
 (if (< emacs-major-version 27)
-    (let ((dir (concat (file-name-as-directory hgs-user-directory) ".emacs.d")))
+    (let ((dir (concat hgs-user-directory ".emacs.d")))
       (when (file-accessible-directory-p dir)
         (delete-directory dir 'recursive))))
 
@@ -148,33 +149,29 @@ This passes through the passed `NOERROR', `NOMESSAGE', `NOSUFFIX' and
     (load file-path noerror nomessage nosuffix must-suffix)))
 
 ;; Load the core package management primitives we use
-(load (concat (file-name-as-directory hgs-config-directory) "lisp/minmacs")
+(load (concat hgs-config-directory "lisp/minmacs")
       nil 'nomessage)
 (minmacs-bootstrap)
 
 ;; Declaratively specify packages
-(load (concat (file-name-as-directory hgs-config-directory) "core-package")
+(load (concat  hgs-config-directory "core-package")
       nil 'nomessage)
-(load-if-exists (concat (file-name-as-directory hgs-config-directory)
-                        "custom-package"))
+(load-if-exists (concat hgs-config-directory "custom-package"))
 
 ;; Load core configuration modules
-(load (concat (file-name-as-directory hgs-config-directory) "core-config")
+(load (concat hgs-config-directory "core-config")
       nil 'nomessage)
-(load-if-exists (concat (file-name-as-directory hgs-config-directory)
-                        "custom-config"))
+(load-if-exists (concat hgs-config-directory "custom-config"))
 
 ;; Setup customization paths
 ;; We want the customize interface to alter a local overrides file
 (customize-set-variable 'custom-file
-                        (concat (file-name-as-directory hgs-config-directory)
-                                "custom-customization.el"))
+                        (concat hgs-config-directory "custom-customization.el"))
 (load-if-exists custom-file)
 
 ;; Same as above for abbreviations
 (customize-set-variable 'abbrev-file-name
-                        (concat (file-name-as-directory hgs-config-directory)
-                                "custom-abbreviation.el"))
+                        (concat hgs-config-directory "custom-abbreviation.el"))
 (load-if-exists abbrev-file-name)
 
 ;; For non daemon run we want to manually run frame setup hooks that have been

@@ -20,8 +20,7 @@ wrappers."
 (defvar bootstrap-version)
 
 ;; Configure Straight
-(defvar straight-base-dir
-  (file-name-as-directory hgs-data-directory))
+(defvar straight-base-dir hgs-data-directory)
 (defvar straight-repository-branch
   "master"
   "Use master instead of develop for stability.")
