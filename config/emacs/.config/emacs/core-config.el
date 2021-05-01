@@ -1537,7 +1537,10 @@ delimiters."
   (lsp-keymap-prefix "C-c l" "Prefix key-binding for LSP mappings.")
   (lsp-server-install-dir
    (concat hgs-data-directory "lsp")
-   "Directory in which to install automatically installed LSP servers."))
+   "Directory in which to install automatically installed LSP servers.")
+  (lsp-session-file
+   (concat hgs-cache-directory "lsp-session-v1")
+   "Place the LSP session information in the cache."))
 
 (use-package lsp-ui
   :after
@@ -1636,7 +1639,10 @@ Can be forced on by supplying >0 or t, and off via <0."
   :custom
   (dap-auto-configure-features
    '(sessions locals controls tooltip)
-   "Which DAP features should be auto-configured by default."))
+   "Which DAP features should be auto-configured by default.")
+  (dap-breakpoints-file
+   (concat hgs-cache-directory "dap-breakpoints")
+   "Place DAP break-point information into the cache."))
 
 (use-package avy
   :defines
