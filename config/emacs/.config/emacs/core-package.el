@@ -461,6 +461,13 @@
      :host github
      :repo "mhayashi1120/Emacs-wgrep"))
 
+  ;; Vterm
+  (straight-use-package
+   '(vterm
+     :type git
+     :host github
+     :repo "akermu/emacs-libvterm"))
+
   (progress-reporter-done core-packages-progress))
 
 ;; Local Variables:

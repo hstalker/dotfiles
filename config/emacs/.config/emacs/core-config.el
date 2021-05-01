@@ -589,6 +589,8 @@ history etc.)")
    nil
    "We don't want to scroll to bottom on output."))
 
+(unless (null module-file-suffix)
+  (use-package vterm))
 
 (use-package url
   :custom
@@ -1369,7 +1371,9 @@ emacsclient (invalid argument stringp errors)."
         ([remap shell-command] . with-editor-shell-command)))
 
 (use-package magit
-  :after transient
+  :after
+  transient
+  with-editor
 
   :commands
   magit-status
