@@ -802,10 +802,6 @@ history etc.)")
     (all-the-icons-install-fonts t)))
 
 (use-package dashboard
-  :after
-  all-the-icons
-  page-break-lines
-
   :demand t
 
   :diminish
@@ -840,7 +836,6 @@ text banners, or a path to an image or text file.")
    #'projectile-switch-project-by-name
    "Which function to use for switching projects from the dashboard.")
   (dashboard-week-agenda t "Show upcoming seven days' agenda.")
-
   (initial-buffer-choice
    (lambda ()
      (get-buffer "*dashboard*"))
@@ -982,19 +977,21 @@ automation."))
   :commands
   projectile-mode
   projectile-switch-project-by-name
+  projectile-project-root
+
+  :hook
+  ((prog-mode text-mode special-mode) . projectile-mode)
+
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
 
   :config
-  (projectile-mode t)
-
   ;; Make setting the projectile build-related variables via local variables
   ;; safe.
   (put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
   (put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
   (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
   (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
-
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
 
   :custom
   (projectile-completion-system
@@ -1142,9 +1139,6 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 partially sorted lists by length, as this ruins the sort order."))
 
 (use-package consult
-  :after
-  projectile                            ; For `projectile-project-root'
-
   :demand t
 
   :functions
