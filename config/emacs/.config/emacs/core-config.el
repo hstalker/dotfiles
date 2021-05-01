@@ -1889,12 +1889,19 @@ American English."))
 
   :commands
   which-key-mode
+  which-key-add-key-based-replacements
+  which-key-add-major-mode-key-based-replacements
 
   :hook
   ((prog-mode text-mode special-mode) . which-key-mode)
 
+  :config
+  (which-key-setup-side-window-bottom)
+
   :custom
-  (which-key-popup-type 'minibuffer "Use the minibuffer for the key display.")
+  (which-key-popup-type 'side-window "Use the minibuffer for the key display.")
+  (which-key-side-window-slot 0 "Slot of the side window to use.")
+  (which-key-side-window-location 'bottom "Place on the bottom.")
   (which-key-sort-order 'which-key-key-order "Use the default sort order.")
   (which-key-idle-delay 2.0 "How long to wait before offering a guide.")
   (which-key-max-description-length 27 "Truncate descriptions.")
