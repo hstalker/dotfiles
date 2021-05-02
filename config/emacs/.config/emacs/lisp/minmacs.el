@@ -14,9 +14,33 @@ wrappers."
   :group 'local
   :version "26.1")
 
+(defcustom minmacs-core-recipe-sources
+  '((org-elpa :local-repo nil)
+    (melpa
+     :type git
+     :host github
+     :repo "melpa/melpa"
+     :no-build t)
+    (gnu-elpa-mirror
+     :type git
+     :host github
+     :repo "emacs-straight/gnu-elpa-mirror"
+     :no-build t)
+    (emacsmirror-mirror
+     :type git
+     :host github
+     :repo "emacs-straight/emacsmirror-mirror"
+     :no-build t))
+  "A list of recipe sources for straight to use
+Note: recipes, *NOT* packages. The recipes describe where to retrieve them from
+and what files to include."
+  :group 'minmacs
+  :type 'list)
+
 ;; Define functions for somewhat declaratively managing packages
 ;; Satisfy the Emacs compiler
 (defvar hgs-data-directory)
+(defvar hgs-config-directory)
 (defvar bootstrap-version)
 
 ;; Configure Straight
@@ -55,26 +79,45 @@ paths.")
 Should match an entry in `straight-profiles'. Bind this to different values over
 different parts of `core-package.el' in order to have that profile be in
 effect.")
+(defvar straight-built-in-pseudo-packages
+  '(emacs python nadvice seq let-alist)
+  "Packages which straight should treat as built-in packages and ignore.")
+(defvar straight-recipes-gnu-elpa-user-mirror t
+  "If we are using elpa, then make sure to use a Git mirror instead.")
 
-(defmacro minmacs--with-no-default-repositories (&rest body)
-  "Disable default ELPA/MELPA etc. repositories for `BODY'."
+(defvar use-package-compute-statistics t
+  "Track how many packages are loaded and their state of initialization.")
+
+;; Minmacs core functions
+(defmacro minmacs--as-package-profile (profile &rest body)
+  "Specify using straight profile `PROFILE' over `BODY'."
   (declare (indent defun))
-  `(let ((straight-recipe-repositories nil)
-         (straight-recipe-overrides nil))
+  `(let ((straight-current-profile ',profile))
      ,@body))
 
 (defmacro minmacs-as-core-packages (&rest body)
   "Make all package declarations inside `BODY' be specified as core packages."
   (declare (indent defun))
-  `(minmacs--with-no-default-repositories
-     (let ((straight-current-profile 'core))
-       ,@body)))
+  `(minmacs--as-package-profile core
+     ,@body))
 
 (defmacro minmacs-as-custom-packages (&rest body)
   "Make all package declarations inside `BODY' be specified as custom packages."
   (declare (indent defun))
-  `(let ((straight-current-profile 'custom))
+  `(minmacs--as-package-profile custom
      ,@body))
+
+(defun minmacs-get-transitive-dependencies (package)
+  "Retrieve a list of all non-built-in dependencies for `PACKAGE'."
+  (declare-function straight--get-transitive-dependencies "straight")
+  (defvar straight-built-in-pseudo-packages)
+  (let ((pkg-name (symbol-name package)))
+    (seq-filter #'(lambda (x)
+                    (not (member x `(,package
+                                     ,@straight-built-in-pseudo-packages))))
+                (mapcar #'(lambda (x)
+                            (intern x))
+                        (straight--get-transitive-dependencies pkg-name)))))
 
 (defun minmacs-bootstrap ()
   "Bootstrap necessary package management libraries."
@@ -82,48 +125,48 @@ effect.")
          (make-progress-reporter "Bootstrapping minmacs..." 0 2)))
     (let* ((bootstrap-file (concat straight-base-dir
                                    "straight/repos/straight.el/bootstrap.el"))
-           (bootstrap-version 5))
+           (bootstrap-version 5)
+           (repo "raxod502/straight.el")
+           (bootstrap-branch "develop")
+           (bootstrap-protocol "https"))
       (unless (file-exists-p bootstrap-file)
         (with-current-buffer
             (url-retrieve-synchronously
-             (let ((protocol "https")
-                   (repo "raxod502/straight.el")
-                   (branch "develop"))
-               (format
-                "%s://raw.githubusercontent.com/%s/%s/install.el"
-                protocol repo branch))
+             (format
+              "%s://raw.githubusercontent.com/%s/%s/install.el"
+              bootstrap-protocol repo bootstrap-branch)
              'silent 'inhibit-cookies)
           (goto-char (point-max))
           (eval-print-last-sexp)))
-      (load bootstrap-file nil 'nomessage))
-    (progress-reporter-update bootstrap-progress 1)
-    ;; (customize-set-variable
-    ;;  'straight-recipe-repositories
-    ;;  nil
-    ;;  "Default repositories to use for recipe-less package
-    ;; declarations. We don't want to use things like MELPA by
-    ;; default, and much prefer to manually specify ALL dependencies
-    ;; in our configuration in order to be maximally reproducible.")
-    ;; (customize-set-variable 'straight-recipe-overrides nil)
-    (declare-function straight-use-package "straight")
+      (load bootstrap-file nil 'nomessage)
+
+      (progress-reporter-update bootstrap-progress 1)
+
+      ;; Setup default recipe repositories
+      (defvar straight-recipe-repositories)
+      (setq straight-recipe-repositories nil)
+      (mapc #'straight-use-recipes minmacs-core-recipe-sources)
+
+      ;; Override straight recipe
+      (straight-register-package
+       `(straight
+         :type git
+         :host github
+         :files ("straight*.el")
+         :branch ,straight-repository-branch
+         :repo ,repo
+         :no-byte-compile t)))
+
     (minmacs-as-core-packages
-      (straight-use-package
-       '(diminish
-         :type git
-         :host github
-         :repo "jwiegley/use-package"))
-      (straight-use-package
-       '(bind-key
-         :type git
-         :host github
-         :repo "jwiegley/use-package"))
-      (straight-use-package
-       '(use-package
-          :type git
-          :host github
-          :repo "jwiegley/use-package")))
+      (mapc #'(lambda (pkg)
+                (straight-use-package
+                 `(,pkg
+                   :type git
+                   :host github
+                   :repo "jwiegley/use-package")))
+            '(diminish bind-key use-package))
     (require 'use-package)
-    (progress-reporter-done bootstrap-progress)))
+    (progress-reporter-done bootstrap-progress))))
 
 (provide 'minmacs)
 

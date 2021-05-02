@@ -10,12 +10,8 @@
 (require 'cl-lib)
 (require 'files)
 (require 'custom)
-
-;; Just make clear that these variables and functions do, in fact, exist.
-;; Perhaps we can restructure this configuration to make it use Emacs
-;; require/provide etc. mechanisms instead in future, which would obviate the
-;; need for this.
-(declare-function use-package "use-package")
+(require 'minmacs)
+(require 'use-package)
 
 (defvar hgs-config-directory)
 (defvar hgs-cache-directory)
@@ -589,8 +585,23 @@ history etc.)")
    nil
    "We don't want to scroll to bottom on output."))
 
-(unless (null module-file-suffix)
-  (use-package vterm))
+(use-package flyspell
+  :if (executable-find "aspell")
+
+  :commands
+  flyspell-mode
+  flyspell-prog-mode
+
+  :hook
+  (((text-mode) . flyspell-mode)
+   ((prog-mode) . flyspell-prog-mode))
+
+  :custom
+  (ispell-program-name "aspell" "Spellcheck program to use.")
+  (ispell-extra-args
+   '("--sug-mode=ultra" "--lang=en_US")
+   "Change the default lookup mode for performance, and force language to
+American English."))
 
 (use-package url
   :custom
@@ -762,6 +773,60 @@ history etc.)")
 
 ;; Third-party package configuration
 
+;;(use-package el-get)
+(use-package avy
+  :defines
+  avy-order-closest
+
+  :commands
+  avy-goto-char
+  avy-goto-char-2
+  avy-goto-char-timer
+  avy-isearch
+  avy-goto-word
+  avy-goto-line
+
+  :bind
+  (:map global-map
+        ("C-'" . avy-goto-char))
+  (:map isearch-mode-map
+        ("C-'". avy-isearch))
+
+  :custom
+  (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
+  (avy-keys-alist '() "Alist of Avy commands to keys to use for prompts. Falls
+back to `avy-keys'")
+  (avy-style 'at "Overlay display style.")
+  (avy-styles-alist '() "Alist of Avy commands to overlay display styles.")
+  (avy-background nil "Use a gray background during selection.")
+  (avy-all-windows t "Scan all windows on the selected for selection.")
+  (avy-case-fold-search t "Ignore case for search.")
+  (avy-highlight-first nil "Don't highlight the first decision character, only
+first non-terminating decision characters.")
+  (avy-timeout-seconds 0.5 "How long `*-timer' commands should wait.")
+  (avy-orders-alist
+   '((avy-goto-char . avy-order-closest))
+   "Alist allowing for specifying commands to use fewer characters when closer
+to point."))
+
+(use-package page-break-lines
+  :diminish
+  page-break-lines-mode
+
+  :commands
+  page-break-lines-mode)
+
+(use-package all-the-icons
+  :after
+  memoize
+
+  :config
+  ;; Try to automatically install the fonts if they appear missing
+  (when (and (not (member "all-the-icons" (font-family-list)))
+             (not (daemonp))
+             (window-system))
+    (all-the-icons-install-fonts t)))
+
 (use-package org-bullets
   :after org
 
@@ -786,156 +851,6 @@ history etc.)")
      ;; ► ★ ▸
      )
    "Unicode bullets to use."))
-
-(use-package page-break-lines
-  :diminish
-  page-break-lines-mode
-
-  :commands
-  page-break-lines-mode)
-
-(use-package memoize)
-
-(use-package all-the-icons
-  :after
-  memoize
-
-  :config
-  ;; Try to automatically install the fonts if they appear missing
-  (when (and (not (member "all-the-icons" (font-family-list)))
-             (not (daemonp))
-             (window-system))
-    (all-the-icons-install-fonts t)))
-
-(use-package dashboard
-  :demand t
-
-  :diminish
-  dashboard-mode
-  page-break-lines-mode
-
-  :config
-  (dashboard-setup-startup-hook)
-
-  :custom
-  (dashboard-banner-logo-title "Welcome to Emacs!" "The title message.")
-  (dashboard-startup-banner
-   ;; Straight doesn't seem to like grabbing the banner from here
-   (concat hgs-config-directory "data/banner.txt")
-   "Can be nil, 'official for the Emacs logo, 1, 2 or 3 for the
-text banners, or a path to an image or text file.")
-  (dashboard-center-content t "Center the dashboard content.")
-  (dashboard-show-shortcuts t "Show the per section jump indicators.")
-  (dashboard-set-heading-icons t "Show widget heading icons.")
-  (dashboard-set-file-icons t "Show file icons.")
-  (dashboard-items
-   '((recents . 5)
-     (bookmarks . 5)
-     (projects . 5)
-     (agenda . 5)
-     (registers . 5))
-   "Show these widgets in format `(SELECTOR-SYMBOL . ENTRY-COUNT)'.")
-  (dashboard-set-navigator t "Show the navigator below the banner.")
-  (dashboard-set-init-info t "Show packages loaded and initialization time.")
-  (dashboard-set-footer t "Enable the randomly selected footnote.")
-  (dashboard-projects-switch-function
-   #'projectile-switch-project-by-name
-   "Which function to use for switching projects from the dashboard.")
-  (dashboard-week-agenda t "Show upcoming seven days' agenda.")
-  (initial-buffer-choice
-   (lambda ()
-     (get-buffer "*dashboard*"))
-   "Show the dashboard as the initial buffer even for the Emacs client."))
-
-(use-package string-inflection
-  :init
-  (defun hgs-restyle-dwim ()
-    "Completing read enabled restyling of the specified region or current word.
-Allows for converting the given region between lowercase, uppercase, kebab-case,
-snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
-    (interactive)
-    ;; We don't want to move the point
-    (save-excursion
-      (let* ((selection (progn
-                          ;; If we are relying on DWIM behavior
-                          (if (not (region-active-p))
-                              (progn
-                                ;; Mark the sexp at point.
-                                ;; NOTE: Broken when at beginning of sexp
-                                (backward-sexp)
-                                (set-mark (point))
-                                (forward-sexp)
-                                (activate-mark)))
-                          ;; Grab the string under point
-                          (buffer-substring-no-properties (region-beginning)
-                                                          (region-end))))
-             (choices `(("UPPER CASE" . ,(lambda ()
-                                           (upcase selection)))
-                        ("lower case" . ,(lambda ()
-                                           (downcase selection)))
-                        ("Capitalized" . ,(lambda ()
-                                            (capitalize selection)))
-                        ("snake_case" .
-                         ,(lambda ()
-                            (string-inflection-underscore-function selection)))
-                        ("Snake_Case" .
-                         ,(lambda ()
-                            (string-inflection-capital-underscore-function
-                             selection)))
-                        ("PascalCase" .
-                         ,(lambda ()
-                            (string-inflection-pascal-case-function selection)))
-                        ("camelCase" .
-                         ,(lambda ()
-                            (string-inflection-camelcase-function selection)))
-                        ("kebab-case" .
-                         ,(lambda ()
-                            (string-inflection-kebab-case-function selection)))))
-             (choice (completing-read "Select target style: "
-                                      choices
-                                      nil                  ; Predicate?
-                                      'require-match))
-             (result (funcall (alist-get choice choices nil nil 'string-equal))))
-        ;; Replace region with result of restyle
-        (kill-region (region-beginning) (region-end))
-        (insert result))))
-
-  :commands
-  string-inflection-capital-underscore-function
-  string-inflection-underscore-function
-  string-inflection-camelcase-function
-  string-inflection-pascal-case-function
-  string-inflection-kebab-case-function)
-
-(use-package clang-format+
-  :commands
-  clang-format+-mode
-
-  :init
-  (use-package clang-format)
-
-  :hook
-  ((c-mode c++-mode objc-mode) . clang-format+-mode)
-
-  :custom
-  (clang-format+-context
-   'modification
-   "Only reformat the modified lines. Prevents unnecessary changes in PRs.")
-  (clang-format+-offset-modified-region 0 "")
-  (clang-format+-always-enable
-   nil
-   "If we can't find a .clang-format, then we should not enable this
-automation."))
-
-(use-package editorconfig
-  :diminish
-  editorconfig-mode
-
-  :commands
-  editorconfig-mode
-
-  :hook
-  ((prog-mode) . editorconfig-mode))
 
 (use-package exec-path-from-shell
   :commands
@@ -977,81 +892,6 @@ automation."))
      )
    "All the shell variables Emacs should be attempting to source."))
 
-(use-package hydra)
-
-(use-package projectile
-  :commands
-  projectile-mode
-  projectile-switch-project-by-name
-  projectile-project-root
-
-  :hook
-  ((prog-mode text-mode special-mode) . projectile-mode)
-
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-
-  :init
-  (which-key-add-key-based-replacements
-    "C-c p" "Projectile")
-
-  :config
-  ;; Make setting the projectile build-related variables via local variables
-  ;; safe.
-  (put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
-
-  :custom
-  (projectile-completion-system
-   'default
-   "Use Selectrum (or rather: `completing-read') as the completion backend.")
-  (projectile-project-search-path
-   `(,hgs-project-directory ,hgs-user-directory)
-   "Where should projectile search?")
-  (projectile-known-projects-file
-   (concat hgs-cache-directory "projectile-bookmarks.eld")
-   "Where to cache known projects.")
-  (projectile-use-git-grep nil "Don't use git-grep over other tools.")
-  (projectile-cache-file
-   (concat hgs-cache-directory "projectile.cache")
-   "Place the projectile cache file into our cache directory.")
-  (projectile-other-file-alist
-   '(;; General C/C++ extensions
-     ("C" . ("H")) ("H" . ("C"))
-     ("cpp" . ("h" "hpp" "ipp"))
-     ("ipp" . ("h" "hpp" "cpp"))
-     ("hpp" . ("h" "ipp" "cpp" "cc"))
-     ("cxx" . ("h" "hxx" "ixx"))
-     ("ixx" . ("h" "hxx" "cxx"))
-     ("hxx" . ("h" "ixx" "cxx"))
-     ("c" . ("h"))
-     ("m" . ("h"))
-     ("mm" . ("h"))
-     ("h" . ("c" "cc" "cpp" "ipp" "hpp" "cxx" "ixx" "hxx" "m" "mm"))
-     ("cc" . ("h" "hh" "hpp"))
-     ("hh" . ("cc"))
-
-     ;; OCaml extensions
-     ("ml" . ("mli"))
-     ("mli" . ("ml" "mll" "mly"))
-     ("mll" . ("mli"))
-     ("mly" . ("mli"))
-     ("eliomi" . ("eliom"))
-     ("eliom" . ("eliomi"))
-
-     ;; Typical vertex & fragment shader language extensions
-     ("vert" . ("frag"))
-     ("frag" . ("vert"))
-
-     ;; Handle files with no extension
-     (nil . ("lock" "gpg"))
-     ("lock" . (""))
-     ("gpg" . ("")))
-   "Alist of extensions for switching to file with the same name, using other
-extensions based on the extension of the current file."))
-
 (use-package selectrum
   :demand t
 
@@ -1060,6 +900,7 @@ extensions based on the extension of the current file."))
 
   :config
   (selectrum-mode +1))
+
 
 (use-package prescient
   :after
@@ -1108,45 +949,59 @@ filters use character folding.")
   (prescient-use-case-folding 'smart "Whether filters should be
 case-insensitive. Smart disables case insensitivity when upper case is used."))
 
-(use-package selectrum-prescient
-  :after
-  selectrum
-  prescient
+(use-package company
+  :hook
+  (prog-mode . company-mode)
+  ((org-mode text-mode) . company-mode)
+  (prog-mode . hgs--set-prog-mode-company-backends)
+  ((org-mode text-mode) . hgs--set-text-mode-company-backends)
 
-  :demand t
+  :init
+  (defun hgs--set-prog-mode-company-backends ()
+    "Set appropriate Company back-ends for programming mode buffers."
+    (make-local-variable 'company-backends)
+    (setq-local company-backends
+                '((company-capf
+                   company-yasnippet
+                   company-keywords
+                   company-files)
+                  (company-etags
+                   company-dabbrev-code)
+                  (company-dabbrev))))
 
-  :diminish
-  selectrum-prescient-mode
-
-  :commands
-  selectrum-prescient-mode
-
-  :config
-  (selectrum-prescient-mode +1)
-
-  :custom
-  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
-  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
-
-(use-package company-prescient
-  :after
-  company
-  prescient
-
-  :demand t
-
-  :diminish
-  company-prescient-mode
-
-  :commands
-  company-prescient-mode
-
-  :config
-  (company-prescient-mode +1)
+  (defun hgs--set-text-mode-company-backends ()
+    "Set appropriate Company back-ends for text mode buffers."
+    (make-local-variable 'company-backends)
+    (setq-local company-backends
+                '((company-yasnippet
+                   company-ispell
+                   company-keywords
+                   company-files)
+                  (company-dabbrev))))
 
   :custom
-  (company-prescient-sort-length-enable nil "Don't resort company's already
-partially sorted lists by length, as this ruins the sort order."))
+  (company-backends
+   '((company-capf
+      company-yasnippet
+      company-keywords
+      company-files)
+     (company-dabbrev-code
+      company-etags)
+     (company-ispell)
+     (company-abbrev))
+   "Set default company backends to use.")
+  (company-echo-delay 0.5 "How long to wait before echoing.")
+  (company-idle-delay 0.5 "How long to wait before offering completion.")
+  (company-show-numbers t "Number the completion options.")
+  (company-tooltip-limit 20 "Cap the number of candidates on display.")
+  (company-minimum-prefix-length
+   2
+   "Minimum length of prefix before completion.")
+  (company-tooltip-align-annotations t "Align candidates to the right.")
+  (company-tooltip-flip-when-above
+   nil
+   "Don't invert navigation direction when near the bottom of the page.")
+  (company-dabbrev-downcase nil "Don't downcase return value of dabbrev."))
 
 (use-package consult
   :demand t
@@ -1210,18 +1065,6 @@ partially sorted lists by length, as this ruins the sort order."))
   (consult-project-root-function
    #'projectile-project-root
    "Use Projectile for finding the project root."))
-
-(use-package consult-flycheck
-  :after
-  consult
-  flycheck
-
-  :commands
-  consult-flycheck
-
-  :bind
-  (:map flycheck-command-map
-        ("!" . consult-flycheck)))
 
 (use-package marginalia
   :after
@@ -1288,13 +1131,16 @@ partially sorted lists by length, as this ruins the sort order."))
    0.8
    "Delay before popping up collection."))
 
-(use-package embark-consult
+(use-package flyspell-correct
   :after
-  embark
-  consult
+  flyspell
 
-  :hook
-  (embark-collect-mode . embark-consult-preview-minor-mode))
+  :bind
+  (:map flyspell-mode-map
+        ("C-c $" . flyspell-correct-at-point))
+
+  :custom
+  (flyspell-correct-highlight t "Highlight word being corrected."))
 
 (use-package solarized-theme
   :config
@@ -1370,32 +1216,6 @@ emacsclient (invalid argument stringp errors)."
         ([remap async-shell-command] . with-editor-async-shell-command)
         ([remap shell-command] . with-editor-shell-command)))
 
-(use-package magit
-  :after
-  transient
-  with-editor
-
-  :commands
-  magit-status
-  magit-dispatch
-  magit-blame
-  magit-stage
-  magit-unstage
-  magit-pull
-  magit-push
-  magit-clone
-  magit-reset
-  magit-fetch
-  magit-reflog
-  magit-commit
-  magit-revert
-  magit-stash
-
-  :bind
-  (:map global-map
-        ("C-x g" . magit-status)
-        ("C-x M-g" . magit-dispatch)))
-
 ;; Trim whitespace on touched lines only automatically when saving
 (use-package ws-butler
   :diminish
@@ -1403,7 +1223,6 @@ emacsclient (invalid argument stringp errors)."
   ws-butler-mode
 
   :commands
-  ws-butler
   ws-butler-mode
   ws-butler-global-mode
 
@@ -1422,6 +1241,228 @@ emacsclient (invalid argument stringp errors)."
   :bind
   (:map global-map
         ("C-=" . er/expand-region)))
+
+(use-package yasnippet
+  :diminish
+  yas-global-mode
+  yas-minor-mode
+
+  :commands
+  yas-global-mode
+  yas-minor-mode
+  snippet-mode
+
+  :functions
+  yas-reload-all
+
+  :mode
+  (("\\.yasnippet\\'" . snippet-mode)
+   ("\\.yas\\'" . snippet-mode))
+
+  :hook
+  ((prog-mode text-mode) . yas-minor-mode)
+
+  :bind-keymap
+  ("C-c &" . yas-keymap)
+
+  :init
+  (which-key-add-key-based-replacements
+    "C-c &" "Yasnippet")
+
+  :config
+  ;; Needed to force Emacs to load up all snippets given in our personal
+  ;; snippet directories
+  (yas-reload-all)
+
+  :custom
+  (yas-snippet-dirs
+   `(,(concat hgs-config-directory "snippets"))
+   "Where to find snippet definitions."))
+
+(use-package yasnippet-snippets
+  :after yasnippet
+
+  :config
+  (yasnippet-snippets-initialize))
+
+(use-package which-key
+  :diminish
+  which-key-mode
+
+  :commands
+  which-key-mode
+  which-key-add-key-based-replacements
+  which-key-add-major-mode-key-based-replacements
+
+  :hook
+  ((prog-mode text-mode special-mode) . which-key-mode)
+
+  :config
+  (which-key-setup-side-window-bottom)
+
+  :custom
+  (which-key-popup-type 'side-window "Use the minibuffer for the key display.")
+  (which-key-side-window-slot 0 "Slot of the side window to use.")
+  (which-key-side-window-location 'bottom "Place on the bottom.")
+  (which-key-sort-order 'which-key-key-order "Use the default sort order.")
+  (which-key-idle-delay 2.0 "How long to wait before offering a guide.")
+  (which-key-max-description-length 27 "Truncate descriptions.")
+  (which-key-add-column-padding 0 "Left padding for key display.")
+  (which-key-show-prefix 'bottom "Display currently typed prefix at bottom."))
+
+(use-package transpose-frame
+  :commands
+  transpose-frame
+  flip-frame
+  flop-frame
+  rotate-frame
+  rotate-frame-clockwise
+  rotate-frame-anticlockwise
+
+  :bind
+  (:map global-map
+        ("C-c <up>" . transpose-frame)
+        ("C-c <down>" . rotate-frame-clockwise)))
+
+(use-package rainbow-delimiters
+  :diminish
+  rainbow-delimiters-mode
+
+  :commands
+  rainbow-delimiters-mode
+
+  :hook
+  ((prog-mode) . rainbow-delimiters-mode))
+
+(use-package cmake-mode
+  :commands
+  cmake-mode
+
+  :mode
+  (("\\(CMakeLists\\.txt\\|\\.cmake\\)\\'" . cmake-mode)))
+
+(use-package yaml-mode
+  :commands
+  yaml-mode
+
+  :mode
+  (("\\(\\.[Yy][Mm][Ll]\\|\\.yaml\\)\\'" . yaml-mode)))
+
+(use-package csv-mode
+  :commands
+  csv-mode
+
+  :mode
+  (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
+
+(use-package lua-mode
+  :commands
+  lua-mode
+
+  :mode
+  (("\\.lua\\'" . lua-mode))
+
+  :custom
+  (lua-indent-level 2 "We prefer to indent in Lua to 2 spaces."))
+
+(use-package markdown-mode
+  :commands
+  markdown-mode
+  gfm-mode
+
+  :mode
+  (("README\\.md\\'" . gfm-mode)
+   ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
+
+(use-package string-inflection
+  :init
+  (defun hgs-restyle-dwim ()
+    "Completing read enabled restyling of the specified region or current word.
+Allows for converting the given region between lowercase, uppercase, kebab-case,
+snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
+    (interactive)
+    ;; We don't want to move the point
+    (save-excursion
+      (let* ((selection (progn
+                          ;; If we are relying on DWIM behavior
+                          (if (not (region-active-p))
+                              (progn
+                                ;; Mark the sexp at point.
+                                ;; NOTE: Broken when at beginning of sexp
+                                (backward-sexp)
+                                (set-mark (point))
+                                (forward-sexp)
+                                (activate-mark)))
+                          ;; Grab the string under point
+                          (buffer-substring-no-properties (region-beginning)
+                                                          (region-end))))
+             (choices `(("UPPER CASE" . ,(lambda ()
+                                           (upcase selection)))
+                        ("lower case" . ,(lambda ()
+                                           (downcase selection)))
+                        ("Capitalized" . ,(lambda ()
+                                            (capitalize selection)))
+                        ("snake_case" .
+                         ,(lambda ()
+                            (string-inflection-underscore-function selection)))
+                        ("Snake_Case" .
+                         ,(lambda ()
+                            (string-inflection-capital-underscore-function
+                             selection)))
+                        ("PascalCase" .
+                         ,(lambda ()
+                            (string-inflection-pascal-case-function selection)))
+                        ("camelCase" .
+                         ,(lambda ()
+                            (string-inflection-camelcase-function selection)))
+                        ("kebab-case" .
+                         ,(lambda ()
+                            (string-inflection-kebab-case-function selection)))))
+             (choice (completing-read "Select target style: "
+                                      choices
+                                      nil                  ; Predicate?
+                                      'require-match))
+             (result (funcall (alist-get choice choices nil nil 'string-equal))))
+        ;; Replace region with result of restyle
+        (kill-region (region-beginning) (region-end))
+        (insert result))))
+
+  :commands
+  string-inflection-capital-underscore-function
+  string-inflection-underscore-function
+  string-inflection-camelcase-function
+  string-inflection-pascal-case-function
+  string-inflection-kebab-case-function)
+
+(use-package editorconfig
+  :diminish
+  editorconfig-mode
+
+  :commands
+  editorconfig-mode
+
+  :hook
+  ((prog-mode) . editorconfig-mode))
+
+(use-package wgrep
+  :commands
+  wgrep-mode
+
+  :bind
+  (:map grep-mode-map
+        ("C-c C-p" . wgrep-mode))
+
+  :custom
+  (wgrep-auto-save-buffer
+   nil
+   "Don't save buffer automatically when `wgrep-finish-edit'.")
+  ;; (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
+  (wgrep-change-readonly-file
+   nil
+   "Don't apply changes regardless of whether the buffer is read-only."))
+
+(unless (null module-file-suffix)
+  (use-package vterm))
 
 (use-package smartparens
   :diminish
@@ -1471,102 +1512,269 @@ delimiters."
   :hook
   ((prog-mode . smartparens-mode)))
 
-(use-package yasnippet
+(use-package dashboard
+  :demand t
+
   :diminish
-  yas-global-mode
-  yas-minor-mode
+  dashboard-mode
+  page-break-lines-mode
+
+  :config
+  (dashboard-setup-startup-hook)
+
+  :custom
+  (dashboard-banner-logo-title "Welcome to Emacs!" "The title message.")
+  (dashboard-startup-banner
+   ;; Straight doesn't seem to like grabbing the banner from here
+   (concat hgs-config-directory "data/banner.txt")
+   "Can be nil, 'official for the Emacs logo, 1, 2 or 3 for the
+text banners, or a path to an image or text file.")
+  (dashboard-center-content t "Center the dashboard content.")
+  (dashboard-show-shortcuts t "Show the per section jump indicators.")
+  (dashboard-set-heading-icons t "Show widget heading icons.")
+  (dashboard-set-file-icons t "Show file icons.")
+  (dashboard-items
+   '((recents . 5)
+     (bookmarks . 5)
+     (projects . 5)
+     (agenda . 5)
+     (registers . 5))
+   "Show these widgets in format `(SELECTOR-SYMBOL . ENTRY-COUNT)'.")
+  (dashboard-set-navigator t "Show the navigator below the banner.")
+  (dashboard-set-init-info t "Show packages loaded and initialization time.")
+  (dashboard-set-footer t "Enable the randomly selected footnote.")
+  (dashboard-projects-switch-function
+   #'projectile-switch-project-by-name
+   "Which function to use for switching projects from the dashboard.")
+  (dashboard-week-agenda t "Show upcoming seven days' agenda.")
+  (initial-buffer-choice
+   (lambda ()
+     (get-buffer "*dashboard*"))
+   "Show the dashboard as the initial buffer even for the Emacs client."))
+
+(use-package clang-format)
+
+(use-package clang-format+
+  :after
+  clang-format
 
   :commands
-  yas-global-mode
-  yas-minor-mode
-  snippet-mode
-
-  :functions
-  yas-reload-all
-
-  :mode
-  (("\\.yasnippet\\'" . snippet-mode)
-   ("\\.yas\\'" . snippet-mode))
+  clang-format+-mode
 
   :hook
-  ((prog-mode text-mode) . yas-minor-mode)
+  ((c-mode c++-mode objc-mode) . clang-format+-mode)
+
+  :custom
+  (clang-format+-context
+   'modification
+   "Only reformat the modified lines. Prevents unnecessary changes in PRs.")
+  (clang-format+-offset-modified-region 0 "")
+  (clang-format+-always-enable
+   nil
+   "If we can't find a .clang-format, then we should not enable this
+automation."))
+
+(use-package hydra)
+
+(use-package undo-tree
+  :diminish
+  global-undo-tree-mode
+  undo-tree-mode-hook
+
+  :commands
+  global-undo-tree-mode
+  undo-tree-mode
+  undo-tree-undo
+  undo-tree-redo
+  undo-tree-visualize
+
+  :hook
+  ((prog-mode text-mode) . undo-tree-mode)
+
+  :custom
+  (undo-tree-history-directory-alist
+   `(("." . ,(concat hgs-cache-directory "undo-tree")))
+   "Put history backups in the cache directory."))
+
+(use-package projectile
+  :commands
+  projectile-mode
+  projectile-switch-project-by-name
+  projectile-project-root
+
+  :hook
+  ((prog-mode text-mode special-mode) . projectile-mode)
 
   :bind-keymap
-  ("C-c &" . yas-keymap)
+  ("C-c p" . projectile-command-map)
 
   :init
   (which-key-add-key-based-replacements
-    "C-c &" "Yasnippet")
+    "C-c p" "Projectile")
 
   :config
-  ;; Needed to force Emacs to load up all snippets given in our personal
-  ;; snippet directories
-  (yas-reload-all)
+  ;; Make setting the projectile build-related variables via local variables
+  ;; safe.
+  (put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
+  (put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
+  (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
+  (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
 
   :custom
-  (yas-snippet-dirs
-   `(,(concat hgs-config-directory "snippets"))
-   "Where to find snippet definitions."))
+  (projectile-completion-system
+   'default
+   "Use Selectrum (or rather: `completing-read') as the completion backend.")
+  (projectile-project-search-path
+   `(,hgs-project-directory ,hgs-user-directory)
+   "Where should projectile search?")
+  (projectile-known-projects-file
+   (concat hgs-cache-directory "projectile-bookmarks.eld")
+   "Where to cache known projects.")
+  (projectile-use-git-grep nil "Don't use git-grep over other tools.")
+  (projectile-cache-file
+   (concat hgs-cache-directory "projectile.cache")
+   "Place the projectile cache file into our cache directory.")
+  (projectile-other-file-alist
+   '(;; General C/C++ extensions
+     ("C" . ("H")) ("H" . ("C"))
+     ("cpp" . ("h" "hpp" "ipp"))
+     ("ipp" . ("h" "hpp" "cpp"))
+     ("hpp" . ("h" "ipp" "cpp" "cc"))
+     ("cxx" . ("h" "hxx" "ixx"))
+     ("ixx" . ("h" "hxx" "cxx"))
+     ("hxx" . ("h" "ixx" "cxx"))
+     ("c" . ("h"))
+     ("m" . ("h"))
+     ("mm" . ("h"))
+     ("h" . ("c" "cc" "cpp" "ipp" "hpp" "cxx" "ixx" "hxx" "m" "mm"))
+     ("cc" . ("h" "hh" "hpp"))
+     ("hh" . ("cc"))
 
-(use-package yasnippet-snippets
-  :after yasnippet
+     ;; OCaml extensions
+     ("ml" . ("mli"))
+     ("mli" . ("ml" "mll" "mly"))
+     ("mll" . ("mli"))
+     ("mly" . ("mli"))
+     ("eliomi" . ("eliom"))
+     ("eliom" . ("eliomi"))
+
+     ;; Typical vertex & fragment shader language extensions
+     ("vert" . ("frag"))
+     ("frag" . ("vert"))
+
+     ;; Handle files with no extension
+     (nil . ("lock" "gpg"))
+     ("lock" . (""))
+     ("gpg" . ("")))
+   "Alist of extensions for switching to file with the same name, using other
+extensions based on the extension of the current file."))
+
+(use-package selectrum-prescient
+  :after
+  selectrum
+  prescient
+
+  :demand t
+
+  :diminish
+  selectrum-prescient-mode
+
+  :commands
+  selectrum-prescient-mode
 
   :config
-  (yasnippet-snippets-initialize))
+  (selectrum-prescient-mode +1)
 
-(use-package company
+  :custom
+  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
+  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
+
+(use-package company-prescient
+  :after
+  company
+  prescient
+
+  :demand t
+
+  :diminish
+  company-prescient-mode
+
+  :commands
+  company-prescient-mode
+
+  :config
+  (company-prescient-mode +1)
+
+  :custom
+  (company-prescient-sort-length-enable nil "Don't resort company's already
+partially sorted lists by length, as this ruins the sort order."))
+
+(use-package embark-consult
+  :after
+  embark
+  consult
+
   :hook
-  (prog-mode . company-mode)
-  ((org-mode text-mode) . company-mode)
-  (prog-mode . hgs--set-prog-mode-company-backends)
-  ((org-mode text-mode) . hgs--set-text-mode-company-backends)
+  (embark-collect-mode . embark-consult-preview-minor-mode))
+
+(use-package json-mode
+  :commands
+  json-mode
+
+  :mode
+  (("\\.json\\'" . json-mode)))
+
+(use-package flycheck
+  :commands
+  flycheck-mode
+
+  :bind-keymap
+  ("C-c !" . flycheck-keymap-prefix)
+
+  :hook
+  ((prog-mode) . flycheck-mode)
 
   :init
-  (defun hgs--set-prog-mode-company-backends ()
-    "Set appropriate Company back-ends for programming mode buffers."
-    (make-local-variable 'company-backends)
-    (setq-local company-backends
-                '((company-capf
-                   company-yasnippet
-                   company-keywords
-                   company-files)
-                  (company-etags
-                   company-dabbrev-code)
-                  (company-dabbrev))))
+  (which-key-add-key-based-replacements
+    "C-c !" "Flycheck"))
 
-  (defun hgs--set-text-mode-company-backends ()
-    "Set appropriate Company back-ends for text mode buffers."
-    (make-local-variable 'company-backends)
-    (setq-local company-backends
-                '((company-yasnippet
-                   company-ispell
-                   company-keywords
-                   company-files)
-                  (company-dabbrev))))
+(use-package magit
+  :after
+  transient
+  with-editor
 
-  :custom
-  (company-backends
-   '((company-capf
-      company-yasnippet
-      company-keywords
-      company-files)
-     (company-dabbrev-code
-      company-etags)
-     (company-ispell)
-     (company-abbrev))
-   "Set default company backends to use.")
-  (company-echo-delay 0.5 "How long to wait before echoing.")
-  (company-idle-delay 0.5 "How long to wait before offering completion.")
-  (company-show-numbers t "Number the completion options.")
-  (company-tooltip-limit 20 "Cap the number of candidates on display.")
-  (company-minimum-prefix-length
-   2
-   "Minimum length of prefix before completion.")
-  (company-tooltip-align-annotations t "Align candidates to the right.")
-  (company-tooltip-flip-when-above
-   nil
-   "Don't invert navigation direction when near the bottom of the page.")
-  (company-dabbrev-downcase nil "Don't downcase return value of dabbrev."))
+  :commands
+  magit-status
+  magit-dispatch
+  magit-blame
+  magit-stage
+  magit-unstage
+  magit-pull
+  magit-push
+  magit-clone
+  magit-reset
+  magit-fetch
+  magit-reflog
+  magit-commit
+  magit-revert
+  magit-stash
+
+  :bind
+  (:map global-map
+        ("C-x g" . magit-status)
+        ("C-x M-g" . magit-dispatch)))
+
+(use-package consult-flycheck
+  :after
+  consult
+  flycheck
+
+  :commands
+  consult-flycheck
+
+  :bind
+  (:map flycheck-command-map
+        ("!" . consult-flycheck)))
 
 (use-package lsp-mode
   :after
@@ -1633,48 +1841,6 @@ delimiters."
    "When non-nil, show documentation when hovering over a releveant symbol with
 the mouse."))
 
-(use-package lsp-treemacs
-  :after
-  lsp-mode
-  treemacs
-
-  :diminish
-  lsp-treemacs-sync-mode
-
-  :hook
-  ((lsp-mode) . lsp-treemacs-sync-mode)
-
-  :bind
-  (:map lsp-mode-map
-        ("C-c l T s" . hgs--toggle-lsp-treemacs-symbols))
-
-  :init
-  (defun hgs--toggle-lsp-treemacs-symbols (&optional state)
-    "Toggle the `lsp-treemacs-symbols' window.
-Can be forced on by supplying >0 or t, and off via <0."
-    (interactive)
-    (save-selected-window
-      (let* ((symbols-buffer (get-buffer "*LSP Symbols List*"))
-             (symbols-window (get-buffer-window symbols-buffer))
-             (open #'lsp-treemacs-symbols)
-             (close (lambda ()
-                      (delete-window symbols-window)))
-             (toggle (lambda ()
-                       (if (and
-                            (not (null symbols-buffer))
-                            (not (null symbols-window)))
-                           (funcall close)
-                         (lsp-treemacs-symbols)))))
-        ;; If we haven't been passed an argument
-        (if (null state)
-            (funcall toggle)
-          ;; If we have been passed an argument
-          (if (or (eq state t) (> state 0))
-              ;; If it's trying to be toggled on
-              (funcall open)
-            ;; If it's trying to be toggled off
-            (funcall close)))))))
-
 (use-package consult-lsp
   :after
   lsp-mode
@@ -1686,58 +1852,6 @@ Can be forced on by supplying >0 or t, and off via <0."
   :bind
   (:map lsp-mode-map
         ([remap xref-find-apropos] . consult-lsp-symbols)))
-
-(use-package dap-mode
-  ;; (use-package dap-LANGUAGE) ; To load dap adapter for LANGUAGE
-
-  :hook
-  (dap-mode . tooltip-mode)
-  (dap-mode . dap-ui-mode)
-  (dap-mode . dap-tooltip-mode)
-  (dap-mode . dap-ui-controls-mode)
-
-  :custom
-  (dap-auto-configure-features
-   '(sessions locals controls tooltip)
-   "Which DAP features should be auto-configured by default.")
-  (dap-breakpoints-file
-   (concat hgs-cache-directory "dap-breakpoints")
-   "Place DAP break-point information into the cache."))
-
-(use-package avy
-  :defines
-  avy-order-closest
-
-  :commands
-  avy-goto-char
-  avy-goto-char-2
-  avy-goto-char-timer
-  avy-isearch
-  avy-goto-word
-  avy-goto-line
-
-  :bind
-  (:map global-map
-        ("C-'" . avy-goto-char))
-  (:map isearch-mode-map
-        ("C-'". avy-isearch))
-
-  :custom
-  (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
-  (avy-keys-alist '() "Alist of Avy commands to keys to use for prompts. Falls
-back to `avy-keys'")
-  (avy-style 'at "Overlay display style.")
-  (avy-styles-alist '() "Alist of Avy commands to overlay display styles.")
-  (avy-background nil "Use a gray background during selection.")
-  (avy-all-windows t "Scan all windows on the selected for selection.")
-  (avy-case-fold-search t "Ignore case for search.")
-  (avy-highlight-first nil "Don't highlight the first decision character, only
-first non-terminating decision characters.")
-  (avy-timeout-seconds 0.5 "How long `*-timer' commands should wait.")
-  (avy-orders-alist
-   '((avy-goto-char . avy-order-closest))
-   "Alist allowing for specifying commands to use fewer characters when closer
-to point."))
 
 (use-package treemacs
   :commands
@@ -1871,174 +1985,79 @@ to point."))
   :hook
   ((dired-mode) . treemacs-icons-dired-mode))
 
-(use-package undo-tree
-  :diminish
-  global-undo-tree-mode
-  undo-tree-mode-hook
-
-  :commands
-  global-undo-tree-mode
-  undo-tree-mode
-  undo-tree-undo
-  undo-tree-redo
-  undo-tree-visualize
-
-  :hook
-  ((prog-mode text-mode) . undo-tree-mode)
-
-  :custom
-  (undo-tree-history-directory-alist
-   `(("." . ,(concat hgs-cache-directory "undo-tree")))
-   "Put history backups in the cache directory."))
-
-(use-package flycheck
-  :commands
-  flycheck-mode
-
-  :bind-keymap
-  ("C-c !" . flycheck-keymap-prefix)
-
-  :hook
-  ((prog-mode) . flycheck-mode)
-
-  :init
-  (which-key-add-key-based-replacements
-    "C-c !" "Flycheck"))
-
-(use-package flyspell
-  :if (executable-find "aspell")
-
-  :commands
-  flyspell-mode
-  flyspell-prog-mode
-
-  :hook
-  (((text-mode) . flyspell-mode)
-   ((prog-mode) . flyspell-prog-mode))
-
-  :custom
-  (ispell-program-name "aspell" "Spellcheck program to use.")
-  (ispell-extra-args
-   '("--sug-mode=ultra" "--lang=en_US")
-   "Change the default lookup mode for performance, and force language to
-American English."))
-
-(use-package flyspell-correct
+(use-package lsp-treemacs
   :after
-  flyspell
+  lsp-mode
+  treemacs
+
+  :diminish
+  lsp-treemacs-sync-mode
+
+  :hook
+  ((lsp-mode) . lsp-treemacs-sync-mode)
 
   :bind
-  (:map flyspell-mode-map
-        ("C-c $" . flyspell-correct-at-point))
+  (:map lsp-mode-map
+        ("C-c l T s" . hgs--toggle-lsp-treemacs-symbols))
 
-  :custom
-  (flyspell-correct-highlight t "Highlight word being corrected."))
+  :init
+  (defun hgs--toggle-lsp-treemacs-symbols (&optional state)
+    "Toggle the `lsp-treemacs-symbols' window.
+Can be forced on by supplying >0 or t, and off via <0."
+    (interactive)
+    (save-selected-window
+      (let* ((symbols-buffer (get-buffer "*LSP Symbols List*"))
+             (symbols-window (get-buffer-window symbols-buffer))
+             (open #'lsp-treemacs-symbols)
+             (close (lambda ()
+                      (delete-window symbols-window)))
+             (toggle (lambda ()
+                       (if (and
+                            (not (null symbols-buffer))
+                            (not (null symbols-window)))
+                           (funcall close)
+                         (lsp-treemacs-symbols)))))
+        ;; If we haven't been passed an argument
+        (if (null state)
+            (funcall toggle)
+          ;; If we have been passed an argument
+          (if (or (eq state t) (> state 0))
+              ;; If it's trying to be toggled on
+              (funcall open)
+            ;; If it's trying to be toggled off
+            (funcall close)))))))
 
-(use-package which-key
-  :diminish
-  which-key-mode
-
-  :commands
-  which-key-mode
-  which-key-add-key-based-replacements
-  which-key-add-major-mode-key-based-replacements
+(use-package dap-mode
+  ;; (use-package dap-LANGUAGE) ; To load dap adapter for LANGUAGE
 
   :hook
-  ((prog-mode text-mode special-mode) . which-key-mode)
-
-  :config
-  (which-key-setup-side-window-bottom)
+  (dap-mode . tooltip-mode)
+  (dap-mode . dap-ui-mode)
+  (dap-mode . dap-tooltip-mode)
+  (dap-mode . dap-ui-controls-mode)
 
   :custom
-  (which-key-popup-type 'side-window "Use the minibuffer for the key display.")
-  (which-key-side-window-slot 0 "Slot of the side window to use.")
-  (which-key-side-window-location 'bottom "Place on the bottom.")
-  (which-key-sort-order 'which-key-key-order "Use the default sort order.")
-  (which-key-idle-delay 2.0 "How long to wait before offering a guide.")
-  (which-key-max-description-length 27 "Truncate descriptions.")
-  (which-key-add-column-padding 0 "Left padding for key display.")
-  (which-key-show-prefix 'bottom "Display currently typed prefix at bottom."))
+  (dap-auto-configure-features
+   '(sessions locals controls tooltip)
+   "Which DAP features should be auto-configured by default.")
+  (dap-breakpoints-file
+   (concat hgs-cache-directory "dap-breakpoints")
+   "Place DAP break-point information into the cache."))
 
-(use-package transpose-frame
+(use-package docker
   :commands
-  transpose-frame
-  flip-frame
-  flop-frame
-  rotate-frame
-  rotate-frame-clockwise
-  rotate-frame-anticlockwise
+  docker
 
   :bind
   (:map global-map
-        ("C-c <up>" . transpose-frame)
-        ("C-c <down>" . rotate-frame-clockwise)))
+        ("C-c D" . docker))
 
-(use-package wgrep
-  :commands
-  wgrep-mode
-
-  :bind
-  (:map grep-mode-map
-        ("C-c C-p" . wgrep-mode))
-
-  :custom
-  (wgrep-auto-save-buffer
-   nil
-   "Don't save buffer automatically when `wgrep-finish-edit'.")
-  ;; (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
-  (wgrep-change-readonly-file
-   nil
-   "Don't apply changes regardless of whether the buffer is read-only."))
-
-(use-package rainbow-delimiters
-  :diminish
-  rainbow-delimiters-mode
-
-  :commands
-  rainbow-delimiters-mode
-
-  :hook
-  ((prog-mode) . rainbow-delimiters-mode))
-
-(use-package cmake-mode
-  :commands
-  cmake-mode
-
-  :mode
-  (("\\(CMakeLists\\.txt\\|\\.cmake\\)\\'" . cmake-mode)))
-
-(use-package yaml-mode
-  :commands
-  yaml-mode
-
-  :mode
-  (("\\(\\.[Yy][Mm][Ll]\\|\\.yaml\\)\\'" . yaml-mode)))
-
-(use-package csv-mode
-  :commands
-  csv-mode
-
-  :mode
-  (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
-
-(use-package lua-mode
-  :commands
-  lua-mode
-
-  :mode
-  (("\\.lua\\'" . lua-mode))
-
-  :custom
-  (lua-indent-level 2 "We prefer to indent in Lua to 2 spaces."))
-
-(use-package markdown-mode
-  :commands
-  markdown-mode
-  gfm-mode
-
-  :mode
-  (("README\\.md\\'" . gfm-mode)
-   ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
+  :init
+  (defun hgs-toggle-docker-as-root ()
+    "Toggle whether to run Docker as root on/off."
+    (interactive)
+    (message "`docker-run-as-root' is now %s" docker-run-as-root)
+    (customize-set-variable 'docker-run-as-root (not (not docker-run-as-root)))))
 
 ;; Local Variables:
 ;; mode: emacs-lisp
