@@ -1517,19 +1517,43 @@ delimiters."
 (use-package company
   :hook
   (prog-mode . company-mode)
-  (org-mode . company-mode)
+  ((org-mode text-mode) . company-mode)
+  (prog-mode . hgs--set-prog-mode-company-backends)
+  ((org-mode text-mode) . hgs--set-text-mode-company-backends)
+
+  :init
+  (defun hgs--set-prog-mode-company-backends ()
+    "Set appropriate Company back-ends for programming mode buffers."
+    (make-local-variable 'company-backends)
+    (setq-local company-backends
+                '((company-capf
+                   company-yasnippet
+                   company-keywords
+                   company-files)
+                  (company-etags
+                   company-dabbrev-code)
+                  (company-dabbrev))))
+
+  (defun hgs--set-text-mode-company-backends ()
+    "Set appropriate Company back-ends for text mode buffers."
+    (make-local-variable 'company-backends)
+    (setq-local company-backends
+                '((company-yasnippet
+                   company-ispell
+                   company-keywords
+                   company-files)
+                  (company-dabbrev))))
 
   :custom
   (company-backends
-   '((company-keywords
-      company-capf
-      company-files
-      company-etags
-      company-cmake
-      company-ispell
+   '((company-capf
       company-yasnippet
-      company-dabbrev-code
-      company-abbrev))
+      company-keywords
+      company-files)
+     (company-dabbrev-code
+      company-etags)
+     (company-ispell)
+     (company-abbrev))
    "Set default company backends to use.")
   (company-echo-delay 0.5 "How long to wait before echoing.")
   (company-idle-delay 0.5 "How long to wait before offering completion.")
