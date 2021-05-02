@@ -1714,6 +1714,15 @@ partially sorted lists by length, as this ruins the sort order."))
   embark
   consult
 
+  ;; This package is needed by default to integrate embark actions with consult
+  ;; commands properly (for example, consult-buffer's items won't have
+  ;; appropriate actions without it). The hook/command prevents loading this
+  ;; immediately, so we must demand it.
+  :demand t
+
+  :commands
+  embark-consult-preview-minor-mode
+
   :hook
   (embark-collect-mode . embark-consult-preview-minor-mode))
 
