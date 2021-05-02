@@ -14,31 +14,36 @@ if [ -z "$IS_LOGIN_SHELL" ]; then
   fi
 fi
 
-. "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
+require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 
 # Colors and PS1 setup - for now this is largely shared between shells
-if [ $(id -u) -eq 0 ]; then
-  # Special root PS1 colors
-  color_shell="\[$(text_fg_color 10)\]"
-  color_path="\[$(text_fg_color 10)\]"
-  color_git="\[$(text_fg_color 10)\]"
-  color_separator="\[$(text_fg_color cyan)\]"
-  color_reset="\[$(text_reset)\]"
+# Tramp and other dumb terminals require a more ordinary prompt
+if [ "$TERM" = "dumb" ]; then
+    PS1="$ "
 else
-  # PS1 for other users
-  color_shell="\[$(text_fg_color 10)\]"
-  color_path="\[$(text_fg_color red)\]"
-  color_git="\[$(text_fg_color blue)\]"
-  color_separator="\[$(text_fg_color cyan)\]"
-  color_reset="\[$(text_reset)\]"
+  if [ $(id -u) -eq 0 ]; then
+    # Special root PS1 colors
+    color_shell="\[$(text_fg_color 10)\]"
+    color_path="\[$(text_fg_color 10)\]"
+    color_git="\[$(text_fg_color 10)\]"
+    color_separator="\[$(text_fg_color cyan)\]"
+    color_reset="\[$(text_reset)\]"
+  else
+    # PS1 for other users
+    color_shell="\[$(text_fg_color 10)\]"
+    color_path="\[$(text_fg_color red)\]"
+    color_git="\[$(text_fg_color blue)\]"
+    color_separator="\[$(text_fg_color cyan)\]"
+    color_reset="\[$(text_reset)\]"
+  fi
+  # Add a convenient shell name identifier
+  PS1="$(text_reset)${color_shell}[\$(whoami)@\$(hostname):sh]"
+  PS1+="${color_path}<\$(basename \${PWD})/>" # Path
+  PS1+="${color_git}\$(get_vcs_branch)" # VCS branch
+  PS1+="${color_separator}λ " # Separator
+  PS1+="${color_reset}" # Color back to normal
+  unset color_shell color_path color_git color_separator color_reset
 fi
-# Add a convenient shell name identifier
-PS1="$(text_reset)${color_shell}[\$(whoami)@\$(hostname):sh]"
-PS1+="${color_path}<\$(basename \${PWD})/>" # Path
-PS1+="${color_git}\$(get_vcs_branch)" # VCS branch
-PS1+="${color_separator}λ " # Separator
-PS1+="${color_reset}" # Color back to normal
-unset color_shell color_path color_git color_separator color_reset
 
 reload_dotfiles() {
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/sh/env"

@@ -6,28 +6,33 @@
 
 require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 
-autoload -U colors && colors
-setopt prompt_subst
-autoload -Uz vcs_info
-zstyle ':vcs_info:*' enable git cvs svn hg
-zstyle ':vcs_info:*' \
-  formats "%{$fg[blue]%}(%s:%b)%{$reset_color%}"
-zstyle ':vcs_info:*' \
-  actionformats "%{$fg[blue]%}(%s:%b-%a)%{$reset_color%}"
-vcs_info_wrapper() {
-  vcs_info
-  if [ -n "$vcs_info_msg_0_" ]; then
-    echo "${vcs_info_msg_0_}%{$reset_color%}"
-  fi
-}
-precmd_functions+='vcs_info_wrapper'
-chpwd_functions+='vcs_info_wrapper'
-preexec_functions+='vcs_info_wrapper'
-unset PS1 # Just to make sure a previous setting isn't interfering
-PROMPT='[$(whoami)@$(hostname):zsh]' # System info
-PROMPT+='%{$fg[red]%}<%1//>%{$reset_color%}' # Path
-PROMPT+='$(vcs_info_wrapper)' # VCS info
-PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Separator
+# Tramp and other dumb terminals require a more ordinary prompt
+if [ "$TERM" = "dumb" ]; then
+    PS1="$ "
+else
+  autoload -U colors && colors
+  setopt prompt_subst
+  autoload -Uz vcs_info
+  zstyle ':vcs_info:*' enable git cvs svn hg
+  zstyle ':vcs_info:*' \
+    formats "%{$fg[blue]%}(%s:%b)%{$reset_color%}"
+  zstyle ':vcs_info:*' \
+    actionformats "%{$fg[blue]%}(%s:%b-%a)%{$reset_color%}"
+  vcs_info_wrapper() {
+    vcs_info
+    if [ -n "$vcs_info_msg_0_" ]; then
+      echo "${vcs_info_msg_0_}%{$reset_color%}"
+    fi
+  }
+  precmd_functions+='vcs_info_wrapper'
+  chpwd_functions+='vcs_info_wrapper'
+  preexec_functions+='vcs_info_wrapper'
+  unset PS1 # Just to make sure a previous setting isn't interfering
+  PROMPT='[$(whoami)@$(hostname):zsh]' # System info
+  PROMPT+='%{$fg[red]%}<%1//>%{$reset_color%}' # Path
+  PROMPT+='$(vcs_info_wrapper)' # VCS info
+  PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Separator
+fi
 
 zmodload zsh/zle
 # Forcefully ZLE put into vi mode
