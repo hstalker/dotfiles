@@ -115,6 +115,11 @@
        :host github
        :repo "dryman/toml-mode.el"))
     (straight-use-package
+     '(dimmer
+       :type git
+       :host github
+       :report "gonewest818/dimmer.el"))
+    (straight-use-package
      '(avy
        :type git
        :host github

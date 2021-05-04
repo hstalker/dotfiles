@@ -875,6 +875,32 @@ American English."))
   :mode
   (("\\.toml\\'" . toml-mode)))
 
+;; Dim non-focused windows for clarity
+(use-package dimmer
+  :demand t
+
+  :diminish
+  dimmer-mode
+
+  :init
+  ;; Apply some fixes when/if these packages load to prevent dimmer from
+  ;; interfering with their visibility.
+  (defmacro hgs--apply-dimmer-fix (package-name)
+    (let ((package-name-str (symbol-name package-name)))
+    `(with-eval-after-load ,package-name-str
+       (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
+
+  :config
+  (dolist (pkg '(magit which-key hydra org posframe gnus helm company-box))
+    (hgs--apply-dimmer-fix pkg))
+
+  (dimmer-mode +1)
+
+  :custom
+  (dimmer-adjustment-mode :both "Dim the other windows' fore/backgrounds.")
+  (dimmer-fraction 0.15 "Higher means greater dimming.")
+  (dimmer-watch-frame-focus-events t "React to frame-wide focusing changes."))
+
 (use-package avy
   :defines
   avy-order-closest
