@@ -18,6 +18,7 @@
 (defvar hgs-data-directory)
 (defvar hgs-project-directory)
 (defvar hgs-org-directory)
+(defvar hgs-has-dynamic-module-support)
 (defvar hgs-is-bsd)
 (defvar hgs-is-linux)
 (defvar hgs-is-mac)
@@ -1375,6 +1376,26 @@ emacsclient (invalid argument stringp errors)."
   (:map global-map
         ("C-=" . er/expand-region)))
 
+(when hgs-has-dynamic-module-support
+  (use-package tree-sitter
+    :diminish
+    global-tree-sitter-mode
+    tree-sitter-mode
+    tree-sitter-hl-mode
+
+    :commands
+    global-tree-sitter-mode
+    tree-sitter-hl-mode
+
+    :hook
+    ((prog-mode) . tree-sitter-hl-mode)
+    ((prog-mode) . tree-sitter-mode))
+
+
+  (use-package tree-sitter-langs
+    :after
+    tree-sitter))
+
 (use-package yasnippet
   :diminish
   yas-global-mode
@@ -1592,7 +1613,7 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
    nil
    "Don't apply changes regardless of whether the buffer is read-only."))
 
-(unless (null module-file-suffix)
+(when hgs-has-dynamic-module-support
   (use-package vterm))
 
 (use-package smartparens
@@ -1906,11 +1927,12 @@ partially sorted lists by length, as this ruins the sort order."))
 
 ;; Largely a performance optimization that can be safely disabled if necessary.
 ;; Requires some additional packages and compilation.
-(use-package libgit)
-(use-package magit-libgit
-  :after
-  magit
-  libgit)
+(when hgs-has-dynamic-module-support
+  (use-package libgit)
+  (use-package magit-libgit
+    :after
+    magit
+    libgit))
 
 (use-package forge
   :after

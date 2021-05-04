@@ -28,6 +28,9 @@
   :group 'local
   :version "26.1")
 
+(defconst hgs-has-dynamic-module-support
+  (and (functionp 'module-load) (not (null module-file-suffix))))
+
 (defconst hgs-is-mac (eq system-type 'darwin))
 (defconst hgs-is-linux (eq system-type 'gnu/linux))
 (defconst hgs-is-bsd

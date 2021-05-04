@@ -205,6 +205,16 @@
        :host github
        :repo "magnars/expand-region.el"))
     (straight-use-package
+     '(tree-sitter
+       :type git
+       :host github
+       :repo "ubolonton/emacs-tree-sitter"))
+    (straight-use-package
+     '(tree-sitter-langs
+       :type git
+       :host github
+       :repo "ubolonton/tree-sitter-langs"))
+    (straight-use-package
      '(yasnippet
        :type git
        :host github
