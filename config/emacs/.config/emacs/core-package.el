@@ -84,6 +84,37 @@
        :host github
        :repo "magnars/dash.el"))
     (straight-use-package
+     '(dockerfile-mode
+       :type git
+       :host github
+       :repo "spotify/dockerfile-mode"))
+    (straight-use-package
+     '(protobuf-mode
+       :type git
+       :host github
+       :repo "google/protobuf"
+       :files ("editors/protobuf-mode.el")))
+    (straight-use-package
+     '(bazel
+       :type git
+       :host github
+       :repo "bazelbuild/emacs-bazel-mode"))
+    (straight-use-package
+     '(meson-mode
+       :type git
+       :host github
+       :repo "wentasah/meson-mode"))
+    (straight-use-package
+     '(jq-mode
+       :type git
+       :host github
+       :repo "ljos/jq-mode"))
+    (straight-use-package
+     '(toml-mode
+       :type git
+       :host github
+       :repo "dryman/toml-mode.el"))
+    (straight-use-package
      '(avy
        :type git
        :host github
@@ -218,6 +249,11 @@
        :type git
        :host github
        :repo "jrblevin/markdown-mode"))
+    (straight-use-package
+     '(restclient
+       :type git
+       :host github
+       :repo "pashky/restclient.el"))
     (straight-use-package
      '(string-inflection
        :type git

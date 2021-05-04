@@ -814,7 +814,67 @@ American English."))
 
 ;; Third-party package configuration
 
-;;(use-package el-get)
+(use-package dockerfile-mode
+  :commands
+  dockerfile-mode
+
+  :mode
+  (("Dockerfile\\'" . dockerfile-mode))
+
+  :config
+  ;; Allow the use to put a file-local variable specifying the image name.
+  (put 'docker-image-name 'safe-local-variable #'stringp))
+
+(use-package protobuf-mode
+  :commands
+  protobuf-mode
+
+  :mode
+  (("\\.\\(pb\\|proto\\)\\'" . protobuf-mode)))
+
+(use-package bazel
+  :commands
+  bazel-build-mode
+  bazel-workspace-mode
+  bazelrc-mode
+  bazel-starlark-mode
+
+  :mode
+  (("/BUILD\\(\\..*\\)?\\'" . bazel-build-mode)
+   ("/WORKSPACE\\'" . bazel-workspace-mode)
+   ("\\.bzl\\'" . bazel-starlark-mode)
+   ("\\.bazelrc\\'" . bazelrc-mode)))
+
+(use-package meson-mode
+  :commands
+  meson-mode
+
+  :mode
+  (("\\.meson\\'" . meson-mode)
+   ("/meson\\.build\\'" . meson-mode)))
+
+(use-package jq-mode
+  :after
+  json-mode
+
+  :commands
+  jq-mode
+  jq-interactively
+
+  :mode
+  ("\\.jq\\'" . jq-mode)
+
+  :bind
+  (:map json-mode-map
+        ("C-c C-j" . jq-interactively)))
+
+(use-package toml-mode
+  :commands
+  toml-mode
+
+  :mode
+  (("\\.toml\\'" . toml-mode)))
+
 (use-package avy
   :defines
   avy-order-closest
@@ -1415,6 +1475,13 @@ emacsclient (invalid argument stringp errors)."
   (("README\\.md\\'" . gfm-mode)
    ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
 
+(use-package restclient
+  :commands
+  restclient-mode
+
+  :mode
+  (("\\.restclient\\'" . restclient-mode)))
+
 (use-package string-inflection
   :commands
   string-inflection-get-current-word
@@ -1759,6 +1826,9 @@ partially sorted lists by length, as this ruins the sort order."))
   (embark-collect-mode . embark-consult-preview-minor-mode))
 
 (use-package json-mode
+  :defines
+  json-mode-map
+
   :commands
   json-mode
 
