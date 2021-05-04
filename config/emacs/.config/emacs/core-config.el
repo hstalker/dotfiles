@@ -1904,6 +1904,18 @@ partially sorted lists by length, as this ruins the sort order."))
         ("C-x g" . magit-status)
         ("C-x M-g" . magit-dispatch)))
 
+;; Largely a performance optimization that can be safely disabled if necessary.
+;; Requires some additional packages and compilation.
+(use-package libgit)
+(use-package magit-libgit
+  :after
+  magit
+  libgit)
+
+(use-package forge
+  :after
+  magit)
+
 (use-package consult-flycheck
   :after
   consult
