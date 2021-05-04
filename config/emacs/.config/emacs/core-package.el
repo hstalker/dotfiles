@@ -402,6 +402,11 @@
     (straight-use-package
      '(org-plus-contrib
        :includes (org)))
+    (straight-use-package
+     '(doom-modeline
+       :type git
+       :host github
+       :repo "seagle0128/doom-modeline"))
 
     (progress-reporter-done core-packages-progress)))
 

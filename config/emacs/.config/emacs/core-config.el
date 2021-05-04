@@ -134,10 +134,9 @@ tall. This won't work as expected under daemon mode."
       (modify-frame-parameters frame
                                '((inhibit-double-buffering . t)))))
 
-  (defun hgs--setup-default-tui (frame)
+  (defun hgs--setup-default-tui (_frame)
     "Set default terminal UI for the given frame."
-    ;; Do nothing for now
-    frame)
+    (menu-bar-mode -1))
 
   (add-hook 'hgs-frame-customization-hook #'hgs--setup-default-fonts -50)
   (add-hook 'hgs-frame-customization-gui-hook #'hgs--setup-default-gui -50)
@@ -857,6 +856,9 @@ American English."))
   :after
   json-mode
 
+  :defines
+  json-mode-map
+
   :commands
   jq-mode
   jq-interactively
@@ -875,7 +877,8 @@ American English."))
   :mode
   (("\\.toml\\'" . toml-mode)))
 
-;; Dim non-focused windows for clarity
+;; Dim non-focused windows for clarity. This seems to cause massive terminal
+;; slow-down when changing active window, so I might eventually remove it.
 (use-package dimmer
   :demand t
 
@@ -891,15 +894,18 @@ American English."))
        (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
 
   :config
-  (dolist (pkg '(magit which-key hydra org posframe gnus helm company-box))
-    (hgs--apply-dimmer-fix pkg))
+  (dolist (_pkg '(magit which-key hydra org posframe gnus helm company-box))
+    (hgs--apply-dimmer-fix _pkg))
 
   (dimmer-mode +1)
 
   :custom
   (dimmer-adjustment-mode :both "Dim the other windows' fore/backgrounds.")
   (dimmer-fraction 0.15 "Higher means greater dimming.")
-  (dimmer-watch-frame-focus-events t "React to frame-wide focusing changes."))
+  (dimmer-watch-frame-focus-events
+   nil
+   "Don't react to frame-wide focusing changes. Needed to avoid flashing on
+mouse navigation."))
 
 (use-package avy
   :defines
@@ -1852,9 +1858,6 @@ partially sorted lists by length, as this ruins the sort order."))
   (embark-collect-mode . embark-consult-preview-minor-mode))
 
 (use-package json-mode
-  :defines
-  json-mode-map
-
   :commands
   json-mode
 
@@ -2197,6 +2200,16 @@ Can be forced on by supplying >0 or t, and off via <0."
     (if (null docker-run-as-root)
         (setq docker-run-as-root t)
       (setq docker-run-as-root nil))))
+
+(use-package doom-modeline
+  :after
+  all-the-icons
+
+  :commands
+  doom-modeline-mode
+
+  :hook
+  ((window-setup-hook after-init) . doom-modeline-mode))
 
 ;; Local Variables:
 ;; mode: emacs-lisp
