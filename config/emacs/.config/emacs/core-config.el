@@ -49,6 +49,16 @@
   (message "Reloading user configuration from %s..." user-init-file)
   (load user-init-file))
 
+(defun hgs-copy-file-path ()
+  "Copy the currently visited file's path to clipboard."
+  (interactive)
+  (let ((file-path (if (equal major-mode 'dired-mode)
+                       default-directory
+                     (buffer-file-name))))
+    (when file-path
+      (kill-new file-path)
+      (message "Copied visited file path '%s' to the clipboard." file-path))))
+
 ;; Periodically clearing most of the buffer list is pretty useful
 (defun hgs-kill-other-buffers ()
   "Kill all other open buffers."
@@ -148,6 +158,13 @@ tall. This won't work as expected under daemon mode."
   (setq locale-coding-system 'utf-8)
   ;; We prefer to default to utf-8 with unix line endings
   (setq-default buffer-file-coding-system 'prefer-utf-8-unix)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+
+  ;; Better support handling processes with large amounts of data like LSP
+  (setq read-process-ouput-max (* 1024 1024))
 
   ;; We always want to use the short form for confirmation prompts
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -174,7 +191,14 @@ tall. This won't work as expected under daemon mode."
   (bind-keys :map global-map
              ([remap suspend-frame] . hgs--suspend-frame))
 
+  ;; Indicate the depth of recursion of the mini-buffer in the mode-line
+  (minibuffer-depth-indicate-mode +1)
+
   :custom
+  (require-final-newline t "We should always require a final newline.")
+  (case-fold-search t "Should have non-case-sensitive search by default.")
+  (use-dialog-box nil "All dialog boxes should instead be mini-buffer prompts.")
+  (kill-whole-line nil "C-k shouldn't kill entire line.")
   (cursor-type 'bar "User a bar cursor rather than a box, as bar better suits
 Emacs marking.")
   (enable-recursive-minibuffers t "Allow for minibuffer usage inside
@@ -320,6 +344,23 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
   :hook
   ((prog-mode text-mode) . xterm-mouse-mode))
+
+;; Active regions should be deleted by normal deletion commands like expected
+(use-package delsel
+  :demand t
+
+  :config
+  (delete-selection-mode))
+
+;; Enable highlighting of current line if we have more recent fast line
+;; highlighting (>=27).
+(unless (version< emacs-version "27")
+  (use-package hl-line
+    :commands
+    hl-line-mode
+
+    :hook
+    ((prog-mode text-mode) . hl-line-mode)))
 
 (use-package simple
   :diminish
@@ -1375,64 +1416,55 @@ emacsclient (invalid argument stringp errors)."
    ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
 
 (use-package string-inflection
+  :commands
+  string-inflection-get-current-word
+  string-inflection-upcase
+  string-inflection-upcase-function
+  string-inflection-upcase-p
+  string-inflection-capital-underscore
+  string-inflection-capital-underscore-function
+  string-inflection-capital-underscore-p
+  string-inflection-underscore
+  string-inflection-underscore-function
+  string-inflection-underscore-p
+  string-inflection-camelcase
+  string-inflection-camelcase-function
+  string-inflection-camelcase-p
+  string-inflection-pascal-case
+  string-inflection-pascal-case-function
+  string-inflection-pascal-case-p
+  string-inflection-kebab-case
+  string-inflection-kebab-case-function
+  string-inflection-kebab-case-p
+
   :init
   (defun hgs-restyle-dwim ()
     "Completing read enabled restyling of the specified region or current word.
-Allows for converting the given region between lowercase, uppercase, kebab-case,
+Allows for converting the given region between kebab-case,
 snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
     (interactive)
-    ;; We don't want to move the point
-    (save-excursion
-      (let* ((selection (progn
-                          ;; If we are relying on DWIM behavior
-                          (if (not (region-active-p))
-                              (progn
-                                ;; Mark the sexp at point.
-                                ;; NOTE: Broken when at beginning of sexp
-                                (backward-sexp)
-                                (set-mark (point))
-                                (forward-sexp)
-                                (activate-mark)))
-                          ;; Grab the string under point
-                          (buffer-substring-no-properties (region-beginning)
-                                                          (region-end))))
-             (choices `(("UPPER CASE" . ,(lambda ()
-                                           (upcase selection)))
-                        ("lower case" . ,(lambda ()
-                                           (downcase selection)))
-                        ("Capitalized" . ,(lambda ()
-                                            (capitalize selection)))
+    ;; We don't want to move the point or the mark
+    (save-mark-and-excursion
+      (let* ((selection (string-inflection-get-current-word))
+             (choices '(("UPPER_CASE" .
+                         string-inflection-upcase-function)
                         ("snake_case" .
-                         ,(lambda ()
-                            (string-inflection-underscore-function selection)))
+                         string-inflection-underscore-function)
                         ("Snake_Case" .
-                         ,(lambda ()
-                            (string-inflection-capital-underscore-function
-                             selection)))
+                         string-inflection-capital-underscore-function)
                         ("PascalCase" .
-                         ,(lambda ()
-                            (string-inflection-pascal-case-function selection)))
+                         string-inflection-pascal-case-function)
                         ("camelCase" .
-                         ,(lambda ()
-                            (string-inflection-camelcase-function selection)))
+                         string-inflection-camelcase-function)
                         ("kebab-case" .
-                         ,(lambda ()
-                            (string-inflection-kebab-case-function selection)))))
+                         string-inflection-kebab-case-function)))
              (choice (completing-read "Select target style: "
                                       choices
-                                      nil                  ; Predicate?
+                                      nil ; Predicate?
                                       'require-match))
-             (result (funcall (alist-get choice choices nil nil 'string-equal))))
+             (action (alist-get choice choices nil nil 'string-equal)))
         ;; Replace region with result of restyle
-        (kill-region (region-beginning) (region-end))
-        (insert result))))
-
-  :commands
-  string-inflection-capital-underscore-function
-  string-inflection-underscore-function
-  string-inflection-camelcase-function
-  string-inflection-pascal-case-function
-  string-inflection-kebab-case-function)
+        (insert (funcall action selection))))))
 
 (use-package editorconfig
   :diminish
@@ -2066,7 +2098,9 @@ Can be forced on by supplying >0 or t, and off via <0."
     "Toggle whether to run Docker as root on/off."
     (interactive)
     (message "`docker-run-as-root' is now %s" docker-run-as-root)
-    (customize-set-variable 'docker-run-as-root (not (not docker-run-as-root)))))
+    (if (null docker-run-as-root)
+        (setq docker-run-as-root t)
+      (setq docker-run-as-root nil))))
 
 ;; Local Variables:
 ;; mode: emacs-lisp
