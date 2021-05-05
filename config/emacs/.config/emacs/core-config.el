@@ -482,7 +482,7 @@ file when it changes on disk.")
   subword-mode
 
   :hook
-  ((prog-mode text-mode special-mode) . subword-mode))
+  ((prog-mode text-mode special-mode minibuffer-setup) . subword-mode))
 
 (use-package recentf
   :diminish
