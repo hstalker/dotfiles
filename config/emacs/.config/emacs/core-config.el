@@ -1947,7 +1947,12 @@ partially sorted lists by length, as this ruins the sort order."))
 
 (use-package forge
   :after
-  magit)
+  magit
+
+  :custom
+  (forge-database-file
+   (concat hgs-data-directory "forge-database.sqlite")
+   "Place the forge database into the data directory."))
 
 (use-package consult-flycheck
   :after

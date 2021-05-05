@@ -32,6 +32,8 @@
     followTags = true
 [gpg]
     program = gpg
+[github]
+	user = hstalker
 [filter "lfs"]
     required = true
     clean = git-lfs clean -- %f
