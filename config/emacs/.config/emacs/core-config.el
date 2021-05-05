@@ -1385,12 +1385,23 @@ emacsclient (invalid argument stringp errors)."
 
     :commands
     global-tree-sitter-mode
+    tree-sitter-mode
     tree-sitter-hl-mode
 
     :hook
-    ((prog-mode) . tree-sitter-hl-mode)
-    ((prog-mode) . tree-sitter-mode))
+    ;; I would like to just use prog-mode and ignore the message it outputs when
+    ;; there isn't a grammar found, but unfortunately that seems to hang
+    ;; daemonized Emacs. We instead just swallow errors via a proxy function.
+    ;; The alternative is to toggle these per language pair which is not the
+    ;; most ergonomic at scale.
+    ((prog-mode) . hgs--tree-sitter-modes)
 
+    :init
+    (defun hgs--tree-sitter-modes (&optional arg)
+      "Proxy to `tree-sitter-mode' & `tree-sitter-hl-mode' swallowing errors."
+      (with-demoted-errors "Silenced error: %s"
+        (tree-sitter-mode arg)
+        (tree-sitter-hl-mode arg))))
 
   (use-package tree-sitter-langs
     :after
