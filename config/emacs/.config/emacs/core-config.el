@@ -1575,27 +1575,40 @@ Allows for converting the given region between kebab-case,
 snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
     (interactive)
     ;; We don't want to move the point or the mark
-    (save-mark-and-excursion
-      (let* ((selection (string-inflection-get-current-word))
-             (choices '(("UPPER_CASE" .
-                         string-inflection-upcase-function)
-                        ("snake_case" .
-                         string-inflection-underscore-function)
-                        ("Snake_Case" .
-                         string-inflection-capital-underscore-function)
-                        ("PascalCase" .
-                         string-inflection-pascal-case-function)
-                        ("camelCase" .
-                         string-inflection-camelcase-function)
-                        ("kebab-case" .
-                         string-inflection-kebab-case-function)))
-             (choice (completing-read "Select target style: "
-                                      choices
-                                      nil ; Predicate?
-                                      'require-match))
-             (action (alist-get choice choices nil nil 'string-equal)))
-        ;; Replace region with result of restyle
-        (insert (funcall action selection))))))
+    (let* ((choices
+            `(("UPPER_CASE" .
+               ,#'string-inflection-upcase-function)
+              ("snake_case" .
+               ,#'string-inflection-underscore-function)
+              ("Snake_Case" .
+               ,#'string-inflection-capital-underscore-function)
+              ("PascalCase" .
+               ,#'string-inflection-pascal-case-function)
+              ("camelCase" .
+               ,#'string-inflection-camelcase-function)
+              ("kebab-case" .
+               ,#'string-inflection-kebab-case-function)))
+           (completion-table
+            (lambda (string predicate action)
+              (cond
+               ((eq action 'metadata)
+                `(metadata
+                  (category . symbol)
+                  (annotation-function . ,#'identity)
+                  (cycle-sort-function . ,#'identity)
+                  (display-sort-function . ,#'identity)))
+               (t (complete-with-action action choices string predicate))))))
+      (save-mark-and-excursion
+        (atomic-change-group
+          (let* ((action
+                  (cdr (assoc (completing-read "Select target style: "
+                                               completion-table
+                                               nil
+                                               'require-match)
+                              choices)))
+                 (selection (string-inflection-get-current-word)))
+            ;; Replace region with result of restyle
+            (insert (funcall action selection))))))))
 
 (use-package editorconfig
   :diminish
