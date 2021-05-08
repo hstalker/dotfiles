@@ -1,0 +1,12 @@
+[Unit]
+Description=Background manager for Sway
+Documentation=man:swaybg(1)
+PartOf=graphical-session.target
+
+[Service]
+Environment="BACKGROUND_IMAGE=%h/Pictures/wallpapers/default.png"
+ExecStart=/usr/bin/swaybg -i $BACKGROUND_IMAGE -m fill -o *
+ExecStop=killall swaybg
+
+[Install]
+WantedBy=sway-session.target

@@ -1,0 +1,106 @@
+{
+    "layer": "bottom",
+    "position": "top",
+    "height": 30,
+
+    "modules-left": ["sway/workspaces",
+                     "sway/mode"],
+    "modules-center": ["sway/window"],
+    "modules-right": ["tray",
+                      "custom/storage",
+                      "backlight",
+                      "pulseaudio",
+                      "network",
+                      "idle_inhibitor",
+                      "battery",
+                      "custom/clock"],
+
+    "sway/mode": {
+        "format": "{}"
+    },
+
+    "sway/workspaces": {
+        "format": "{name}",
+        "disable-scroll": true
+    },
+
+    "sway/window": {
+        "max-length": 80,
+        "tooltip": false
+    },
+
+    "custom/clock": {
+        "exec": "date +'%Y-%m-%d %H:%M:%S'",
+        "interval": 1
+    },
+
+    "battery": {
+        "format": "{capacity}% {icon}",
+        "format-alt": "{time} {icon}",
+        "format-icons": [],
+        "format-charging": "{capacity}% ",
+        "interval": 30,
+        "states": {
+            "warning": 25,
+            "critical": 10
+        },
+        "tooltip": false
+    },
+
+    "network": {
+        "format": "{icon}",
+        "format-alt": "{ipaddr}/{cidr} {icon}",
+        "format-icons": {
+            "wifi": [],
+            "ethernet": [],
+            "disconnected": []
+        },
+        "on-click": "foot -e nmtui",
+        "tooltip": false
+    },
+
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-alt": "{volume} {icon}",
+        "format-alt-click": "click-right",
+        "format-muted": "Mute",
+        "format-icons": {
+            "phone": [],
+            "default": []
+        },
+        "scroll-step": 10,
+        "on-click": "pavucontrol",
+        "tooltip": false
+    },
+
+    "backlight": {
+        "format": "{icon}",
+        "format-alt": "{percent}% {icon}",
+        "format-alt-click": "click-right",
+        "format-icons": [],
+        "on-scroll-down": "light -A 1",
+        "on-scroll-up": "light -U 1"
+    },
+
+    "custom/storage": {
+        "format": "{}",
+        "format-alt": "{percentage}%",
+        "format-alt-click": "click-right",
+        "return-type": "json",
+        "interval": 600,
+        "exec": "~/.config/waybar/modules/storage.sh"
+    },
+
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "E",
+            "deactivated": "D"
+        },
+        "tooltip": false
+    },
+
+    "tray": {
+        "icon-size": 18
+    }
+}

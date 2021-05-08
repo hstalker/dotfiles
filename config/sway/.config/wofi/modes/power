@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+set -eu
+
+if ! command -v wofi >/dev/null 2>&1; then
+  notify-send "Wofi was not found! Please install onto your system."
+  exit 1
+fi
+
+entries="Lock,Logout,Suspend,Reboot,Shutdown"
+
+selected="$(echo ${entries} | \
+  wofi -m 0 --show dmenu -Ddmenu-separator=',' -p "Power" -i | \
+  awk '{print tolower($1)}')"
+
+case "$(echo "$selected" | tr [A-Z] [a-z])" in
+  lock)
+    notify-send "Locking..."
+    "$HOME/.local/bin/sway-lock.sh"
+    ;;
+  logout)
+    notify-send "Logging out..."
+    swaymsg exit
+    ;;
+  suspend)
+    notify-send "Suspending..."
+    exec systemctl suspend
+    ;;
+  reboot)
+    notify-send "Rebooting..."
+    exec systemctl reboot
+    ;;
+  shutdown)
+    notify-send "Shutting down..."
+    exec systemctl poweroff -i
+    ;;
+  *)
+    exit 2
+    ;;
+esac
+
+exit 0

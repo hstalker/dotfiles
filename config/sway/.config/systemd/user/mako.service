@@ -1,0 +1,14 @@
+[Unit]
+Description=Lightweight Wayland notification daemon
+Documentation=man:mako(1)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.Notifications
+ExecStart=/usr/bin/mako -c "%h/.config/mako/config"
+ExecReload=/usr/bin/makoctl reload
+
+[Install]
+WantedBy=sway-session.target

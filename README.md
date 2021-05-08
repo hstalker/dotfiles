@@ -54,7 +54,6 @@ made considerably simpler, alas the world isn't so simple.
 ## Future Goals
 * Try to move Vim plug usage to support an automated lockfile mechanism for
   pinning.
-* Add WM/DE/rofi configuration.
 * Consider move to NixOS on all my systems, whilst maintaining near full
   stowability of dotfiles to non-Nix systems.
 
@@ -94,6 +93,9 @@ Currently includes some configuration for the following pieces of software:
 * Desktop tooling
   * MPV - Media player that knocks the socks off of the competition
   * WINE - Windows emulation layer
+* Desktop environments (Not enabled by default)
+  * Sway/Wofi/Waybar/Swaylock/Swaybg/Mako - Tiling Wayland native desktop
+    environment.
 * Language tooling
   * .NET
     * NuGet - Package management
