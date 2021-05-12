@@ -1,0 +1,14 @@
+[Unit]
+Description=Redshift display colour temperature adjustment
+Documentation=http://jonls.dk/redshift/
+After=display-manager.service
+
+[Service]
+ExecStart=/usr/bin/redshift
+Restart=always
+# Redshift can be relatively aggressive about starting too early.
+# We do this to make systemd kill the service outright as often.
+RestartSec=5
+
+[Install]
+WantedBy=default.target

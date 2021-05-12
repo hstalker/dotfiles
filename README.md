@@ -93,6 +93,7 @@ Currently includes some configuration for the following pieces of software:
 * Desktop tooling
   * MPV - Media player that knocks the socks off of the competition
   * WINE - Windows emulation layer
+  * Redshift - Monitor time/location-based color temperature adjustments
 * Desktop environments (Not enabled by default)
   * Sway/Wofi/Waybar/Swaylock/Swaybg/Mako - Tiling Wayland native desktop
     environment.
