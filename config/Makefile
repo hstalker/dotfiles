@@ -42,6 +42,7 @@ PACKAGES ?= shells \
 	java \
 	dircolors \
 	redshift \
+	mozc \
 	sway \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \

@@ -1,0 +1,12 @@
+# A needed fix to get the Google IME-based Mozc to work as expected under IBus
+# `ibus write-cache; ibus restart` might be necessary to apply changes.
+engines {
+  name : "mozc-jp"
+  longname : "Mozc"
+  layout : "default"
+  layout_variant : ""
+  layout_option : ""
+  rank : 80
+}
+# Needed to make it go into hiragana mode instead of direct input
+active_on_launch: True
