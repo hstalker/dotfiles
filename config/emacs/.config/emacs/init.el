@@ -85,9 +85,17 @@
   :type 'directory
   :group 'personal)
 
+(defcustom hgs-documents-directory
+  (file-name-as-directory
+   (or (getenv "XDG_DOCUMENTS_DIR")
+       (concat hgs-user-directory "Documents")))
+  "Directory in which our user's documents should be placed."
+  :type 'directory
+  :group 'personal)
+
 (defcustom hgs-org-directory
   (file-name-as-directory
-   (concat (file-name-as-directory hgs-user-directory) "org"))
+   (concat (file-name-as-directory hgs-documents-directory) "org"))
   "Directory in which our user's org files should be placed."
   :type 'directory
   :group 'personal)

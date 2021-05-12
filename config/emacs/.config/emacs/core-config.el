@@ -714,33 +714,48 @@ American English."))
   (org-agenda-files
    `(,hgs-org-directory)
    "Directory to search for matching org files for agenda.")
+  (org-archive-location
+   (concat hgs-org-directory "archive/%s::datetree/")
+   "Place archivals into an organized datetree in an archive sub-directory.")
+  (org-refile-targets
+   '((nil : maxlevel . 9)
+     (org-agenda-files :maxlevel . 9))
+   "Allow us to refile to all Org files in the agenda and current buffer to an
+arbitrary depth.")
+  (org-refile-use-outline-path 'file "Show the file name as part of the outline
+path when refiling.")
+  (org-refile-allow-creating-parent-nodes 'confirm "Prompt when wanting to
+create new nodes during a refile.")
+  (org-outline-path-complete-in-steps nil "Allow us to complete the path using a
+narrowing framework.")
+  (org-log-into-drawer t "Place automatic log lines into a drawer.")
   (org-todo-keywords
    '((sequence
-      "TODO(t)" "INPROGRESS(p)" "BLOCKED(b)" ; Non-terminal states
+      "TODO(t)" "INPROGRESS(p!)" "BLOCKED(b@)" ; Non-terminal states
       "|"
-      "DONE(d)" "CANCELLED(c)")) ; Terminal states
+      "DONE(d!)" "CANCELLED(c@)")) ; Terminal states
    "Sequence of states for org-todo entries.")
   (org-capture-templates
    `(("n" "Notes" entry
       (file
        (lambda ()
          org-default-notes-file))
-      "* NOTES %? %^G\n%U" :empty-lines 1)
+      "* NOTES %? %^g\n%U" :empty-lines 1)
      ("t" "Todo" entry
       (file
        (lambda ()
          (concat org-directory "todo.org")))
-      "* TODO %? %^G\n%U" :empty-lines 1)
+      "* TODO %? %^g\n%U" :empty-lines 1)
      ("s" "Scheduled Todo" entry
       (file
        (lambda ()
          (concat org-directory "todo.org")))
-      "* TODO %? %^G\nSCHEDULED: %^t\n%U" :empty-lines 1)
+      "* TODO %? %^g\nSCHEDULED: %^t\n%U" :empty-lines 1)
      ("d" "Deadline" entry
       (file
        (lambda ()
          (concat org-directory "todo.org")))
-      "* TODO %? %^G\nDEADLINE: %^t" :empty-lines 1))
+      "* TODO %? %^g\nDEADLINE: %^t" :empty-lines 1))
    "Basic entry templates for org-capture.")
   (org-babel-load-languages
    `((awk . t)
