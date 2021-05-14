@@ -33,7 +33,7 @@
 [gpg]
     program = gpg
 [github]
-	user = hstalker
+    user = hstalker
 [filter "lfs"]
     required = true
     clean = git-lfs clean -- %f
@@ -41,3 +41,4 @@
     process = git-lfs filter-process
 [include]
     path = ~/.config/git/custom.config
+
