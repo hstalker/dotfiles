@@ -104,20 +104,66 @@ tall. This won't work as expected under daemon mode."
   :init
   (defun hgs--setup-default-fonts (frame)
     "Setup default fonts for the given frame."
-    (cl-flet ((get-font-family (lambda (font) (car font)))
-              (get-font-size (lambda (font) (cadr font))))
-      (let ((latin-font '("7x13" 12))
-            (unicode-font '("DejaVu Sans" 12)))
+    (cl-flet* ((get-font-family (lambda (font) (car font)))
+              (get-font-size (lambda (font) (cdr font)))
+              (set-font-override
+               (lambda (font-type char-set &optional add)
+                 "Override a specific region of code-points with the given font.
+
+`FONT-TYPE' should be '(NAME . SIZE), and `CHAR-SET' should be
+either a character set from `list-character-sets' or a script
+symbol from `script-representative-chars'. `ADD' can be either
+nil, 'prepend or 'append."
+                 (set-fontset-font t    ; Default font-set
+                                   char-set
+                                   (font-spec :family (get-font-family font-type)
+                                              :size (get-font-size font-type)
+                                              :slant 'normal
+                                              :weight 'normal)
+                                   frame add))))
+      (let ((latin-font '("DejaVu Sans Mono" . 12))
+            ;; These unicode fonts can be a bit small relatively speaking
+            (unicode-font '("Noto Sans Mono" . 14))
+            (emoji-font '("Noto Color Emoji" . 14))
+            (jp-font '("Source Han Sans JP" . 14))
+            (kr-font '("Noto Sans CJK KR" . 14))
+            (zh-font '("Noto Sans CJK SC" . 14)))
+        ;; HACK: For some reason, some GUI Emacs instances will use underline
+        ;; and no slant for italics. Probably something to do with my theme. To
+        ;; counter this we manually turn off underline and add italic slant.
+        (set-face-attribute 'italic frame :slant 'italic :underline nil)
+
+        ;; Set the default frame font here to our latin font. This always gets
+        ;; used before any other font in the default font-set.
         (set-face-attribute 'default frame
-                            :family (get-font-family latin-font))
-        (set-fontset-font t 'unicode
-                          (font-spec :family (get-font-family unicode-font)
-                                     :size (get-font-size unicode-font))
-                          frame)
-        (set-fontset-font t 'latin
-                          (font-spec :family (get-font-family latin-font)
-                                     :size (get-font-size latin-font))
-                          frame 'prepend))))
+                            :family (get-font-family latin-font)
+                            ;; Height is 1/10th size
+                            :height (* 10 (get-font-size latin-font))
+                            :width 'normal
+                            :weight 'normal
+                            :slant 'normal)
+
+        ;; Now we override specific Unicode character sets. Order is important.
+        ;; The earlier fonts in the font-set are preferred in the case of
+        ;; overlapping code-points (and unicode overlaps a lot around CJK).
+        ;;
+        ;; Setup emoji
+        (dolist (char-set-or-script '(symbol))
+          ;; It's the first font, so we overwrite the existing font-set by
+          ;; not passing 'append/'prepend
+          (set-font-override emoji-font char-set-or-script))
+        ;; Simplified Chinese
+        (dolist (char-set-or-script '(chinese-gbk))
+          (set-font-override zh-font char-set-or-script 'prepend))
+        ;; Korean
+        (dolist (char-set-or-script '(hangul))
+          (set-font-override kr-font char-set-or-script 'prepend))
+        ;; Japanese
+        (dolist (char-set-or-script '(cjk-misc kana japanese-jisx0213.2004-1))
+          (set-font-override jp-font char-set-or-script 'prepend))
+        ;; Unicode font as the last font in the font-set for any stragglers
+        (dolist (char-set-or-script '(unicode))
+          (set-font-override unicode-font char-set-or-script 'append)))))
 
   (defun hgs--setup-default-gui (frame)
     "Set default graphical UI for the given frame."

@@ -27,6 +27,10 @@
 ;; We don't want to use xresources for themes
 (advice-add #'x-apply-session-resources :override #'ignore)
 
+;; GTK Emacs will react to gconf settings for things like fonts by default. This
+;; turns that off.
+(define-key special-event-map [config-changed-event] 'ignore)
+
 ;; Local Variables:
 ;; coding: utf-8-unix
 ;; fill-column: 80

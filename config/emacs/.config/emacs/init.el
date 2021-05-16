@@ -22,6 +22,10 @@
 ;; Prevent GC until after init finishes
 (customize-set-variable 'gc-cons-threshold most-positive-fixnum)
 
+;; GTK Emacs will react to gconf settings for things like fonts by default. This
+;; turns that off.
+(define-key special-event-map [config-changed-event] 'ignore)
+
 (defgroup personal nil
   "Core settings for our personal configuration."
   :prefix "hgs-"
