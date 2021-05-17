@@ -1752,6 +1752,10 @@ delimiters."
 (use-package dashboard
   :demand t
 
+  ;; Don't load dashboard if we are launching Emacs with a file argument
+  :if
+  (< (length command-line-args) 2)
+
   :diminish
   dashboard-mode
   page-break-lines-mode
