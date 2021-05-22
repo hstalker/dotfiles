@@ -432,6 +432,21 @@
        :type git
        :host github
        :repo "seagle0128/doom-modeline"))
+    (straight-use-package
+     '(auth-source-pass
+       :type git
+       :host github
+       :repo "DamienCassou/auth-source-pass"))
+    (straight-use-package
+     '(password-store
+       :type git
+       :host github
+       :repo "zx2c4/password-store"))
+    (straight-use-package
+     '(pass
+       :type git
+       :host github
+       :repo "NicolasPetton/pass"))
 
     (progress-reporter-done core-packages-progress)))
 

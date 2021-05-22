@@ -1083,9 +1083,66 @@ to point."))
      "EMAIL"
      "LANG"
      "LC_ALL"
+     "PASSWORD_STORE_DIR"
      ;; User-defined variables
      )
    "All the shell variables Emacs should be attempting to source."))
+
+(use-package auth-source
+  :custom
+  (auth-sources
+   '(;; Unix Pass style password store (pass or gopass)
+     (password-store)
+     ;; PGP encryped authinfo format
+     (:source (concat (hgs-data-directory "authinfo.gpg"))))
+   "Setup my ordered list of preferred authentication sources for Emacs."))
+
+(use-package auth-source-pass
+  :if (or (executable-find "pass")
+          (executable-find "gopass"))
+
+  :after
+  auth-source
+
+  :functions
+  hgs-pass-refresh-store-directory
+
+  :config
+  (defun hgs-refresh-password-store-directory ()
+    "Refetch the store directory variable from the hosting shell environment."
+    (exec-path-from-shell-initialize)
+    (customize-set-variable 'auth-source-pass-filename
+                            (getenv "PASSWORD_STORE_DIR")))
+
+  :custom
+  (auth-source-pass-filename (getenv "PASSWORD_STORE_DIR"))
+  (auth-source-pass-port-separator
+   ":"
+   "Separator between host name and port in an entry."))
+
+(use-package password-store
+  :if (or (executable-find "pass")
+          (executable-find "gopass"))
+
+  :after
+  auth-source-pass
+
+  :custom
+  (password-store-executable
+   (if (executable-find "gopass")
+       "gopass"
+     "pass")
+   "Prefer gopass if it is available."))
+
+(use-package pass
+  :if (or (executable-find "pass")
+          (executable-find "gopass"))
+
+  :after
+  password-store
+
+  :commands
+  pass)
 
 (use-package selectrum
   :demand t
