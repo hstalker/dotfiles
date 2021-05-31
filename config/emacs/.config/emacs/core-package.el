@@ -300,6 +300,11 @@
        :host github
        :repo "abo-abo/hydra"))
     (straight-use-package
+     '(flycheck
+       :type git
+       :host github
+       :repo "flycheck/flycheck"))
+    (straight-use-package
      '(undo-tree
        :type git
        :host gitlab
@@ -425,7 +430,7 @@
        :host github
        :repo "emacs-dashboard/emacs-dashboard"))
     (straight-use-package
-     '(org-plus-contrib
+     '(org-contrib
        :includes (org)))
     (straight-use-package
      '(doom-modeline

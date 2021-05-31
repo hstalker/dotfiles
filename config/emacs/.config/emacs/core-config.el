@@ -2018,11 +2018,8 @@ partially sorted lists by length, as this ruins the sort order."))
   ;; immediately, so we must demand it.
   :demand t
 
-  :commands
-  embark-consult-preview-minor-mode
-
   :hook
-  (embark-collect-mode . embark-consult-preview-minor-mode))
+  (embark-collect-mode . embark-collect-mode-preview-minor-mode))
 
 (use-package json-mode
   :commands
