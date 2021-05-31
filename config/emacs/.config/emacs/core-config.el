@@ -2390,11 +2390,16 @@ Can be forced on by supplying >0 or t, and off via <0."
   :after
   all-the-icons
 
-  :commands
-  doom-modeline-mode
+  :demand t
 
-  :hook
-  ((window-setup-hook after-init) . doom-modeline-mode))
+  ;; Ordinarily it's recommended to setup a hook like the following, but this
+  ;; won't work for client/server Emacs.
+  ;; :hook
+  ;; (after-init . doom-modeline-mode)
+
+  :config
+  (doom-modeline-mode +1))
+
 
 ;; Local Variables:
 ;; mode: emacs-lisp
