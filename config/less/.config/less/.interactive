@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 
+# Set less as the default pager
+PAGER='less'
+
 alias rless='less -r' # Allow control codes in input (e.g. colours)
 

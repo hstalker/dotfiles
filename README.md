@@ -224,6 +224,9 @@ It should go in `login` if:
   should be preferably place within a `[0-9]+-*.conf` formatted file under
   `${XDG_CONFIG_HOME}/environment.d` so that they are correctly available to
   both systemd services and GUI applications even under Wayland sessions.
+  However, if the environment variable is only meant to be used interactively
+  within a terminal, you should prefer the `.interactive` mechanism for
+  setting that variable (as a non-export).
 * It needs to occur on initial login (e.g. display machine information).
 
 It should go in `logout` if:
