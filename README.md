@@ -46,16 +46,13 @@ The aim is to:
 
 Unfortunately I require the ability to stow or symlink configuration files on
 various Linux distros, so my dotfiles themselves are kept in a form making that
-easy. Current plans are to move to a NixOS configuration, and use these
-dotfiles as-is via home-manager. If the requirement of supporting other distros
+easy. If the requirement of supporting other distros
 (and shells for that matter) could be dropped, it is likely that this could be
 made considerably simpler, alas the world isn't so simple.
 
 ## Future Goals
 * Try to move Vim plug usage to support an automated lockfile mechanism for
   pinning.
-* Consider move to NixOS on all my systems, whilst maintaining near full
-  stowability of dotfiles to non-Nix systems.
 
 ## Prerequisites
 * Git (to clone this repo somewhere local).
@@ -109,9 +106,11 @@ Currently includes some configuration for the following pieces of software:
   * Haskell
     * Stack - Package management & build tool
   * Java
+    * Java - The runtime itself
     * Gradle - Build tool
   * Javascript
     * NPM - Package management
+    * Node - Javascript framework/environment
   * Python
     * IPython - Interpreter
     * Jupyter - Jupyter notebooks
