@@ -366,6 +366,19 @@ require_source() {
   fi
 }
 
+# Determine whether we are running under a particular session type
+is_session() (
+  if [ $# != 1 ]; then
+    report_error "USAGE: is_session MATCH-STR"
+  fi
+
+  if echo "$XDG_SESSION_TYPE" | grep -iq "${1}"; then
+    return 0
+  else
+    return 1
+  fi
+)
+
 # Are we on a Systemd machine? This changes how we have to handle things.
 # There are a bunch of ways of doing this, but this is how `sd_booted()` works
 # in systemd itself.
@@ -389,17 +402,32 @@ load_user_systemd_environment_d() {
   if [ $# -gt 1 ]; then
     report_error "Usage: load_user_systemd_environment_d [ENVIRONMENT-D-PATH]"
   fi
-  report_status "Loading systemd environment.d settings from \
-'${1:-$XDG_CONFIG_HOME}/environment.d/'..."
-  for ENV_SCRIPT in "${1:-$XDG_CONFIG_HOME}/environment.d/*"; do
-    if [ -r "$ENV_SCRIPT" ]; then
-      report_status "Loading '${ENV_SCRIPT}'..."
-      push_set_state
-      set -a
-      try_source "$ENV_SCRIPT"
-      pop_set_state
-    fi
-  done
+  if ! has_systemd; then
+    # This is a very hacky approach to loading the environment conf files. We
+    # cannot guarantee that all files are correct shell-like default format.
+    _ENV_SCRIPT_DIR="${1:-${XDG_CONFIG_HOME:-${HOME}/.config}/environment.d}"
+    report_status \
+      "Loading systemd environment.d settings from '${_ENV_SCRIPT_DIR}/'..."
+    for _ENV_SCRIPT in "${_ENV_SCRIPT_DIR}"/*; do
+      if [ -r "$_ENV_SCRIPT" ]; then
+        report_status "Loading '${_ENV_SCRIPT}'..."
+        push_set_state
+        set -a
+        # The systemd environment generator uses a slightly different syntax to
+        # POSIX bourne shells here (it isn't actually a subset!), so we need to
+        # replace $$ with \$. There may be other areas of differences.
+        eval "$(cat "${_ENV_SCRIPT}" | sed 's/\$\$/\\\$/g')"
+        pop_set_state
+      fi
+    done
+  else
+    report_status "Loading systemd environment.d settings via systemd..."
+    # We will use `systemctl --user show-environment` for export
+    push_set_state
+    set -a
+    eval "$(systemctl --user show-environment)"
+    pop_set_state
+  fi
 
   return 0
 }

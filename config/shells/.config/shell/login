@@ -4,48 +4,16 @@
 # Must be Posix shell compatible.
 
 ###############################################################################
-# Setting up environment variables and PATH
-# Personal information
-assign_export GITHUB_NAME 'Hector Stalker'
-assign_export GITHUB_EMAIL '1683065+hstalker@users.noreply.github.com'
-assign_export NAME "$GITHUB_NAME"
-assign_export EMAIL "$GITHUB_EMAIL"
 
-# Use Nano as a sane default alternative editor
-assign_export ALTERNATE_EDITOR 'nano'
-
-# Base keyboard layout, language & locale
-assign_export KEYBOARD_LAYOUT "us"
-assign_export LANG "en_US.UTF-8"
-assign_export LANGUAGE ""
-assign_export LC_CTYPE "$LANG"
-assign_export LC_NUMERIC "$LANG"
-assign_export LC_TIME "$LANG"
-assign_export LC_COLLATE "$LANG"
-assign_export LC_MONETARY "$LANG"
-assign_export LC_MESSAGES "$LANG"
-assign_export LC_PAPER "$LANG"
-assign_export LC_NAME "$LANG"
-assign_export LC_ADDRESS "$LANG"
-assign_export LC_TELEPHONE "$LANG"
-assign_export LC_MEASUREMENT "$LANG"
-assign_export LC_IDENTIFICATION "$LANG"
-assign_export LC_ALL ""
-
-# Set all the XDG path vars
-assign_export XDG_DATA_HOME "${XDG_DATA_HOME:-$HOME/.local/share}"
-assign_export XDG_CONFIG_HOME "${XDG_CONFIG_HOME:-$HOME/.config}"
-assign_export XDG_CACHE_HOME "${XDG_CACHE_HOME:-$HOME/.cache}"
-# Shouldn't set this ourselves as systemd sets it up
-#assign_export XDG_RUNTIME_DIR "${XDG_RUNTIME_DIR:-/run/user/$UID}"
-assign_export XDG_DATA_DIRS "${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
-assign_export XDG_CONFIG_DIRS "${XDG_CONFIG_DIRS:-/etc/xdg}"
-
-# Path settings
-# Local installation overrides should be prioritized
-path_prepend "$HOME/.local/bin" PATH
-path_prepend "$HOME/.local/lib" LD_LIBRARY_PATH
-path_prepend "$HOME/.local/include" CPATH
+# Manually load environment.d user-global environment variables if systemd is
+# not present or we are running under a TTY. If we're running under a TTY then
+# we want to fresh load all the environment variables on each login shell (in
+# order to make the initial login shell work properly if dependent on these
+# variables, as the systemd user session appears to be loaded *after* the
+# initial shell)
+if ! has_systemd || is_session tty; then
+  silence_output load_user_systemd_environment_d
+fi
 
 # Making sure the current directory isn't in PATH for security & weirdness
 # reasons.

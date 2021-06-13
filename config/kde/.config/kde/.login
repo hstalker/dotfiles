@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export KDEHOME "${XDG_CONFIG_HOME:-$HOME/.config}/kde"
-
+silence_output assert_directory "${KDEHOME}"

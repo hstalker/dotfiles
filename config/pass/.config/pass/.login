@@ -1,5 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export PASSWORD_STORE_DIR \
-  "${XDG_DATA_HOME:-$HOME/.local/share}/pass"
-
+silence_output assert_directory "${PASSWORD_STORE_DIR}"

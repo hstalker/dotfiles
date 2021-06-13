@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export RUSTUP_HOME "${XDG_DATA_HOME:-$HOME/.local/share}/rustup"
-
+silence_output assert_directory "${RUSTUP_HOME}"

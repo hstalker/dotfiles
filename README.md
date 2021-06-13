@@ -220,7 +220,10 @@ shells load `login`, interactive shells run `interactive`, and login shells run
 
 Generally the following rules of thumb apply:
 It should go in `login` if:
-* It's an exported variable/function.
+* It's an exported variable/function. Note that many user session variables
+  should be preferably place within a `[0-9]+-*.conf` formatted file under
+  `${XDG_CONFIG_HOME}/environment.d` so that they are correctly available to
+  both systemd services and GUI applications even under Wayland sessions.
 * It needs to occur on initial login (e.g. display machine information).
 
 It should go in `logout` if:

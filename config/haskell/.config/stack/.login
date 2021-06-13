@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export STACK_ROOT "${XDG_DATA_HOME:-$HOME/.local/share}/stack"
-
+silence_output assert_directory "${STACK_ROOT}"

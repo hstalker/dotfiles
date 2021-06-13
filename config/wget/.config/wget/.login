@@ -1,4 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export WGETRC "${XDG_CONFIG_HOME:-$HOME/.config}/wget/wgetrc"
-
+silence_output assert_directory "$(dirname "${WGETRC}")"

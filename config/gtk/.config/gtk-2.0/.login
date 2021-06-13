@@ -1,5 +1,3 @@
 #!/usr/bin/env sh
 
-assign_export GTK2_RC_FILES \
-  "${XDG_CONFIG_HOME:-$HOME/.config}/gtk-2.0/gtkrc"
-
+silence_output assert_directory "$(dirname "${GTK2_RC_FILES}")"
