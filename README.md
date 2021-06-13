@@ -90,11 +90,12 @@ Currently includes some configuration for the following pieces of software:
   * Vagrant - Virtualization
   * WGet - Fetch files over the internet
   * Xorg utilities - Sets up XDG compatible paths for X software
-* Desktop tooling
+* User & desktop applications
   * MPV - Media player that knocks the socks off of the competition
   * WINE - Windows emulation layer
   * Redshift - Monitor time/location-based color temperature adjustments
   * Mozc - Open Google IME-based input method
+  * Weechat - Terminal IRC client
 * Desktop environments (Not enabled by default)
   * Sway/Wofi/Waybar/Swaylock/Swaybg/Mako - Tiling Wayland native desktop
     environment.
