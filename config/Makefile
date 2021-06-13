@@ -44,6 +44,7 @@ PACKAGES ?= shells \
 	redshift \
 	mozc \
 	weechat \
+	zoom \
 	sway \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \

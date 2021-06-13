@@ -96,6 +96,7 @@ Currently includes some configuration for the following pieces of software:
   * Redshift - Monitor time/location-based color temperature adjustments
   * Mozc - Open Google IME-based input method
   * Weechat - Terminal IRC client
+  * Zoom - Video conferencing (all the rage after the 2020-21 pandemic)
 * Desktop environments (Not enabled by default)
   * Sway/Wofi/Waybar/Swaylock/Swaybg/Mako - Tiling Wayland native desktop
     environment.
