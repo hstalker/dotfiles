@@ -194,14 +194,12 @@ enabled."))
   (normal-top-level-add-to-load-path '("."))
   (normal-top-level-add-subdirs-to-load-path))
 
-(defun load-if-exists (file-path &optional noerror nomessage nosuffix
-                                 must-suffix)
-  "Load file at `FILE-PATH' if it exists.
+(defmacro load-if-exists (file-path &optional nomessage nosuffix must-suffix)
+  "Load file at `FILE-PATH' if it exists. Mainly just for clarity
 
-This passes through the passed `NOERROR', `NOMESSAGE', `NOSUFFIX' and
-`MUST-SUFFIX' to the underlying load call as one might expect."
-  (when (file-exists-p file-path)
-    (load file-path noerror nomessage nosuffix must-suffix)))
+This passes through the passed `NOSUFFIX' and `MUST-SUFFIX' to the underlying
+load call as one might expect."
+  `(load ,file-path 'noerror ,nomessage ,nosuffix ,must-suffix))
 
 ;; Load the core package management primitives we use
 (load (concat hgs-config-directory "lisp/minmacs")
