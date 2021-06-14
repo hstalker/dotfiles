@@ -706,10 +706,18 @@ American English."))
     "Disables whitespace mode in erc buffers, as it causes issues."
     (whitespace-mode -1))
 
+  (defun hgs--erc-save-buffers-to-logs (&optional _)
+    "Auto saves erc buffers to their log files when exiting emacs."
+    (save-some-buffers t (lambda (&optional _)
+                           (when (eq major-mode 'erc-mode)
+                             t))))
+
   :config
   (add-to-list 'erc-modules 'notifications) ;; Enable notifications
   (add-to-list 'erc-modules 'spelling) ;; Enable spelling corrections
   (erc-update-modules)
+
+  (advice-add #'save-buffers-kill-emacs :before #'hgs--erc-save-buffers-to-logs)
 
   :custom
   (erc-nick user-login-name "Default nick.")
@@ -744,8 +752,13 @@ American English."))
   :after
   erc
 
+  :functions
+  erc-autojoin-mode
+  erc-autojoin-enable
+  erc-autojoin-disable
+
   :hook
-  (erc-mode . erc-autojoin-mode)
+  (erc-mode . erc-autojoin-enable)
 
   :custom
   (erc-autojoin-channels-alist
@@ -756,8 +769,13 @@ American English."))
   :after
   erc
 
+  :functions
+  erc-fill-mode
+  erc-fill-enable
+  erc-fill-disable
+
   :hook
-  (erc-mode . erc-fill-mode)
+  (erc-mode . erc-fill-enable)
 
   :custom
   (erc-fill-column
@@ -774,8 +792,13 @@ American English."))
   :after
   erc
 
+  :functions
+  erc-match-mode
+  erc-match-enable
+  erc-match-disable
+
   :hook
-  (erc-mode . erc-match-mode)
+  (erc-mode . erc-match-enable)
 
   :custom
   (erc-pals '() "Pals to highlight.")
@@ -787,8 +810,13 @@ American English."))
   :after
   erc
 
+  :functions
+  erc-track-mode
+  erc-track-enable
+  erc-track-disable
+
   :hook
-  (erc-mode . erc-track-mode)
+  (erc-mode . erc-track-enable)
 
   :custom
   (erc-track-enable-keybindings
@@ -817,30 +845,102 @@ buffers).")
   :after
   erc
 
+  :functions
+  erc-ring-mode
+  erc-ring-enable
+  erc-ring-disable
+
   :hook
-  (erc-mode . erc-ring-mode))
+  (erc-mode . erc-ring-enable))
 
 ;; Hides mode changes from the servers
 (use-package erc-netsplit
   :after
   erc
 
+  :functions
+  erc-netsplit-mode
+  erc-netsplit-enable
+  erc-netsplit-disable
+
   :hook
-  (erc-mode . erc-netsplit-mode))
+  (erc-mode . erc-netsplit-enable))
 
 ;; Performs logging of channels
 (use-package erc-log
   :after
   erc
 
+  :functions
+  erc-log-mode
+  erc-log-enable
+  erc-log-disable
+
+  :hook
+  (((erc-mode) . erc-log-enable))
+
+  :init
+  (defcustom hgs-erc-log-channels-directory
+    (file-name-as-directory (concat hgs-data-directory "erc/logs"))
+    "Base directory path for placing erc logs."
+    :type 'directory
+    :group 'personal)
+
+  (defcustom hgs-erc-log-auto-create-directories
+    t
+    "Whether we should automatically create needed directories for erc log
+files."
+    :type '(choice (const :tag "Yes" t)
+                   (const :tag "No" nil)
+                   (const :tag "Ask" 'ask))
+    :group 'personal)
+
+  (defun hgs--erc-compute-log-channels-directory (_buffer
+                                                  target nick server
+                                                  _port)
+    "This computes a path to logs for a specific nick, server and channel.
+This results in a path based off of `hgs-erc-log-channels-directory', matching
+the pattern of $nick/$server/$channel/."
+    (let* ((channel (if target
+                        target
+                      "server-channel"))
+           (directory
+            (file-name-as-directory
+             (concat hgs-erc-log-channels-directory
+                     (format "%s/%s/%s" nick server channel)))))
+      ;; We need to prompt to create the directory if it doesn't exist
+      (cond
+       ;; Prompt
+       ((equal hgs-erc-log-auto-create-directories 'ask)
+        (when (and (not (file-directory-p directory))
+                   (yes-or-no-p (format "Create directory `%s' for logs?"
+                                        directory)))
+          (make-directory directory 'create-parents)))
+       ;; Just do it quietly if true
+       (hgs-erc-log-auto-create-directories
+        (make-directory directory 'create-parents))
+       (t (message "Missing directory for logs on %s with nick %s on server %s"
+                   target nick server)))
+      directory))
+
+  (defun hgs--erc-generate-log-file-name (_buffer _target _nick _server _port)
+    "This function computes a short log file name.
+The name of the log file is composed of nick current date."
+    (convert-standard-filename
+     (concat (format-time-string "%Y-%m-%d") ".log")))
+
   :custom
+  (erc-log-channels-directory
+   #'hgs--erc-compute-log-channels-directory
+   "Where to place the log files. Dynamically compute based on channel
+information.")
+  (erc-generate-log-file-name-function
+   #'hgs--erc-generate-log-file-name
+   "Use a minimal date format for the log files themselves.")
   (erc-log-insert-log-on-open
    t
    "Show log file up until now for the channel on open.")
   (erc-log-channels t "Log channel contents to disk.")
-  (erc-log-channels-directory
-   (concat hgs-data-directory "erc/logs")
-   "Where to place the log files.")
   (erc-log-write-after-send t "Save log file on send.")
   (erc-log-write-after-insert
    t
@@ -852,6 +952,14 @@ buffers).")
   :after
   erc
 
+  :functions
+  erc-stamp-mode
+  erc-stamp-enable
+  erc-stamp-disable
+
+  :hook
+  (((erc-mode) . erc-stamp-enable))
+
   :custom
   (erc-hide-timestamps nil "Timestamps should be visible.")
   (erc-timestamp-format "[%Y-%m-%d %H:%M:%S]" "How to present timestamps."))
@@ -860,6 +968,14 @@ buffers).")
 (use-package erc-truncate
   :after
   erc
+
+  :functions
+  erc-truncate-mode
+  erc-truncate-enable
+  erc-truncate-disable
+
+  :hook
+  (((erc-mode) . erc-truncate-enable))
 
   :custom
   (erc-max-buffer-size 30000 "Truncate buffers so they don't hog core.")
@@ -879,8 +995,13 @@ buffers).")
   :after
   erc
 
+  :functions
+  erc-services-mode
+  erc-services-enable
+  erc-services-disable
+
   :hook
-  (erc-mode . erc-services-mode)
+  (erc-mode . erc-services-enable)
 
   :custom
   (erc-prompt-for-password
