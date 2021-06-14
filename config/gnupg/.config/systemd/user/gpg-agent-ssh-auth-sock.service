@@ -1,0 +1,9 @@
+[Unit]
+Description=Set the SSH_AUTH_SOCK environment variable in systemd session to use GnuPG agent
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "/usr/bin/systemctl --user set-environment SSH_AUTH_SOCK=\"$(gpgconf --list-dirs agent-ssh-socket)\""
+
+[Install]
+WantedBy=default.target
