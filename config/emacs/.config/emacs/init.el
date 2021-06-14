@@ -140,6 +140,46 @@ the frame being created as an argument."
 
 (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
 
+;; Make TLS settings sensible. Emacs is basically a giant insecure lisp REPL. We
+;; do it here, because we want this setup before we do *anything* else
+;; significant - especially loading packages.
+(when (gnutls-available-p)
+  (require 'gnutls)
+  (customize-set-variable 'gnutls-verify-error t
+                          "Always verify on error.")
+  (customize-set-variable 'gnutls-min-prime-bits 3072
+                          "A sensible number for security.")
+  (customize-set-variable
+   'gnutls-algorithm-priority
+   (concat "SECURE192:+SECURE128:-VERS-ALL"
+           (if (and (version< "26.3" emacs-version)
+                    (>= libgnutls-version 30605)
+                    (not hgs-is-windows))
+               ;; Use TLS 1.3 if GnuTLS is both available and high enough
+               ;; version
+               ":+VERS-TLS1.3"
+             ;; Otherwise fallback to 1.2
+             ":+VERS-TLS1.2")))
+  "Set a relatively secure default priority list of cipher algorithms.")
+;; Non-GnuTLS path - Note that `tls' is deprecated, so this may no longer work
+;; in future versions
+(when (require 'tls nil 'noerror)
+  (customize-set-variable 'tls-checktrust t
+                          "We should accept un-trusted certificates.")
+  (customize-set-variable
+   'tls-program
+   '(;; Emacs will use gnutls by default if built with it, but we prefer openssl
+     ;; when it isn't.
+     "openssl s_client -connect %h:%p -CAfile %t -nbio -no_ssl3 -no_tls1 \
+-no_tls1_1 -ign_eof"
+     ;; Use gnutls if we can't use openssl
+     "gnutls-cli -p %p --dh-bits=3072 --ocsp -x509cafile=%t --strict-tofu \
+--priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3' %h"
+     ;; If all else fails...
+     "gnutls-cli -p %p %h")
+   "Sensible TLS program invocations (in-order of priority) when GnuTLS isn't
+enabled."))
+
 ;; Chnage the built-in init directories for old emacs versions using ~/.emacs
 (setq user-init-file load-file-name)
 (setq user-emacs-directory hgs-config-directory)
