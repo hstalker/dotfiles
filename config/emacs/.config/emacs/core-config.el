@@ -690,6 +690,202 @@ history etc.)")
    "Change the default lookup mode for performance, and force language to
 American English."))
 
+(use-package erc
+  :hook
+  (erc-mode . hgs--erc-disable-whitespace-mode)
+  ;; Default to readonly when joining a channel to prevent fat fingering by
+  ;; default
+  (erc-join . read-only-mode)
+
+  :init
+  (defun hgs--erc-disable-whitespace-mode ()
+    "Disables whitespace mode in erc buffers, as it causes issues."
+    (whitespace-mode -1))
+
+  :config
+  (add-to-list 'erc-modules 'notifications) ;; Enable notifications
+  (add-to-list 'erc-modules 'spelling) ;; Enable spelling corrections
+  (erc-update-modules)
+
+  :custom
+  (erc-nick user-login-name "Default nick.")
+  (erc-user-full-name erc-nick "Full real name of the user.")
+  (erc-email-userid erc-nick "Email of the user.")
+  (erc-nick-uniquifier
+   "_"
+   "Use trailing underscores for nicks that are already taken.")
+  (erc-join-buffer
+   'bury
+   "Don't bring channel buffers to the forefront when they appear.")
+  (erc-hide-list
+   '()
+   "Don't hide anything by default.")
+  (erc-lurker-hide-list
+   '("JOIN"
+     "PART"
+     "QUIT")
+   "Hide status changes for lurkers.")
+  (erc-lurker-threshold-time
+   (* 60 (* 60 (* 24)))
+   "Class anyone inactive for 24 hours as a lurker.")
+  (erc-debug-log-file
+   (concat hgs-data-directory "erc/debug.log")
+   "Relocate the erc debug log file somewhere more sensible.")
+  (erc-send-whitespace-lines
+   nil
+   "Don't send lines only consisting of whitespace."))
+
+;; Manages joining channels (both manually and automatically)
+(use-package erc-join
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-autojoin-mode)
+
+  :custom
+  (erc-autojoin-channels-alist
+   '()
+   "AList of server -> channel list to auto-join on connection."))
+
+(use-package erc-fill
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-fill-mode)
+
+  :custom
+  (erc-fill-column
+   fill-column
+   "Set ERC fill column to be the same as everywhere else.")
+  (erc-fill-function 'erc-fill-variable "Use variable filling")
+  (erc-fill-prefix
+   (make-string (erc-timestamp-offset) ? )
+   "Prefix wrapping with enough spaces to be just past the timestamp
+(aligning with nicks)."))
+
+;; Highlights or hides messages matching certain patterns
+(use-package erc-match
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-match-mode)
+
+  :custom
+  (erc-pals '() "Pals to highlight.")
+  (erc-fools '() "Fools to ignore.")
+  (erc-keywords '() "Keywords to track."))
+
+;; Tracks active erc buffers
+(use-package erc-track
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-track-mode)
+
+  :custom
+  (erc-track-enable-keybindings
+   t
+   "Use track mode keybindings (e.g. C-c SPC for jumping between IRC
+buffers).")
+  (erc-track-visibility
+   'visible
+   "Consider all actually visible frames as containing visible buffers.")
+  (erc-track-exclude
+   '()
+   "Channels to exclude from tracking.")
+  (erc-track-exclude-types
+   '("JOIN"
+     "NICK"
+     "QUIT"
+     "MODE"
+     "AWAY")
+   "Types of messages to exclude")
+  (erc-track-exclude-server-buffer
+   t
+   "Don't track anything in the server buffer."))
+
+;; Stores previous commands/text in a ring available for recall via M-p/M-n
+(use-package erc-ring
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-ring-mode))
+
+;; Hides mode changes from the servers
+(use-package erc-netsplit
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-netsplit-mode))
+
+;; Performs logging of channels
+(use-package erc-log
+  :after
+  erc
+
+  :custom
+  (erc-log-insert-log-on-open
+   t
+   "Show log file up until now for the channel on open.")
+  (erc-log-channels t "Log channel contents to disk.")
+  (erc-log-channels-directory
+   (concat hgs-data-directory "erc/logs")
+   "Where to place the log files.")
+  (erc-log-write-after-send t "Save log file on send.")
+  (erc-log-write-after-insert
+   t
+   "Save log file when new text appears in the buffer.")
+  (erc-save-buffer-on-part t "Save log file when leaving a channel."))
+
+;; Manages timestamps
+(use-package erc-stamp
+  :after
+  erc
+
+  :custom
+  (erc-hide-timestamps nil "Timestamps should be visible.")
+  (erc-timestamp-format "[%Y-%m-%d %H:%M:%S]" "How to present timestamps."))
+
+;; Keeps the erc buffers to a manageable size
+(use-package erc-truncate
+  :after
+  erc
+
+  :custom
+  (erc-max-buffer-size 30000 "Truncate buffers so they don't hog core.")
+  (erc-truncate-buffer-on-save
+   nil
+   "Don't truncate the erc buffer after saving to log file."))
+
+(use-package erc-backend
+  :after
+  erc
+
+  :custom
+  (erc-server-reconnect-attempts 5 "Try up to 5 times to reconnect.")
+  (erc-server-reconnect-timeout 3 "Timeout after 3 minutes."))
+
+(use-package erc-services
+  :after
+  erc
+
+  :hook
+  (erc-mode . erc-services-mode)
+
+  :custom
+  (erc-prompt-for-password
+   nil
+   "We don't want to prompt, instead we should use an auth-source.")
+  (erc-prompt-for-nickserv-password
+   nil
+   "We don't want to prompt, instead we should always use an auth-source."))
+
 (use-package url
   :custom
   (url-cache-directory
@@ -1089,12 +1285,12 @@ to point."))
    "All the shell variables Emacs should be attempting to source."))
 
 (use-package auth-source
+  :demand t
+
   :custom
   (auth-sources
-   '(;; Unix Pass style password store (pass or gopass)
-     (password-store)
-     ;; PGP encryped authinfo format
-     (:source (concat (hgs-data-directory "authinfo.gpg"))))
+   `(;; PGP encryped authinfo format
+     (:source ,(concat hgs-data-directory "authinfo.gpg")))
    "Setup my ordered list of preferred authentication sources for Emacs."))
 
 (use-package auth-source-pass
@@ -1114,11 +1310,15 @@ to point."))
     (customize-set-variable 'auth-source-pass-filename
                             (getenv "PASSWORD_STORE_DIR")))
 
+  ;; Adds auth source to list
+  (auth-source-pass-enable)
+
   :custom
   (auth-source-pass-filename (getenv "PASSWORD_STORE_DIR"))
   (auth-source-pass-port-separator
    ":"
    "Separator between host name and port in an entry."))
+
 
 (use-package password-store
   :if (or (executable-find "pass")
@@ -2461,6 +2661,10 @@ Can be forced on by supplying >0 or t, and off via <0."
 
   :config
   (doom-modeline-mode +1))
+
+(use-package erc-hl-nicks
+  :after
+  erc)
 
 
 ;; Local Variables:

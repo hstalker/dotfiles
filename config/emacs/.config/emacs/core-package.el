@@ -452,6 +452,11 @@
        :type git
        :host github
        :repo "NicolasPetton/pass"))
+    (straight-use-package
+     '(erc-hl-nicks
+       :type git
+       :host github
+       :repo "leathekd/erc-hl-nicks"))
 
     (progress-reporter-done core-packages-progress)))
 
