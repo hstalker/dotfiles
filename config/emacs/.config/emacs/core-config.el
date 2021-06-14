@@ -962,7 +962,11 @@ information.")
 
   :custom
   (erc-hide-timestamps nil "Timestamps should be visible.")
-  (erc-timestamp-format "[%Y-%m-%d %H:%M:%S]" "How to present timestamps."))
+  (erc-timestamp-only-if-changed-flag nil "Always insert timestamp")
+  (erc-insert-timestamp-function
+   #'erc-insert-timestamp-left
+   "Put timestamps on the left.")
+  (erc-timestamp-format "[%H:%M:%S]" "How to present timestamps."))
 
 ;; Keeps the erc buffers to a manageable size
 (use-package erc-truncate
