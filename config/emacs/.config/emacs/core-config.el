@@ -691,6 +691,10 @@ history etc.)")
 American English."))
 
 (use-package erc
+  :functions
+  erc
+  erc-tls
+
   :hook
   (erc-mode . hgs--erc-disable-whitespace-mode)
   ;; Default to readonly when joining a channel to prevent fat fingering by
