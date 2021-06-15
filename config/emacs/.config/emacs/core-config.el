@@ -690,6 +690,23 @@ history etc.)")
    "Change the default lookup mode for performance, and force language to
 American English."))
 
+(use-package epa
+  :hook
+  (((find-file) . hgs--epa-inhibit-backups))
+
+  :init
+  (defun hgs--epa-inhibit-backups ()
+    "Inhibit backups when operating on encrypted files."
+    (when (and buffer-file-name
+               (string-match epa-file-name-regexp buffer-file-name))
+        (message "Backup inhibited for this file `%s'." buffer-file-name)
+        (setq-local backup-inhibited t)))
+
+  :custom
+  (epa-file-inhibit-auto-save
+   t
+   "Don't autosave when operating on encrypted files."))
+
 (use-package erc
   :functions
   erc
@@ -711,6 +728,17 @@ American English."))
     (save-some-buffers t (lambda (&optional _)
                            (when (eq major-mode 'erc-mode)
                              t))))
+
+  (defun hgs-erc-current-network-name (&optional buffer-to-check)
+    "Returns network name (not necessarily server).
+Will use the current buffer unless `BUFFER-TO-CHECK' is non-nil,
+in which case it will be used."
+    (let ((channel-buffer (or buffer-to-check (current-buffer))))
+      (with-current-buffer channel-buffer
+        (or (and (fboundp 'erc-network-name) (erc-network-name))
+            (erc-shorten-server-name
+             (or erc-server-announced-name
+                 erc-session-server))))))
 
   :config
   (add-to-list 'erc-modules 'notifications) ;; Enable notifications
@@ -745,7 +773,13 @@ American English."))
    "Relocate the erc debug log file somewhere more sensible.")
   (erc-send-whitespace-lines
    nil
-   "Don't send lines only consisting of whitespace."))
+   "Don't send lines only consisting of whitespace.")
+  (erc-rename-buffers
+   t
+   "Rename server buffers with network name instead of
+server:port where possible. This is particularly useful for
+bouncers, where you'll have multiple server buffers for different
+networks, but they'll appear as the same server to the client."))
 
 ;; Manages joining channels (both manually and automatically)
 (use-package erc-join
