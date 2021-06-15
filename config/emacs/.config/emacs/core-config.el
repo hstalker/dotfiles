@@ -2823,7 +2823,27 @@ Can be forced on by supplying >0 or t, and off via <0."
   ;; (after-init . doom-modeline-mode)
 
   :config
-  (doom-modeline-mode +1))
+  (doom-modeline-mode +1)
+
+  ;; Doom-modeline can cover up the bottom row of which-key sometimes when using
+  ;; side-windows, so this is a hack to fix that by adding a superfluous row.
+  ;; Remove when no longer necessary.
+  (with-eval-after-load 'which-key
+    (defun hgs--add-additional-which-key-line (fn &rest tail)
+      "Adds an additional line to the display height of which-key popups."
+      (let ((additional-lines 3))
+        (progn
+          (apply fn
+                 `(,(cons (+ additional-lines
+                             (caar tail))
+                          (cdar tail)))))))
+    (when-let ((which-key-display-fns
+                (pcase which-key-popup-type
+                  ('side-window '(which-key--show-buffer-side-window)))))
+      (mapc #'(lambda (display-fn)
+                (advice-add display-fn :around
+                            #'hgs--add-additional-which-key-line))
+            which-key-display-fns))))
 
 (use-package erc-hl-nicks
   :after
