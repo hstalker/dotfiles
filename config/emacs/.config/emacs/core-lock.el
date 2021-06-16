@@ -10,6 +10,7 @@
  ("cmake-mode" . "d5d77de8c4c69e348b182eeb30222b2f1ba8db7b")
  ("company-mode" . "b7120176b8107048a32e9083e48acd8abec2c20c")
  ("consult" . "f1ae2244da20702525fe2991076322b9c6b34202")
+ ("consult-flycheck" . "92b259e6a8ebe6439f67d3d7ffa44b7e64b76478")
  ("consult-lsp" . "12989949cc21a1173206f688d56a1e798073a4c3")
  ("csv-mode" . "a95d748a98af51bf5ebb3848f4b5251f6f0f9562")
  ("dap-mode" . "cc395e066755c7513d4862f5639f3d162b3bd30f")

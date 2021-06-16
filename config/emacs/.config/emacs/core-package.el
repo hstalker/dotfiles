@@ -363,7 +363,7 @@
      '(consult-flycheck
        :type git
        :host github
-       :repo "minad/consult"))
+       :repo "minad/consult-flycheck"))
     (straight-use-package
      '(lsp-mode
        :type git
