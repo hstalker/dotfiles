@@ -7,12 +7,14 @@
     a = add
     s = status
     l = log
+    sl = shortlog
     ci = commit
     co = checkout
     br = branch
     ps = push
     pl = pull
     plff = pull --ff-only
+    f = fetch
     df = diff
     dt = difftool
     cl = clone
