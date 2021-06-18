@@ -376,16 +376,6 @@ function! core#PluginDisable(name)
   endif
 endfunction
 
-" Pin a plugin in the delay load registry to a specific commit SHA
-function! core#PluginPin(name, commit_hash)
-  " Check if plugin name exists, error if doesn't
-  if has_key(g:plugin_registry, a:name)
-    let g:plugin_registry[a:name]['commit'] = a:commit_hash
-  else
-    echom 'Attempted to pin to commit hash unknown plugin: ' . a:name
-  endif
-endfunction
-
 " Run an action after an update occurs (e.g. compile a module)
 function! core#PluginPostUpdateHook(name, operation)
   " Check if plugin name exists, error if doesn't
@@ -393,15 +383,6 @@ function! core#PluginPostUpdateHook(name, operation)
     let g:plugin_registry[a:name]['do'] = a:operation
   else
     echom 'Attempted to add post update hook to unknown plugin: ' . a:name
-  endif
-endfunction
-
-" Unpin a previously pinned plugin in the delay load registry
-function! core#PluginUnpin(name)
-  if has_key(g:plugin_registry, a:name)
-    remove(g:plugin_registry[a:name], 'commit')
-  else
-    echom 'Attempted to unpin unknown plugin: ' . a:name
   endif
 endfunction
 

@@ -51,8 +51,7 @@ easy. If the requirement of supporting other distros
 made considerably simpler, alas the world isn't so simple.
 
 ## Future Goals
-* Try to move Vim plug usage to support an automated lockfile mechanism for
-  pinning.
+* None currently
 
 ## Prerequisites
 * Git (to clone this repo somewhere local).
@@ -306,7 +305,9 @@ order of these scripts is as follows:
 * `$XDG_CONFIG_HOME/vim/core.vim`
 * If not minimal mode:
   * `$XDG_CONFIG_HOME/vim/plugin.vim`
+  * `$XDG_CONFIG_HOME/vim/lock.vim`
   * `$XDG_CONFIG_HOME/vim/custom.plugin.vim`
+  * `$XDG_CONFIG_HOME/vim/custom.lock.vim`
 * `$XDG_CONFIG_HOME/vim/custom.config.vim`
 
 #### General Configuration
@@ -324,9 +325,6 @@ are:
 * `core#PluginPostUpdateHook(name, action)`, where `action` is a string of
   either a colon prefixed vim command, or a shell command.
 * `core#PluginDisable(name)`
-* `core#PluginPin(name, commit_hash)`, where the hash is the specific commit
-  hash desired to pin to (can be both long or short).
-* `core#PluginUnpin(name)`
 
 Local machine configuration additions (including configuration for plugins
 specified in custom.plugin.vim) should be placed in
@@ -336,17 +334,17 @@ specified in custom.plugin.vim) should be placed in
 
 Typically our core vim functions for configuration are prefixed by `core#`.
 
+Package pinning and overrides are managed via vim-plug snapshots source from
+`$XDG_CONFIG_HOME/vim/lock.vim` and `$XDG_CONFIG_HOME/vim/custom.lock.vim`,
+loaded during `plugin.vim`.
+
 ##### Example: Custom Per-Install Overrides
 An example `custom.plugin.vim`:
 ```vimscript
 " Disable the auto-save plugin because it causes issues on our machine
 core#PluginDisable('907th/vim-auto-save')
-" Allow vim-plug to grab the latest commit in master of vim-airline
-core#PluginUnpin('vim-airline/vim-airline')
-" We want syntax support for more languages because we use them on this machine
+" Add polyglot locally
 core#PluginAdd('vim-polyglot')
-" We want to use this known, working commit for vim-polyglot
-core#PluginPin('vim-polyglot', '9c3c0bc082e0d58d15dc6f24d8a335931417e2f0')
 ```
 
 An example `custom.config.vim`:

@@ -4,7 +4,9 @@ scriptencoding utf-8
 " Use VimPlug for plugin management
 let g:plug_dir=g:data_dir . 'plug/'
 let g:plug_script=g:plug_dir . 'plug.vim'
-let g:plug_commit_hash='cffcfe'
+" We fix the hash for reproducibility, so this will need to be manually
+" updated.
+let g:plug_commit_hash='fc2813e'
 let g:plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/'
   \ . g:plug_commit_hash . '/plug.vim'
 " Grab vimplug if not available using curl
@@ -36,79 +38,58 @@ augroup END
 " Default plugins and pinnings
 " Theming (solarized8 supports truecolor, whereas old vim-solarized does not)
 call core#PluginAdd('lifepillar/vim-solarized8')
-call core#PluginPin('lifepillar/vim-solarized8',
-  \ 'd3ba80')
 " Status line prettification
 call core#PluginAdd('vim-airline/vim-airline')
-call core#PluginPin('vim-airline/vim-airline',
-  \ '07ab201')
 call core#PluginAdd('vim-airline/vim-airline-themes')
-call core#PluginPin('vim-airline/vim-airline-themes',
-  \ '0f9995d')
 " Spacemacs (which-key) style dynamic keybinding helper menu
 call core#PluginAdd('liuchengxu/vim-which-key')
-call core#PluginPin('liuchengxu/vim-which-key',
-  \ '4c605b1')
 " Make the `.` command work for more complex actions
 call core#PluginAdd('tpope/vim-repeat')
-call core#PluginPin('tpope/vim-repeat',
-  \ '24afe92')
 " Primitive motions for manipulating surrounded text (''/""/() etc.)
 call core#PluginAdd('tpope/vim-surround')
-call core#PluginPin('tpope/vim-surround',
-  \ 'f51a26d')
 " Commenting blocks
 call core#PluginAdd('tpope/vim-commentary')
-call core#PluginPin('tpope/vim-commentary',
-  \ '349340d')
 " Autosave documents on hooks
 call core#PluginAdd('907th/vim-auto-save')
-call core#PluginPin('907th/vim-auto-save',
-  \ '8c1d5dc')
 " VCS LHS change display (e.g. additions/changes/deletions)
 if has('nvim') || has('patch-8.0.902')
   call core#PluginAdd('mhinz/vim-signify')
-  call core#PluginPin('mhinz/vim-signify',
-    \ '2542b64')
 endif
 " Snippets
 if (has('python') || has('python3'))
   call core#PluginAdd('SirVer/ultisnips')
-  call core#PluginPin('SirVer/ultisnips',
-    \ '204b501')
   call core#PluginAdd('honza/vim-snippets')
-  call core#PluginPin('honza/vim-snippets',
-    \ '2a28fc3')
 endif
 " Fuzzy buffer/file searching within project
 call core#PluginAdd('ctrlpvim/ctrlp.vim')
-call core#PluginPin('ctrlpvim/ctrlp.vim',
-  \ 'f68f4d0')
 " Filesytem tree explorer
 call core#PluginAdd('preservim/nerdtree')
-call core#PluginPin('preservim/nerdtree',
-  \ '81f3eab')
 " 'Dumb' jumping for 40+ languages (as opposed to tags)
 call core#PluginAdd('pechorin/any-jump.vim')
-call core#PluginPin('pechorin/any-jump.vim',
-  \ 'c5c319f')
 " Load editorconfig settings from file in directory
 call core#PluginAdd('editorconfig/editorconfig-vim')
-call core#PluginPin('editorconfig/editorconfig-vim',
-  \ 'f305bc7')
 " Dynamically display effects of ex commands (e.g. :s etc.)
 if v:version >= 801
   " Documentation of plugin suggests it only works on 8.1 or above, but this
   " doesn't appear to be true in practice
   call core#PluginAdd('markonm/traces.vim')
-  call core#PluginPin('markonm/traces.vim',
-    \ '0f29f8e')
 endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Load core plugin version lockfile - automanaged via vim-plug's snapshotting
+call core#TrySource(g:config_dir . 'lock.vim')
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load local custom plugin handling overrides
 call core#TrySource(g:config_dir . 'custom.plugin.vim')
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Load plugin version lockfile overrides - automanaged via vim-plug's
+" snapshotting
+call core#TrySource(g:config_dir . 'custom.lock.vim')
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
