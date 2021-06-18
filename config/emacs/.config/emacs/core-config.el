@@ -2168,17 +2168,19 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
 
 (use-package wgrep
   :commands
-  wgrep-mode
+  wgrep-change-to-wgrep-mode
+  wgrep-save-all-buffers
 
   :bind
   (:map grep-mode-map
-        ("C-c C-p" . wgrep-mode))
+        ("C-c C-p" . wgrep-change-to-wgrep))
 
   :custom
+  (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
   (wgrep-auto-save-buffer
    nil
    "Don't save buffer automatically when `wgrep-finish-edit'.")
-  ;; (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
+
   (wgrep-change-readonly-file
    nil
    "Don't apply changes regardless of whether the buffer is read-only."))
