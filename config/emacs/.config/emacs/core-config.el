@@ -2542,7 +2542,7 @@ partially sorted lists by length, as this ruins the sort order."))
   ("\\.vim\\(rc\\)?\\'" . lsp-deferred)
 
   :hook
-  ((c++-modec-mode objc-mode) . lsp-deferred)
+  ((c++-mode c-mode objc-mode) . lsp-deferred)
   (python-mode . lsp-deferred)
   ((html-mode css-mode xml-mode) . lsp-deferred)
   ((yaml-mode json-mode) . lsp-deferred)
