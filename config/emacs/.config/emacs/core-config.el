@@ -402,9 +402,6 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 ;; highlighting (>=27).
 (unless (version< emacs-version "27")
   (use-package hl-line
-    :commands
-    hl-line-mode
-
     :hook
     ((prog-mode text-mode) . hl-line-mode)))
 
@@ -440,11 +437,6 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   (use-package so-long
     :demand t
 
-    :commands
-    global-so-long-mode
-    so-long-minor-mode
-    so-long
-
     :config
     ;; so-long will automatically figure out when to activate with the global
     ;; mode on.
@@ -467,7 +459,14 @@ long lines are detected.")
   whitespace-mode
 
   :functions
+  hgs--reset-whitespace-mode
   hgs--reset-whitespace-mode-local-hack
+
+  :hook
+  ((prog-mode text-mode) . hgs--reset-whitespace-mode-local-hack)
+
+  :config
+  (put 'whitespace-line-column 'safe-local-variable #'integerp)
 
   :init
   (defun hgs--reset-whitespace-mode ()
@@ -482,12 +481,6 @@ to be taken into account inside `WHITESPACE-MODE'."
     (add-hook 'hack-local-variables-hook
               #'hgs--reset-whitespace-mode
               nil 'local))
-
-  :hook
-  ((prog-mode text-mode) . hgs--reset-whitespace-mode-local-hack)
-
-  :config
-  (put 'whitespace-line-column 'safe-local-variable #'integerp)
 
   :custom
   (whitespace-line-column nil "Max line length for whitespace mode. Uses
@@ -527,6 +520,9 @@ file when it changes on disk.")
   global-subword-mode
   subword-mode
 
+  :commands
+  global-subword-mode
+
   :hook
   ((prog-mode text-mode special-mode minibuffer-setup) . subword-mode))
 
@@ -556,6 +552,16 @@ file when it changes on disk.")
 follow symlinks to files potentially outside of the VCS (or inside another)."))
 
 (use-package dired
+  :functions
+  hgs-kill-dired-buffers
+  hgs--dired-up-directory-clean
+
+  :bind
+  ((:map global-map
+         ("C-x d" . dired))
+   (:map dired-mode-map
+         ("^" . hgs--dired-up-directory-clean)))
+
   :init
   ;; Dired tends to clutter the buffer list quite heavily.
   (defun hgs-kill-dired-buffers ()
@@ -570,15 +576,6 @@ follow symlinks to files potentially outside of the VCS (or inside another)."))
     "Stop Dired from creating a new buffer when you go up a directory."
     (interactive)
     (find-alternate-file ".."))
-
-  :commands
-  dired
-
-  :bind
-  ((:map global-map
-         ("C-x d" . dired))
-   (:map dired-mode-map
-         ("^" . hgs--dired-up-directory-clean)))
 
   :config
   ;; Emacs disables this by default, but it's the only real way to use dired w/o
@@ -596,10 +593,10 @@ open."))
   :diminish
   winner-mode
 
-  :commands
-  winner-mode
-  winner-undo
-  winner-redo
+  :bind
+  (:map winner-mode-map
+        ("C-c <left>" . winner-undo)
+        ("C-c <right>" . winner-redo))
 
   :hook
   ((prog-mode text-mode special-mode) . winner-mode))
@@ -612,6 +609,16 @@ open."))
   (desktop-base-file-name "autosave" "Name of the desktop save file.")
   (desktop-base-lock-name "autosave-lock" "Name of the lock for desktop
 package."))
+
+(use-package eww
+  :bind
+  (:map search-map
+        ("M-w" . eww-search-words))
+
+  :custom
+  (eww-bookmarks-directory
+   (concat hgs-data-directory "eww")
+   "Place eww bookmarks under the data directory."))
 
 (use-package tramp
   :custom
@@ -674,10 +681,6 @@ history etc.)")
 
 (use-package flyspell
   :if (executable-find "aspell")
-
-  :commands
-  flyspell-mode
-  flyspell-prog-mode
 
   :hook
   (((text-mode) . flyspell-mode)
@@ -1074,9 +1077,6 @@ information.")
   :defines
   python-indent-guess-indent-offset
 
-  :commands
-  python-mode
-
   :mode
   (("\\.py\\'" . python-mode))
 
@@ -1087,13 +1087,6 @@ information.")
    "Guess indent offset and set it appropriately."))
 
 (use-package org
-  :commands
-  org-mode
-  org-store-link
-  org-capture
-  org-agenda
-  org-clock-goto
-
   :mode
   ("\\.org\\'" . org-mode)
 
@@ -1220,9 +1213,6 @@ narrowing framework.")
   :diminish
   org-indent-mode
 
-  :commands
-  org-indent-mode
-
   :custom
   (org-indent-indentation-per-level
    2
@@ -1235,9 +1225,6 @@ narrowing framework.")
 ;; Third-party package configuration
 
 (use-package dockerfile-mode
-  :commands
-  dockerfile-mode
-
   :mode
   (("Dockerfile\\'" . dockerfile-mode))
 
@@ -1246,19 +1233,10 @@ narrowing framework.")
   (put 'docker-image-name 'safe-local-variable #'stringp))
 
 (use-package protobuf-mode
-  :commands
-  protobuf-mode
-
   :mode
   (("\\.\\(pb\\|proto\\)\\'" . protobuf-mode)))
 
 (use-package bazel
-  :commands
-  bazel-build-mode
-  bazel-workspace-mode
-  bazelrc-mode
-  bazel-starlark-mode
-
   :mode
   (("/BUILD\\(\\..*\\)?\\'" . bazel-build-mode)
    ("/WORKSPACE\\'" . bazel-workspace-mode)
@@ -1266,9 +1244,6 @@ narrowing framework.")
    ("\\.bazelrc\\'" . bazelrc-mode)))
 
 (use-package meson-mode
-  :commands
-  meson-mode
-
   :mode
   (("\\.meson\\'" . meson-mode)
    ("/meson\\.build\\'" . meson-mode)))
@@ -1280,10 +1255,6 @@ narrowing framework.")
   :defines
   json-mode-map
 
-  :commands
-  jq-mode
-  jq-interactively
-
   :mode
   ("\\.jq\\'" . jq-mode)
 
@@ -1292,9 +1263,6 @@ narrowing framework.")
         ("C-c C-j" . jq-interactively)))
 
 (use-package toml-mode
-  :commands
-  toml-mode
-
   :mode
   (("\\.toml\\'" . toml-mode)))
 
@@ -1333,10 +1301,8 @@ mouse navigation."))
   avy-order-closest
 
   :commands
-  avy-goto-char
   avy-goto-char-2
   avy-goto-char-timer
-  avy-isearch
   avy-goto-word
   avy-goto-line
 
@@ -1385,9 +1351,6 @@ to point."))
   :after org
 
   :diminish
-  org-bullets-mode
-
-  :commands
   org-bullets-mode
 
   :hook
@@ -1524,9 +1487,6 @@ to point."))
   :demand t
 
   :diminish
-  prescient-persist-mode
-
-  :commands
   prescient-persist-mode
 
   :config
@@ -1752,9 +1712,6 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 
   :demand t
 
-  :commands
-  marginalia-mode
-
   :diminish
   marginalia-mode
 
@@ -1884,8 +1841,6 @@ emacsclient (invalid argument stringp errors)."
 
   :commands
   with-editor-export-editor
-  with-editor-async-shell-command
-  with-editor-shell-command
 
   :hook
   ((shell-mode term-exec eshell-mode vterm-mode)
@@ -1903,7 +1858,6 @@ emacsclient (invalid argument stringp errors)."
   ws-butler-mode
 
   :commands
-  ws-butler-mode
   ws-butler-global-mode
 
   :hook
@@ -1915,9 +1869,6 @@ emacsclient (invalid argument stringp errors)."
    "Delete whitespace before point."))
 
 (use-package expand-region
-  :commands
-  er/expand-region
-
   :bind
   (:map global-map
         ("C-=" . er/expand-region)))
@@ -1960,8 +1911,6 @@ emacsclient (invalid argument stringp errors)."
 
   :commands
   yas-global-mode
-  yas-minor-mode
-  snippet-mode
 
   :functions
   yas-reload-all
@@ -2001,7 +1950,6 @@ emacsclient (invalid argument stringp errors)."
   which-key-mode
 
   :commands
-  which-key-mode
   which-key-add-key-based-replacements
   which-key-add-major-mode-key-based-replacements
 
@@ -2023,11 +1971,9 @@ emacsclient (invalid argument stringp errors)."
 
 (use-package transpose-frame
   :commands
-  transpose-frame
   flip-frame
   flop-frame
   rotate-frame
-  rotate-frame-clockwise
   rotate-frame-anticlockwise
 
   :bind
@@ -2039,37 +1985,22 @@ emacsclient (invalid argument stringp errors)."
   :diminish
   rainbow-delimiters-mode
 
-  :commands
-  rainbow-delimiters-mode
-
   :hook
   ((prog-mode) . rainbow-delimiters-mode))
 
 (use-package cmake-mode
-  :commands
-  cmake-mode
-
   :mode
   (("\\(CMakeLists\\.txt\\|\\.cmake\\)\\'" . cmake-mode)))
 
 (use-package yaml-mode
-  :commands
-  yaml-mode
-
   :mode
   (("\\(\\.[Yy][Mm][Ll]\\|\\.yaml\\)\\'" . yaml-mode)))
 
 (use-package csv-mode
-  :commands
-  csv-mode
-
   :mode
   (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
 
 (use-package lua-mode
-  :commands
-  lua-mode
-
   :mode
   (("\\.lua\\'" . lua-mode))
 
@@ -2077,18 +2008,11 @@ emacsclient (invalid argument stringp errors)."
   (lua-indent-level 2 "We prefer to indent in Lua to 2 spaces."))
 
 (use-package markdown-mode
-  :commands
-  markdown-mode
-  gfm-mode
-
   :mode
   (("README\\.md\\'" . gfm-mode)
    ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
 
 (use-package restclient
-  :commands
-  restclient-mode
-
   :mode
   (("\\.restclient\\'" . restclient-mode)))
 
@@ -2160,17 +2084,10 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
   :diminish
   editorconfig-mode
 
-  :commands
-  editorconfig-mode
-
   :hook
   ((prog-mode) . editorconfig-mode))
 
 (use-package wgrep
-  :commands
-  wgrep-change-to-wgrep-mode
-  wgrep-save-all-buffers
-
   :bind
   (:map grep-mode-map
         ("C-c C-p" . wgrep-change-to-wgrep))
@@ -2196,7 +2113,6 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
   smartparens-global-strict-mode
 
   :commands
-  smartparens-mode
   smartparens-strict-mode
   smartparens-global-mode
   smartparens-global-strict-mode
@@ -2286,9 +2202,6 @@ text banners, or a path to an image or text file.")
   :after
   clang-format
 
-  :commands
-  clang-format+-mode
-
   :hook
   ((c-mode c++-mode objc-mode) . clang-format+-mode)
 
@@ -2311,7 +2224,6 @@ automation."))
 
   :commands
   global-undo-tree-mode
-  undo-tree-mode
   undo-tree-undo
   undo-tree-redo
   undo-tree-visualize
@@ -2326,7 +2238,6 @@ automation."))
 
 (use-package projectile
   :commands
-  projectile-mode
   projectile-switch-project-by-name
   projectile-project-root
 
@@ -2407,9 +2318,6 @@ extensions based on the extension of the current file."))
   :diminish
   selectrum-prescient-mode
 
-  :commands
-  selectrum-prescient-mode
-
   :config
   (selectrum-prescient-mode +1)
 
@@ -2425,9 +2333,6 @@ extensions based on the extension of the current file."))
   :demand t
 
   :diminish
-  company-prescient-mode
-
-  :commands
   company-prescient-mode
 
   :config
@@ -2452,16 +2357,10 @@ partially sorted lists by length, as this ruins the sort order."))
   (embark-collect-mode . embark-collect-mode-preview-minor-mode))
 
 (use-package json-mode
-  :commands
-  json-mode
-
   :mode
   (("\\.json\\'" . json-mode)))
 
 (use-package flycheck
-  :commands
-  flycheck-mode
-
   :bind-keymap
   ("C-c !" . flycheck-keymap-prefix)
 
@@ -2478,8 +2377,6 @@ partially sorted lists by length, as this ruins the sort order."))
   with-editor
 
   :commands
-  magit-status
-  magit-dispatch
   magit-blame
   magit-stage
   magit-unstage
@@ -2521,9 +2418,6 @@ partially sorted lists by length, as this ruins the sort order."))
   consult
   flycheck
 
-  :commands
-  consult-flycheck
-
   :bind
   (:map flycheck-command-map
         ("!" . consult-flycheck)))
@@ -2534,7 +2428,6 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :commands
   lsp
-  lsp-deferred
   lsp-install-server
 
   :defines
@@ -2599,7 +2492,6 @@ the mouse."))
 
   :commands
   consult-lsp-diagnostics
-  consult-lsp-symbols
 
   :bind
   (:map lsp-mode-map
@@ -2607,16 +2499,14 @@ the mouse."))
 
 (use-package treemacs
   :commands
-  treemacs
-  treemacs-find-file
-  treemacs-find-tag
-  treemacs-select-window
-  treemacs-delete-other-windows
-  treemacs-bookmark
-  treemacs-filewatch-mode
-  treemacs-follow-mode
   treemacs-git-mode
   treemacs-fringe-indicator-mode
+
+  :hook
+  ((treemacs-mode) . treemacs-follow-mode)
+  ((treemacs-mode) . treemacs-filewatch-mode)
+  ((treemacs-mode) . hgs--treemacs-fringe-indicator-mode)
+  ((treemacs-mode) . hgs--treemacs-git-mode)
 
   :bind
   (:prefix "C-c t"
@@ -2628,12 +2518,6 @@ the mouse."))
            ("B" . treemacs-bookmark)
            ("f" . treemacs-find-file)
            ("T" . treemacs-find-tag))
-
-  :hook
-  ((treemacs-mode) . treemacs-follow-mode)
-  ((treemacs-mode) . treemacs-filewatch-mode)
-  ((treemacs-mode) . hgs--treemacs-fringe-indicator-mode)
-  ((treemacs-mode) . hgs--treemacs-git-mode)
 
   :init
   (defun hgs--treemacs-fringe-indicator-mode ()
@@ -2797,9 +2681,6 @@ Can be forced on by supplying >0 or t, and off via <0."
    "Place DAP break-point information into the cache."))
 
 (use-package docker
-  :commands
-  docker
-
   :bind
   (:map global-map
         ("C-c D" . docker))
