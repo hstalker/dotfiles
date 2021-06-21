@@ -38,7 +38,7 @@ else
   fi
   # Add a convenient shell name identifier
   PS1="$(text_reset)${color_shell}[\$(whoami)@\$(hostname):sh]"
-  PS1+="${color_path}<\$(basename \${PWD})/>" # Path
+  PS1+="${color_path}<\$(basename \"\${PWD}\")/>" # Path
   PS1+="${color_git}\$(get_vcs_branch)" # VCS branch
   PS1+="${color_separator}λ " # Separator
   PS1+="${color_reset}" # Color back to normal

@@ -68,7 +68,7 @@ alias tarx='tar xzvf' # Extract
 alias tart='tar tzvf' # List contents
 
 # Various bits of hardware info
-alias cpu-count='nproc --all'
+alias cpucount='nproc --all'
 alias meminfo='free -m -l -t'
 alias cpuinfo='lscpu'
 alias diskinfo='df -H'
