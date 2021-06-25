@@ -800,7 +800,10 @@ networks, but they'll appear as the same server to the client."))
   :custom
   (erc-autojoin-channels-alist
    '()
-   "AList of server -> channel list to auto-join on connection."))
+   "AList of server -> channel list to auto-join on connection.")
+  (erc-autojoin-timing
+   'ident
+   "Auto-join after successful identification with NickServ."))
 
 (use-package erc-fill
   :after
