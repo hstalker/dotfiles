@@ -185,6 +185,11 @@
        :host github
        :repo "jwiegley/emacs-async"))
     (straight-use-package
+     '(yaml
+       :type git
+       :host github
+       :repo "zkry/yaml.el"))
+    (straight-use-package
      '(transient
        :type git
        :host github
