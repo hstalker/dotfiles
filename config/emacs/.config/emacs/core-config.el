@@ -2244,13 +2244,12 @@ automation."))
   projectile-switch-project-by-name
   projectile-project-root
 
-  :hook
-  ((prog-mode text-mode special-mode) . projectile-mode)
-
   :bind-keymap
   ("C-c p" . projectile-command-map)
 
   :init
+  (projectile-mode +1)                  ; :hook seems to cause an infinite
+                                        ; require loop
   (which-key-add-key-based-replacements
     "C-c p" "Projectile")
 
