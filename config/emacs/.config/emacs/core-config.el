@@ -320,6 +320,12 @@ non-left-to-right text, so this gives a nice performance boost.")
    "Default action for window placement in order to make Emacs multiplexing more
 predictable."))
 
+(use-package minibuffer
+  :bind
+  ;; Not sure about this binding, but allows us to use a narrowing framework for
+  ;; capf completions
+  ("C-c ;" . completion-at-point))
+
 ;; Only needed for stopping some Emacs games from littering configuration
 ;; directory
 (use-package gamegrid
