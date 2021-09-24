@@ -6,7 +6,7 @@ let g:plug_dir=g:data_dir . 'plug/'
 let g:plug_script=g:plug_dir . 'plug.vim'
 " We fix the hash for reproducibility, so this will need to be manually
 " updated.
-let g:plug_commit_hash='fc2813e'
+let g:plug_commit_hash='c997134'
 let g:plug_url='https://raw.githubusercontent.com/junegunn/vim-plug/'
   \ . g:plug_commit_hash . '/plug.vim'
 " Grab vimplug if not available using curl
