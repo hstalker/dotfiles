@@ -1753,7 +1753,8 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 
   :bind
   (:map global-map
-        ("C-c e a" . embark-act))
+        ("C-c e a" . embark-act)
+        ([remap describe-bindings] . embark-bindings))
   (:map minibuffer-local-map
         ("C-o" . embark-act)
         ("C-S-b" . embark-become))
@@ -1765,6 +1766,9 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
     "C-c e" "Embark")
 
   :custom
+  ;; (prefix-help-command
+  ;;  #'embark-prefix-help-command
+  ;;  "Replace the built-in prefix help command with a completing read version.")
   (embark-quit-after-action
    nil
    "Don't leave the minibuffer etc. after acting.")
@@ -2369,7 +2373,7 @@ partially sorted lists by length, as this ruins the sort order."))
   :demand t
 
   :hook
-  (embark-collect-mode . embark-collect-mode-preview-minor-mode))
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package json-mode
   :mode
