@@ -323,8 +323,8 @@ predictable."))
 (use-package minibuffer
   :bind
   ;; Not sure about this binding, but allows us to use a narrowing framework for
-  ;; capf completions
-  ("C-c ;" . completion-at-point))
+  ;; capf completions, which in my opinion is better UX than company-mode
+  ("C-c C-;" . completion-at-point))
 
 ;; Only needed for stopping some Emacs games from littering configuration
 ;; directory
@@ -1666,6 +1666,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
         ("C-c H" . consult-history)
         ("M-s e" . consult-isearch)
         ("C-x K" . consult-kmacro)
+        ("C-M-#" . consult-register)
         ("C-x r M-\"" . consult-register-load)
         ("C-x r M-'" . consult-register-store)
         ([remap bookmark-jump] . consult-bookmark)
@@ -1677,11 +1678,12 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
         ("g" . consult-goto-line)
         ("M-g" . consult-goto-line)
         ("e" . consult-compile-error)
+        ("f" . consult-flymake)
         ("o" . consult-outline)
         ("m" . consult-mark)
         ("k" . consult-global-mark)
         ("i" . consult-imenu)
-        ("I" . consult-project-imenu))
+        ("I" . consult-imenu-multi))
   (:map search-map
         ("f" . consult-find)
         ("L" . consult-locate)
@@ -1689,17 +1691,22 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
         ("G" . consult-git-grep)
         ("r" . consult-ripgrep)
         ("l" . consult-line)
+        ("L" . consult-line-multi)
         ("m" . consult-multi-occur)
         ("k" . consult-keep-lines)
         ("u" . consult-focus-lines))
   (:map isearch-mode-map
         ([remap isearch-edit-string] . consult-isearch)
-        ("M-s l" . consult-line))
+        ("M-s l" . consult-line)
+        ("M-s L" . consult-line-multi))
 
   :config
   ;; Add thin lines, sorting and hide the mode line of the register preview
   ;; window
   (advice-add #'register-preview :override #'consult-register-window)
+  ;; Replace `completing-read-multiple' with an enhanced version
+  (advice-add #'completing-read-multiple :override
+              #'consult-completing-read-multiple)
 
   :custom
   (xref-show-xrefs-function #'consult-xref "Use Consult for xref.")
