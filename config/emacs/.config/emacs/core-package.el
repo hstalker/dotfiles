@@ -79,6 +79,11 @@
     ;; files/profiles is great.
 
     (straight-use-package
+     '(page-break-lines
+       :type git
+       :host github
+       :repo "purcell/page-break-lines"))
+    (straight-use-package
      '(dash
        :type git
        :host github

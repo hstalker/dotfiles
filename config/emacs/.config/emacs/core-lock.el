@@ -61,6 +61,7 @@
  ("meson-mode" . "1a2e2abb098c9288c2cdb3affbad76edd98abf59")
  ("org-bullets" . "b70ac2ec805bcb626a6e39ea696354577c681b36")
  ("org-contrib" . "fc81309cf6756607a836f93049a9393c2967c4e0")
+ ("page-break-lines" . "3b8549cd414d4d7ee0168ab9917124133566d3db")
  ("pass" . "5651da53137db9adcb125b4897c2fe27eeb4368d")
  ("password-store" . "04cd3023f48cd203f6c0193e57a427226e8b431c")
  ("password-store-otp.el" . "04998c8578a060ab4a4e8f46f2ee0aafad4ab4d5")

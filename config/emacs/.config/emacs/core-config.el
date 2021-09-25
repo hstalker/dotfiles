@@ -2211,6 +2211,9 @@ text banners, or a path to an image or text file.")
    #'projectile-switch-project-by-name
    "Which function to use for switching projects from the dashboard.")
   (dashboard-week-agenda t "Show upcoming seven days' agenda.")
+  (dashboard-page-separator
+   "\n\f\n"
+   "Use form feed for `page-break-lines-mode' to show horizontal lines.")
   (initial-buffer-choice
    (lambda ()
      (get-buffer "*dashboard*"))
