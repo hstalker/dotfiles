@@ -12,14 +12,15 @@
     co = checkout
     br = branch
     ps = push
-    pl = pull
-    plff = pull --ff-only
+    pl = pull --ff-only
     f = fetch
     df = diff
     dt = difftool
     cl = clone
     me = merge
     rb = rebase
+    fap = fetch --all --prune
+    sur = submodule update --init --recursive
     unstage = reset HEAD --
     last = log -1 HEAD
     cached = diff --cached
