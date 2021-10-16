@@ -77,6 +77,11 @@ endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Start up vim-plug, so that lock files can work their magic
+call plug#begin(g:plug_dir)
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load core plugin version lockfile - automanaged via vim-plug's snapshotting
 call core#TrySource(g:config_dir . 'lock.vim')
 
@@ -94,8 +99,11 @@ call core#TrySource(g:config_dir . 'custom.lock.vim')
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Run through final registry and register the information with vim-plug
-call plug#begin(g:plug_dir)
 call core#PluginProcessRegistry()
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Finalize plugins
 call plug#end()
 
 
