@@ -1,7 +1,17 @@
 #!/usr/bin/env sh
 
+# Default less flags
+# -x4: Use 4 characters as tab width
+# -i: Ignore case in search unless uppercase is used
+# -F: Quit if one screen
+# -X: Don't clear screen (disables termcap support)
+# -R: ANSI escape sequence pass-through
+# -M: Use a verbose prompt
+# -J: Show status column for search results + unread text
+# -W: Places cursor temporarily at first new line of any forward movement
+# You can pass any of these arguments as '-+FLAG' (e.g. '-+X') to reset to
+# default behavior.
+assign_export LESS '-x4 -iFXRMJW'
 # Set less as the default pager
-PAGER='less'
-
-alias rless='less -r' # Allow control codes in input (e.g. colours)
+assign_export PAGER 'less'
 
