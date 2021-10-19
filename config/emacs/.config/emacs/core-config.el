@@ -1405,7 +1405,6 @@ to point."))
      "DBUS_SESSION_BUS_ADDRESS"
      "SHELL"
      "PATH"
-     "LD_LIBRARY_PATH"
      "CPATH"
      "MANPATH"
      "INFOPATH"
