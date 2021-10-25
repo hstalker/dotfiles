@@ -82,6 +82,16 @@
   :type 'directory
   :group 'personal)
 
+(defcustom hgs-state-directory
+  (file-name-as-directory
+   (concat (file-name-as-directory
+            (or (getenv "XDG_STATE_HOME")
+                (concat hgs-user-directory ".local/state")))
+           "emacs"))
+  "XDG directory specification's state directory."
+  :type 'directory
+  :group 'personal)
+
 (defcustom hgs-project-directory
   (file-name-as-directory
    (concat (file-name-as-directory hgs-user-directory) "project"))

@@ -34,6 +34,11 @@ if !empty($XDG_CACHE_HOME)
 else
   let g:cache_dir=expand('$HOME/.cache/vim/')
 endif
+if !empty($XDG_STATE_HOME)
+  let g:state_dir=expand('$XDG_STATE_HOME/vim/')
+else
+  let g:state_dir=expand('$HOME/.local/state/vim/')
+endif
 if !empty($XDG_DATA_HOME)
   let g:data_dir=expand('$XDG_DATA_HOME/vim/')
 else

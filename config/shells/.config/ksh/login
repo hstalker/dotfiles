@@ -7,7 +7,7 @@
 require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/ksh"
-silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.local/share}/ksh"
+silence_output assert_directory "${XDG_STATE_HOME:-$HOME/.local/state}/ksh"
 
 # Local installation overrides
 load_override_module ksh login

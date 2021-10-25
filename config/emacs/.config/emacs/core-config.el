@@ -15,6 +15,7 @@
 
 (defvar hgs-config-directory)
 (defvar hgs-cache-directory)
+(defvar hgs-state-directory)
 (defvar hgs-data-directory)
 (defvar hgs-project-directory)
 (defvar hgs-org-directory)
@@ -227,7 +228,7 @@ nil, 'prepend or 'append."
 
   ;; Put game scores directories under cache
   (setq shared-game-score-directory
-        (concat hgs-cache-directory "games/shared"))
+        (concat hgs-state-directory "games/shared"))
 
   ;; Enable narrow-to-* family of functions, as they're disabled by default
   (put 'narrow-to-region 'disabled nil)
@@ -259,7 +260,7 @@ echo area.")
   (inhibit-default-init t "Don't load the default library.")
   (initial-scratch-message nil "Don't show an initial message in the scratch
 buffer.")
-  (auto-save-list-file-prefix (concat hgs-cache-directory "auto-save-list")
+  (auto-save-list-file-prefix (concat hgs-state-directory "auto-save-list")
                               "Put autosaves in our cache directory.")
   (sentence-end-double-space nil "Tell Emacs that we don't use double spacing
 for sentences.")
@@ -331,7 +332,7 @@ predictable."))
 (use-package gamegrid
   :config
   (setq gamegrid-user-score-file-directory
-        (concat hgs-cache-directory "games/gamegrid")))
+        (concat hgs-state-directory "games/gamegrid")))
 
 (use-package help
   :config
@@ -513,11 +514,11 @@ file when it changes on disk.")
    "Increase the default large file warning threshold to 200MB.")
 
   (auto-save-file-name-transforms
-   `((".*" ,(concat hgs-cache-directory) "backup")
+   `((".*" ,(concat hgs-state-directory) "backup")
      t)
    "Put autosaves in the cache directory.")
   (backup-directory-alist
-   `((".*" . ,(concat hgs-cache-directory "backup")))
+   `((".*" . ,(concat hgs-state-directory "backup")))
    "Put backups in the cache directory.")
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
@@ -540,7 +541,7 @@ file when it changes on disk.")
   ((prog-mode text-mode special-mode) . recentf-mode)
 
   :custom
-  (recentf-save-file (concat hgs-cache-directory "recentf")
+  (recentf-save-file (concat hgs-state-directory "recentf")
                      "Place the recentf cache into our cache directory.")
   (recentf-max-menu-items 25 "Maximum number of menu items to show.")
   (recentf-max-saved-items 25 "Maximum number of items to save."))
@@ -609,7 +610,7 @@ open."))
 
 (use-package desktop
   :config
-  (setq desktop-dirname (concat hgs-data-directory "desktop"))
+  (setq desktop-dirname (concat hgs-state-directory "desktop"))
 
   :custom
   (desktop-base-file-name "autosave" "Name of the desktop save file.")
@@ -623,20 +624,20 @@ package."))
 
   :custom
   (eww-bookmarks-directory
-   (concat hgs-data-directory "eww")
-   "Place eww bookmarks under the data directory."))
+   (concat hgs-state-directory "eww")
+   "Place eww bookmarks under the state directory."))
 
 (use-package tramp
   :custom
   (tramp-auto-save-directory
-   (concat hgs-cache-directory "tramp-auto-save")
+   (concat hgs-state-directory "tramp-auto-save")
    "Directory to place auto-saves when editing via Tramp.")
   (tramp-backup-directory-alist
    backup-directory-alist
    "Put Tramp backups in the same place as local backups.")
   (tramp-persistency-file-name
    (concat hgs-cache-directory "tramp-persistency.el")
-   "Put the Tramp persistency file in the cache."))
+   "Put the Tramp persistency file in the cache directory."))
 
 (use-package eshell
   :functions
@@ -664,8 +665,8 @@ package."))
        " ")))
 
   :custom
-  (eshell-directory-name (concat hgs-data-directory "eshell")
-                         "Use cache directory for storing files (e.g. aliases,
+  (eshell-directory-name (concat hgs-state-directory "eshell")
+                         "Use state directory for storing files (e.g. aliases,
 history etc.)")
   (eshell-buffer-maximum-lines
    20000
@@ -778,7 +779,7 @@ in which case it will be used."
    (* 60 (* 60 (* 24)))
    "Class anyone inactive for 24 hours as a lurker.")
   (erc-debug-log-file
-   (concat hgs-data-directory "erc/debug.log")
+   (concat hgs-state-directory "erc/debug.log")
    "Relocate the erc debug log file somewhere more sensible.")
   (erc-send-whitespace-lines
    nil
@@ -927,7 +928,7 @@ buffers).")
 
   :init
   (defcustom hgs-erc-log-channels-directory
-    (file-name-as-directory (concat hgs-data-directory "erc/logs"))
+    (file-name-as-directory (concat hgs-state-directory "erc/logs"))
     "Base directory path for placing erc logs."
     :type 'directory
     :group 'personal)
@@ -1073,7 +1074,7 @@ information.")
 (use-package bookmark
   :custom
   (bookmark-default-file
-   (concat hgs-data-directory "bookmarks")
+   (concat hgs-state-directory "bookmarks")
    "Put bookmarks in the data directory."))
 
 (use-package custom
@@ -1508,7 +1509,7 @@ to point."))
    0.997
    "How much to decrease candidates' priorities for subsequent non-selections.")
   (prescient-save-file
-   (concat hgs-cache-directory "prescient-statistics")
+   (concat hgs-state-directory "prescient-statistics")
    "Where to save Prescient statistics to on disk.")
   (prescient-filter-method
    '(literal
@@ -1830,7 +1831,7 @@ emacsclient (invalid argument stringp errors)."
 (use-package async
   :init
   (setq async-byte-compile-log-file
-        (concat hgs-data-directory "async-bytecomp.log"))
+        (concat hgs-state-directory "async-bytecomp.log"))
 
   :hook
   ((after-init . async-bytecomp-package-mode)
@@ -1839,14 +1840,14 @@ emacsclient (invalid argument stringp errors)."
 (use-package transient
   :custom
   (transient-levels-file
-   (concat hgs-cache-directory "transient/levels.el")
-   "Where to place the Transient levels cache file.")
+   (concat hgs-state-directory "transient/levels.el")
+   "Where to place the Transient levels file.")
   (transient-values-file
-   (concat hgs-cache-directory "transient/values.el")
-   "Where to place the Transient values cache file.")
+   (concat hgs-state-directory "transient/values.el")
+   "Where to place the Transient values file.")
   (transient-history-file
-   (concat hgs-cache-directory "transient/history.el")
-   "Where to place the Transient history cache file."))
+   (concat hgs-state-directory "transient/history.el")
+   "Where to place the Transient history file."))
 
 (use-package with-editor
   :init
@@ -2255,7 +2256,7 @@ automation."))
 
   :custom
   (undo-tree-history-directory-alist
-   `(("." . ,(concat hgs-cache-directory "undo-tree")))
+   `(("." . ,(concat hgs-state-directory "undo-tree")))
    "Put history backups in the cache directory."))
 
 (use-package projectile
@@ -2288,7 +2289,7 @@ automation."))
    `(,hgs-project-directory ,hgs-user-directory)
    "Where should projectile search?")
   (projectile-known-projects-file
-   (concat hgs-cache-directory "projectile-bookmarks.eld")
+   (concat hgs-state-directory "projectile-bookmarks.eld")
    "Where to cache known projects.")
   (projectile-use-git-grep nil "Don't use git-grep over other tools.")
   (projectile-cache-file
@@ -2431,7 +2432,7 @@ partially sorted lists by length, as this ruins the sort order."))
 
   :custom
   (forge-database-file
-   (concat hgs-data-directory "forge-database.sqlite")
+   (concat hgs-state-directory "forge-database.sqlite")
    "Place the forge database into the data directory."))
 
 (use-package consult-flycheck
@@ -2698,8 +2699,8 @@ Can be forced on by supplying >0 or t, and off via <0."
    '(sessions locals controls tooltip)
    "Which DAP features should be auto-configured by default.")
   (dap-breakpoints-file
-   (concat hgs-cache-directory "dap-breakpoints")
-   "Place DAP break-point information into the cache."))
+   (concat hgs-state-directory "dap-breakpoints")
+   "Place DAP break-point information into the state directory."))
 
 (use-package docker
   :bind

@@ -37,8 +37,8 @@ else
   unset color_shell color_path color_git color_separator color_reset
 fi
 
-# Place the history in data
-HISTFILE="${XDG_DATA_HOME:-$HOME/.local/share}/bash/history-$HOSTNAME-$USER"
+# Place the history in state
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history-$HOSTNAME-$USER"
 # Don't put duplicate lines or lines starting with space in the history
 HISTCONTROL=ignoreboth:erasedups
 # For setting history length
