@@ -79,6 +79,11 @@
     ;; files/profiles is great.
 
     (straight-use-package
+     '(vimrc-mode
+       :type git
+       :host github
+       :repo "mcandre/vimrc-mode"))
+    (straight-use-package
      '(page-break-lines
        :type git
        :host github

@@ -1234,6 +1234,12 @@ narrowing framework.")
 
 ;; Third-party package configuration
 
+(use-package vimrc-mode
+  :mode
+  (("\\.vim\\'" . vimrc-mode)
+   ("[._]?g?vimrc\\'" . vimrc-mode)
+   ("\\.exrc\\'" . vimrc-mode)))
+
 (use-package dockerfile-mode
   :mode
   (("Dockerfile\\'" . dockerfile-mode))
@@ -2455,10 +2461,8 @@ partially sorted lists by length, as this ruins the sort order."))
   :defines
   lsp-mode-map
 
-  :mode
-  ("\\.vim\\(rc\\)?\\'" . lsp-deferred)
-
   :hook
+  (vimrc-mode . lsp-deferred)
   ((c++-mode c-mode objc-mode) . lsp-deferred)
   (python-mode . lsp-deferred)
   ((html-mode css-mode xml-mode) . lsp-deferred)
