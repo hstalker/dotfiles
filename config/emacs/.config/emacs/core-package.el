@@ -84,6 +84,16 @@
        :host github
        :repo "mcandre/vimrc-mode"))
     (straight-use-package
+     '(tablist
+       :type git
+       :host github
+       :repo "politza/tablist"))
+    (straight-use-package
+     '(pdf-tools
+       :type git
+       :host github
+       :repo "vedang/pdf-tools"))
+    (straight-use-package
      '(page-break-lines
        :type git
        :host github

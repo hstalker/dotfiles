@@ -1855,6 +1855,22 @@ emacsclient (invalid argument stringp errors)."
    (concat hgs-state-directory "transient/history.el")
    "Where to place the Transient history file."))
 
+(use-package pdf-tools
+  :magic
+  ("%PDF" . pdf-view-mode)
+
+  :config
+  ;; This performs a build step with some dependencies. I have noticed that it
+  ;; tends to fail silently if invoked non-interactively and dependencies are
+  ;; missing. Unfortunately this blows the default pdf-view out of the water, so
+  ;; we'll prefer it anyway. For similar TTY reasons, the build step can appear
+  ;; silent as well. If it doesn't work automatically, then run it manually, or
+  ;; disable the package.
+  (pdf-tools-install :no-query)
+
+  :custom
+  (pdf-view-display-size 'fit-width "Default to fit-to-width."))
+
 (use-package with-editor
   :init
   (defun hgs--with-editor-export-editor ()
