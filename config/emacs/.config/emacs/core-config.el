@@ -1670,7 +1670,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
         ([remap apropos-command] . consult-apropos)
         ("C-h M" . consult-man)
         ("C-c H" . consult-history)
-        ("M-s e" . consult-isearch)
+        ("M-s e" . consult-isearch-history)
         ("C-x K" . consult-kmacro)
         ("C-M-#" . consult-register)
         ("C-x r M-\"" . consult-register-load)
@@ -1702,7 +1702,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
         ("k" . consult-keep-lines)
         ("u" . consult-focus-lines))
   (:map isearch-mode-map
-        ([remap isearch-edit-string] . consult-isearch)
+        ([remap isearch-edit-string] . consult-isearch-history)
         ("M-s l" . consult-line)
         ("M-s L" . consult-line-multi))
 
@@ -1759,11 +1759,27 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 
   :bind
   (:map global-map
+        ;; Contextual actions on object at point
         ("C-c e a" . embark-act)
+        ;; Change current command w/o quitting
+        ("C-c e b" . embark-become)
+        ;; Export candidates to mode buffer
+        ("C-c e e" . embark-export)
+        ;; Collect candidates into live updating collect buffer
+        ("C-c e c" . embark-collect-live)
+        ;; Collect candidates into a frozen collect buffer
+        ("C-c e C" . embark-collect-snapshot)
+        ;; Do the default action to thing at point
+        ("C-c e d" . embark-dwim)
+        ;; Improved bindings help
         ([remap describe-bindings] . embark-bindings))
   (:map minibuffer-local-map
-        ("C-o" . embark-act)
-        ("C-S-b" . embark-become))
+        ;; Convenience bindings for inside a minibuffer. My general thoughts are
+        ;; that beyond act/become which are frequent and short operations one
+        ;; shouldn't need shortcuts for embark in the minibuffer.
+        ("C-;" . embark-act)
+        ("C-:" . embark-become)
+        ("C-'" . embark-export))
   (:map embark-file-map
         ("j" . dired-jump))
 
@@ -1777,7 +1793,7 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   ;;  "Replace the built-in prefix help command with a completing read version.")
   (embark-quit-after-action
    nil
-   "Don't leave the minibuffer etc. after acting.")
+   "Don't leave the minibuffer etc. after acting. Use prefix to quit.")
   (embark-collect-initial-view-alist
    '((file . list)
      (buffer . list)
