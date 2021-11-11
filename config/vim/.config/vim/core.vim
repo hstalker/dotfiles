@@ -396,7 +396,8 @@ function! core#PluginIsLoaded(name)
   if has_key(g:plugin_registry, a:name)
     return g:plugin_registry[a:name]['loaded']
   else
-    echom 'Attempted to query whether unknown plugin is loaded: ' . a:name
+    " Attempted to query whether unknown plugin is loaded. Return false
+    " anyway
     return 0
   endif
 endfunction
