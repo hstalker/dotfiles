@@ -336,7 +336,7 @@ endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ultisnips configuration
-if core#PluginIsLoaded('SirVer/ultisnips')
+if (has('python') || has('python3')) && core#PluginIsLoaded('SirVer/ultisnips')
   let g:UltiSnipsSnippetDirectories = [
     \ g:config_dir . "UltiSnips",
     \ "UltiSnips"
