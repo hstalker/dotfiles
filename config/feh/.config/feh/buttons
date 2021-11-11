@@ -1,0 +1,29 @@
+# feh button configuration.
+# Comments start with a # sign, do not use them mid-line.
+# Each line must be blank, a comment, or a button definition.
+#
+# button definition: <action name> <button>
+#
+# A <button> is a button number with optional modifier.
+# For instance, C-1 would be Ctrl + Left click, 4-2 Mod4 + Middle click,
+# et cetera.
+
+# 1: left mouse button
+# 2: middle mouse button
+# 3: right mouse button
+# 4: mousewheel down
+# 5: mousewheel up
+# Use C-$NUMBER for Ctrl+$NUMBER
+
+pan 1
+rotate 2
+zoom_in C-5
+zoom_out C-4
+toggle_menu 3
+prev_img 4
+next_img 5
+
+# Unbind default modifiers
+zoom
+reload
+blur

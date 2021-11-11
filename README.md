@@ -90,6 +90,7 @@ Currently includes some configuration for the following pieces of software:
   * MPV - Media player that knocks the socks off of the competition
   * WINE - Windows emulation layer
   * Redshift - Monitor time/location-based color temperature adjustments
+  * Feh - Minimal image viewer
   * Mozc - Open Google IME-based input method
   * Weechat - Terminal IRC client
   * Zoom - Video conferencing (all the rage after the 2020-21 pandemic)

@@ -44,6 +44,7 @@ PACKAGES ?= shells \
 	redshift \
 	mozc \
 	weechat \
+	feh \
 	zoom \
 	sway \
 	themes/halogen
