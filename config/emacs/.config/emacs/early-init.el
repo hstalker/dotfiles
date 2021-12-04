@@ -13,6 +13,12 @@
 ;; Needed to force emacs to not use stale bytecode
 (customize-set-variable 'load-prefer-newer t)
 
+(when (and (fboundp 'native-comp-available)
+           (native-comp-available))
+  (when (boundp 'comp-deferred-compilation)
+    ;; Enable deferred compilation by default
+    (customize-set-variable 'comp-deferred-compilation t)))
+
 ;; Stop package.el from starting by default
 (customize-set-variable 'package-enable-at-startup nil)
 (declare-function package--ensure-init-file "package")

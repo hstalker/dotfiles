@@ -10,9 +10,22 @@
 ;; Needed to force emacs to not use stale bytecode
 (customize-set-variable 'load-prefer-newer t)
 
+(if (fboundp 'json-serialize)
+    (message "Native JSON is available.")
+  (message "Native JSON is not available."))
+
+(if (and (fboundp 'native-comp-available)
+         (native-comp-available))
+    (progn
+      (message "Native compilation is available.")
+      (when (boundp 'comp-deferred-compilation)
+        ;; Enable deferred compilation by default, reasonably early
+        (customize-set-variable 'comp-deferred-compilation t)))
+  (message "Native compilation is not available."))
+
 ;; Stop package.el from starting by default
 (customize-set-variable 'package-enable-at-startup nil)
-;; Stop is from littering our init
+;; Stop it from littering our init
 (declare-function package--ensure-init-file "package")
 (advice-add #'package--ensure-init-file :override #'ignore)
 
