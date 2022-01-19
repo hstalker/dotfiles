@@ -164,7 +164,8 @@ ZZ    quit
 # -R: ANSI escape sequence pass-through
 # -M: Use a verbose prompt
 # -J: Show status column for search results + unread text
+#     We leave this disabled to avoid incorrent indenting on the output
 # -W: Places cursor temporarily at first new line of any forward movement
 # You can pass any of these arguments as '-+FLAG' (e.g. '-+X') to reset to
 # default behavior.
-LESS = -x4 -iFXRMJW
+LESS = -x4 -iFXRMW
