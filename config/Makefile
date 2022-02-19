@@ -47,6 +47,7 @@ PACKAGES ?= shells \
 	feh \
 	zoom \
 	sway \
+	nvidia \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
 	$(TARGET_DIR)/.local/bin \

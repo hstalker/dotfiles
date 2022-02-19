@@ -124,6 +124,7 @@ Currently includes some configuration for the following pieces of software:
 * Misc.
   * GTK - Gnome GUI toolkit
   * KDE- KDE (and Qt) configuration
+  * Nvidia - configuration and fixes for nvidia drivers/devices
 
 And also offers the following themes for all desired software:
 * Halogen - Mishmash of my own making. Warm colors. Primarily light solarized
