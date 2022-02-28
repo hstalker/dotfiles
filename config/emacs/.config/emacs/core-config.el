@@ -2219,7 +2219,9 @@ delimiters."
 
   :diminish
   dashboard-mode
-  page-break-lines-mode
+
+  :hook
+  ((dashboard-mode . page-break-lines-mode))
 
   :config
   (dashboard-setup-startup-hook)
