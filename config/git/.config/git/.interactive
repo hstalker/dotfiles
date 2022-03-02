@@ -84,3 +84,17 @@ git_commit_stats() {
   return 0
 }
 
+# Gives list of N largest blobs in the current working directory's repo
+git_largest_blobs() {
+  if [ $# -gt 1 ]; then
+    report_error "USAGE: git_largest_blobs [COUNT]"
+    return 255
+  fi
+
+  git rev-list --all --objects | \
+    git cat-file --batch-check='%(objectname) %(objecttype) %(objectsize) %(rest)' | \
+    grep blob | sort -k3nr | head -n "${1:-10}"
+
+  return 0
+}
+
