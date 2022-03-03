@@ -95,6 +95,14 @@ dimensions. This won't work as expected under daemon mode."
 tall. This won't work as expected under daemon mode."
   (not (hgs-monitor-is-portrait)))
 
+(defun hgs-toggle-window-dedicated ()
+  "Toggle currently active window's dedication state"
+  (interactive)
+  (let (window (get-buffer-window (current-buffer)))
+    (if (set-window-dedicated-p window (not (window-dedicated-p window)))
+        (message "Dedicated window for buffer: '%s'" (current-buffer))
+      (message "Undedicated window for buffer: '%s'" (current-buffer)))))
+
 ;; Internal/built-in package configuration
 ;; Configure things defined in the core-most Emacs C code.
 ;; If you aren't sure where something goes, prefer to put it here instead of in
