@@ -279,48 +279,36 @@ non-left-to-right text, so this gives a nice performance boost.")
    t
    "Make sure we don't have duplicates in the command history.")
   (display-buffer-alist
-   ;; Attempt to tame Emacs' tendency towards randomly replacing/creating
-   ;; windows for predictability's sake. Generally you want this to be as simple
-   ;; as possible, to allow for maximum flexibility at usage time.
-
+   ;; Don't bother truly attempting to tame Emacs windowing. True freedom is
+   ;; learning to not care where things are as long as *Help* doesn't replace
+   ;; you current buffer ;).
+   ;;
    ;; Note: Be very careful about this structure. Breaking it breaks Emacs'
    ;; multiplexing.
-
+   ;;
    ;; General Structure:
    ;; (REGULAR-EXPRESSION-STRING
    ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
    ;;  OPTIONS...)
    `(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
-      (display-buffer-reuse-mode-window
-       display-buffer-in-side-window)
-      (window-width . 0.25)
-      ;; Would like to make this dynamic and based on monitor proportions, but
-      ;; this won't work properly under daemon mode, and we can't really pass in
-      ;; functions.
-      (side . bottom)
-      (slot . 0))
+      (display-buffer-reuse-mode-window)
+      (inhibit-same-window . t))
      ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
-      (display-buffer-reuse-mode-window
-       display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . -1)
+      (display-buffer-reuse-mode-window display-buffer-in-previous-window)
       (inhibit-same-window . t))
      ("^\\*[Mm]essages.*"
-      (display-buffer-reuse-mode-window
-       display-buffer-in-side-window)
-      (window-height . 0.25)
-      (side . bottom)
-      (slot . 1)
+      (display-buffer-reuse-mode-window)
       (inhibit-same-window . t))
      ("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
       ()
-      (window-parameters (mode-line-format . none))))
+      (window-parameters . (mode-line-format . none))))
    "Custom overrides for window placement of specific buffers.")
   (display-buffer-base-action
    ;; Defaults to make Emacs let us control most of the window layout. This
-   ;; makes Emacs prefer to use existing windows or the same window rather
-   ;; than creating new splits by default.
+   ;; makes Emacs prefer to use existing windows or the same window rather than
+   ;; creating new splits by default. This helps keep things relatively
+   ;; deterministic (and hence learnable), while at the same time giving us more
+   ;; opportunity to decide to make splits & frames ourselves.
    '((display-buffer-reuse-window
       display-buffer-reuse-mode-window
       display-buffer-same-window
