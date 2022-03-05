@@ -319,9 +319,9 @@ predictable."))
 
 (use-package minibuffer
   :bind
-  ;; Not sure about this binding, but allows us to use a narrowing framework for
-  ;; capf completions, which in my opinion is better UX than company-mode
-  ("C-c C-;" . completion-at-point))
+  ;; Allows us to use a narrowing framework for capf completions, which in my
+  ;; opinion is better UX than company-mode.
+  ("C-c ;" . completion-at-point))
 
 ;; Only needed for stopping some Emacs games from littering configuration
 ;; directory
