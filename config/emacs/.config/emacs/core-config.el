@@ -725,6 +725,39 @@ American English."))
   (erc-join . read-only-mode)
 
   :init
+  (require 'rx)
+  (defcustom hgs-erc-freenode-server-regexp
+    (rx "freenode")
+    "Regular expression for matching Freenode IRC server name."
+    :group 'personal
+    :type 'regexp)
+  (defcustom hgs-erc-rizon-server-regexp
+    ;; Rizon uses a round-robin allocation system, so we might get a different
+    ;; actual server domain each time we connect via the generic Rizon domain
+    ;; name.
+    (rx (or "rizon"
+            "sacredland.world"
+            "hostsailor.com"
+            "uworld.se"
+            "anonchan.com"
+            "defineya.com"
+            "losslessone.com"
+            "sxci.net"
+            "shells.org"))
+    "Regular expression for matching Rizon IRC server name."
+    :group 'personal
+    :type 'regexp)
+  (defcustom hgs-erc-libera-server-regexp
+    (rx "libera")
+    "Regular expression for matching Libera Chat IRC server name."
+    :group 'personal
+    :type 'regexp)
+  (defcustom hgs-erc-oftc-server-regexp
+    (rx "oftc")
+    "Regular expression for matching OFTC IRC server name."
+    :group 'personal
+    :type 'regexp)
+
   (defun hgs--erc-disable-whitespace-mode ()
     "Disables whitespace mode in erc buffers, as it causes issues."
     (whitespace-mode -1))
