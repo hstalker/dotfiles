@@ -2788,6 +2788,71 @@ Can be forced on by supplying >0 or t, and off via <0."
   :after
   erc)
 
+(use-package message
+  :defines
+  hgs-smtp-routes
+
+  :functions
+  hgs--provider-from-addr-to-smtp-route
+  hgs--gmail-from-addr-to-smtp-route
+
+  :init
+  (defcustom hgs-smtp-routes '()
+    "List of mappings of `From' headers to SMTP servers for outgoing messages.
+If none are provided, Emacs' SMTP implementation will fallback to
+default behavior."
+    :group 'personal
+    :type '(list (plist :options
+                        ((:from-addr string)
+                         (:smtp-user string)
+                         (:smtp-server string)
+                         (:smtp-port integer)))))
+  (defvar hgs--gmail-smtp-server "smtp.gmail.com"
+    "Default SMTP server address for Gmail.")
+  (defvar hgs--gmail-smtp-port 587
+    "Default SMTP port for Gmail.")
+
+  (defun hgs--gmail-from-addr-to-smtp-route (from-addr)
+    "Maps a Gmail From address to an smtp route for use with `HGS-SMTP-ROUTES'."
+    `(:from-addr ,from-addr
+                 :smtp-user ,from-addr
+                 :smtp-server ,hgs--gmail-smtp-server
+                 :smtp-port ,hgs--gmail-smtp-port))
+
+  (defun hgs--provider-from-addr-to-smtp-route (from-addr)
+    "Maps a From address to an smtp route for use with `HGS-SMTP-ROUTES'.
+This function relies on heuristics based on the provider of the domain of the
+`From' address, and as such will error on unexpected domains."
+    (cond
+     ((string-match "@gmail.com$" from-addr)
+      (hgs--gmail-from-addr-to-smtp-route from-addr))
+     (t
+      (error "Unable to find default route for the provider of your From address `%s'" from-addr))))
+
+  :config
+  (require 'cl-lib)
+  (defun hgs--message-send-route-smtp ()
+    "Set SMTP server from list of multiple ones and send mail based on sender.
+To do this we use a special SMTP header understood by Emacs' SMTP send
+implementation: `X-Message-SMTP-Method'."
+    (let ((smtp-method-header "X-Message-SMTP-Method"))
+      ;; Remove the directive header. We always determine it by the `From' field.
+      (message-remove-header smtp-method-header)
+      (let ((sender (message-fetch-field "From")))
+        (seq-map #'(lambda (entry)
+                     (cl-destructuring-bind
+                         (&key from-addr smtp-server smtp-port smtp-user)
+                         entry
+                       (when (string-match from-addr sender)
+                         (message-add-header
+                          (format "%s: smtp %s %d %s"
+                                  smtp-method-header
+                                  smtp-server smtp-port smtp-user)))))
+                 hgs-smtp-routes)
+        (unless (message-fetch-field smtp-method-header)
+          (warn "Could not find SMTP Server for this Sender address: %s. You might want to correct it or add it to the SMTP Server list 'hgs-smtp-routes'" sender)))))
+
+  (add-hook 'message-send-hook #'hgs--message-send-route-smtp))
 
 ;; Local Variables:
 ;; mode: emacs-lisp
