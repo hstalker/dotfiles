@@ -98,7 +98,7 @@ tall. This won't work as expected under daemon mode."
 (defun hgs-toggle-window-dedicated ()
   "Toggle currently active window's dedication state"
   (interactive)
-  (let (window (get-buffer-window (current-buffer)))
+  (let ((window (get-buffer-window (current-buffer))))
     (if (set-window-dedicated-p window (not (window-dedicated-p window)))
         (message "Dedicated window for buffer: '%s'" (current-buffer))
       (message "Undedicated window for buffer: '%s'" (current-buffer)))))
@@ -2945,7 +2945,7 @@ structured Notmuch configuration directory."
         ("C-c M-p" . hgs-notmuch-change-profile))
 
   :config
-  (defun hgs-notmuch-change-profile (&optional arg)
+  (defun hgs-notmuch-change-profile (&optional)
     "Select from available Notmuch profiles to use."
     (interactive)
     (let ((profile-env-var "NOTMUCH_PROFILE")
