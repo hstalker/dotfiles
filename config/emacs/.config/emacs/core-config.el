@@ -1983,9 +1983,10 @@ emacsclient (invalid argument stringp errors)."
     :init
     (defun hgs--tree-sitter-modes (&optional arg)
       "Proxy to `tree-sitter-mode' & `tree-sitter-hl-mode' swallowing errors."
-      (with-demoted-errors "Silenced error: %s"
-        (tree-sitter-mode arg)
-        (tree-sitter-hl-mode arg))))
+      (let ((debug-on-error nil))
+        (with-demoted-errors "Silenced error: %s"
+          (tree-sitter-mode arg)
+          (tree-sitter-hl-mode arg)))))
 
   (use-package tree-sitter-langs
     :after
