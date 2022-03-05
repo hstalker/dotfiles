@@ -482,6 +482,12 @@
        :type git
        :host github
        :repo "leathekd/erc-hl-nicks"))
+    (straight-use-package
+     '(notmuch
+       :type git
+       :host nil
+       :repo "https://git.notmuchmail.org/git/notmuch"
+       :files ("emacs/*.el" "emacs/*.svg")))
 
     (progress-reporter-done core-packages-progress)))
 

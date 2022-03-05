@@ -2854,6 +2854,73 @@ implementation: `X-Message-SMTP-Method'."
 
   (add-hook 'message-send-hook #'hgs--message-send-route-smtp))
 
+(use-package notmuch
+  :init
+  (require 'cl-lib)
+  (require 'rx)
+  (defun hgs--notmuch-list-profiles-by-filesystem (&optional config-directory)
+    "Infers list of profiles using directories available in `CONFIG-DIRECTORY'.
+If no `CONFIG-DIRECTORY' is provided, a reasonable default is
+used. `CONFIG-DIRECTORY' is expected to point to your XDG
+structured Notmuch configuration directory."
+      (let* ((notmuch-config-directory
+              (or config-directory
+                  (concat hgs-user-directory ".config/notmuch")))
+             (special-directory-regex
+              "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)")
+             (additional-exclusions-regex
+              '("default")))
+        (cl-flet* ((make-exclusion
+                    (lambda (path)
+                      (cl-some
+                       (lambda (x)
+                         (not
+                          (string-match-p (rx bol (regex x) eol) path)))
+                       additional-exclusions-regex)))
+                   (to-profile-name
+                    (lambda (path)
+                      (file-name-base (directory-file-name path))))
+                   (make-exclusions
+                    (lambda (paths)
+                      (seq-filter #'make-exclusion paths)))
+                   (to-profile-names
+                    (lambda (paths)
+                      (seq-map #'to-profile-name paths)))
+                   (only-directories
+                    (lambda (paths)
+                      (seq-filter (lambda (path)
+                                    (file-directory-p path))
+                                  paths))))
+
+          (make-exclusions
+           (to-profile-names
+            (only-directories
+             (directory-files notmuch-config-directory
+                              'full
+                              special-directory-regex
+                              'nosort)))))))
+
+  (defcustom hgs-notmuch-list-profiles
+    #'hgs--notmuch-list-profiles-by-filesystem
+    "Function used for generating a list of available Notmuch profiles."
+    :type 'function
+    :group 'personal)
+
+  :bind
+  (:map notmuch-hello-mode-map
+        ("C-c M-p" . hgs-notmuch-change-profile))
+
+  :config
+  (defun hgs-notmuch-change-profile (&optional arg)
+    "Select from available Notmuch profiles to use."
+    (interactive)
+    (let ((profile-env-var "NOTMUCH_PROFILE")
+          (new-profile
+           (completing-read "Select Notmuch profile: "
+                            (funcall hgs-notmuch-list-profiles)
+                            nil nil)))
+      (setenv profile-env-var new-profile))))
+
 ;; Local Variables:
 ;; mode: emacs-lisp
 ;; coding: utf-8-unix
