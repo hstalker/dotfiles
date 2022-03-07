@@ -512,10 +512,10 @@ file when it changes on disk.")
   (auto-save-file-name-transforms
    `((".*" ,(concat hgs-state-directory) "backup")
      t)
-   "Put autosaves in the cache directory.")
+   "Put autosaves in the state directory.")
   (backup-directory-alist
    `((".*" . ,(concat hgs-state-directory "backup")))
-   "Put backups in the cache directory.")
+   "Put backups in the state directory.")
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
 (use-package subword
@@ -2327,7 +2327,7 @@ automation."))
   :custom
   (undo-tree-history-directory-alist
    `(("." . ,(concat hgs-state-directory "undo-tree")))
-   "Put history backups in the cache directory."))
+   "Put history backups in the state directory."))
 
 (use-package projectile
   :commands
@@ -2886,7 +2886,15 @@ implementation: `X-Message-SMTP-Method'."
         (unless (message-fetch-field smtp-method-header)
           (warn "Could not find SMTP Server for this Sender address: %s. You might want to correct it or add it to the SMTP Server list 'hgs-smtp-routes'" sender)))))
 
-  (add-hook 'message-send-hook #'hgs--message-send-route-smtp))
+  (add-hook 'message-send-hook #'hgs--message-send-route-smtp)
+
+  :custom
+  (mail-source-directory
+   (concat hgs-data-directory "mail")
+   "We don't use this, but point it at a sensible mail directory anyway.")
+  (mail-default-directory
+   hgs-state-directory
+   "Put mail auto-saves in the state directory"))
 
 (use-package notmuch
   :init
