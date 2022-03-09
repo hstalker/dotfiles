@@ -67,41 +67,57 @@
 
 (defcustom hgs-config-directory
   (file-name-as-directory
-   (concat (file-name-as-directory
-            (or (getenv "XDG_CONFIG_HOME")
-                (concat hgs-user-directory ".config")))
-           "emacs"))
+   (or (getenv "XDG_CONFIG_HOME")
+       (concat hgs-user-directory ".config")))
   "XDG directory specification's config directory."
+  :type 'directory
+  :group 'personal)
+
+(defcustom hgs-emacs-config-directory
+  (file-name-as-directory (concat hgs-config-directory "emacs"))
+  "Emacs config directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-cache-directory
   (file-name-as-directory
-   (concat (file-name-as-directory
-            (or (getenv "XDG_CACHE_HOME")
-                (concat hgs-user-directory ".cache")))
-           "emacs"))
+   (or (getenv "XDG_CACHE_HOME")
+       (concat hgs-user-directory ".cache")))
   "XDG directory specification's cache directory."
+  :type 'directory
+  :group 'personal)
+
+(defcustom hgs-emacs-cache-directory
+  (file-name-as-directory (concat hgs-cache-directory "emacs"))
+  "Emacs cache directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-data-directory
   (file-name-as-directory
-   (concat (file-name-as-directory
-            (or (getenv "XDG_DATA_HOME")
-                (concat hgs-user-directory ".local/share")))
-           "emacs"))
+   (or (getenv "XDG_DATA_HOME")
+       (concat hgs-user-directory ".local/share")))
   "XDG directory specification's data directory."
+  :type 'directory
+  :group 'personal)
+
+(defcustom hgs-emacs-data-directory
+  (file-name-as-directory (concat hgs-data-directory "emacs"))
+  "Emacs data directory."
   :type 'directory
   :group 'personal)
 
 (defcustom hgs-state-directory
   (file-name-as-directory
-   (concat (file-name-as-directory
-            (or (getenv "XDG_STATE_HOME")
-                (concat hgs-user-directory ".local/state")))
-           "emacs"))
+   (or (getenv "XDG_STATE_HOME")
+       (concat hgs-user-directory ".local/state")))
   "XDG directory specification's state directory."
+  :type 'directory
+  :group 'personal)
+
+(defcustom hgs-emacs-state-directory
+  (file-name-as-directory (concat hgs-state-directory "emacs"))
+  "Emacs state directory."
   :type 'directory
   :group 'personal)
 
@@ -205,7 +221,7 @@ enabled."))
 
 ;; Chnage the built-in init directories for old emacs versions using ~/.emacs
 (setq user-init-file load-file-name)
-(setq user-emacs-directory hgs-config-directory)
+(setq user-emacs-directory hgs-emacs-config-directory)
 ;; Stop emacs from littering our $HOME
 (if (< emacs-major-version 27)
     (let ((dir (concat hgs-user-directory ".emacs.d")))
@@ -225,32 +241,34 @@ load call as one might expect."
   `(load ,file-path 'noerror ,nomessage ,nosuffix ,must-suffix))
 
 ;; Load the core package management primitives we use
-(load (concat hgs-config-directory "lisp/minmacs")
+(load (concat hgs-emacs-config-directory "lisp/minmacs")
       nil 'nomessage)
 (minmacs-bootstrap)
 
 ;; Declaratively specify packages
-(load (concat  hgs-config-directory "core-package")
+(load (concat  hgs-emacs-config-directory "core-package")
       nil 'nomessage)
 (let (;; (straight-recipe-repositories nil)
       ;; (straight-recipe-overrides nil)
       (straight-current-profile 'custom))
-  (load-if-exists (concat hgs-config-directory "custom-package")))
+  (load-if-exists (concat hgs-emacs-config-directory "custom-package")))
 
 ;; Load core configuration modules
-(load (concat hgs-config-directory "core-config")
+(load (concat hgs-emacs-config-directory "core-config")
       nil 'nomessage)
-(load-if-exists (concat hgs-config-directory "custom-config"))
+(load-if-exists (concat hgs-emacs-config-directory "custom-config"))
 
 ;; Setup customization paths
 ;; We want the customize interface to alter a local overrides file
 (customize-set-variable 'custom-file
-                        (concat hgs-config-directory "custom-customization.el"))
+                        (concat hgs-emacs-config-directory
+                                "custom-customization.el"))
 (load-if-exists custom-file)
 
 ;; Same as above for abbreviations
 (customize-set-variable 'abbrev-file-name
-                        (concat hgs-config-directory "custom-abbreviation.el"))
+                        (concat hgs-emacs-config-directory
+                                "custom-abbreviation.el"))
 (load-if-exists abbrev-file-name)
 
 ;; For non daemon run we want to manually run frame setup hooks that have been

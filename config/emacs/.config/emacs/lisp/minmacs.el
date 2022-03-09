@@ -39,12 +39,12 @@ and what files to include."
 
 ;; Define functions for somewhat declaratively managing packages
 ;; Satisfy the Emacs compiler
-(defvar hgs-data-directory)
-(defvar hgs-config-directory)
+(defvar hgs-emacs-data-directory)
+(defvar hgs-emacs-config-directory)
 (defvar bootstrap-version)
 
 ;; Configure Straight
-(defvar straight-base-dir hgs-data-directory)
+(defvar straight-base-dir hgs-emacs-data-directory)
 (defvar straight-repository-branch
   "master"
   "Use master instead of develop for stability.")
@@ -68,8 +68,8 @@ and what files to include."
   t
   "Install a workaround for a problem with org.")
 (defvar straight-profiles
-  `((core . ,(concat hgs-config-directory "core-lock.el"))
-    (custom . ,(concat hgs-config-directory "custom-lock.el")))
+  `((core . ,(concat hgs-emacs-config-directory "core-lock.el"))
+    (custom . ,(concat hgs-emacs-config-directory "custom-lock.el")))
   "Alist of `'(PROFILE-NAME . LOCK-FILE-NAME)'.
 Lock file names are either relative to \"straight/versions/\" or absolute
 paths.")
