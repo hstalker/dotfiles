@@ -1421,6 +1421,10 @@ to point."))
      )
    "Unicode bullets to use."))
 
+(use-package org-mime
+  :custom
+  (org-mime-library 'mml "Use mml."))
+
 (use-package exec-path-from-shell
   :commands
   exec-path-from-shell-initialize

@@ -458,6 +458,11 @@
      '(org-contrib
        :includes (org)))
     (straight-use-package
+     '(org-mime
+       :type git
+       :host github
+       :repo "org-mime/org-mime"))
+    (straight-use-package
      '(doom-modeline
        :type git
        :host github
