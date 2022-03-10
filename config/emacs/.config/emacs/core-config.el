@@ -638,7 +638,9 @@ package."))
    "Put Tramp backups in the same place as local backups.")
   (tramp-persistency-file-name
    (concat hgs-emacs-cache-directory "tramp-persistency.el")
-   "Put the Tramp persistency file in the cache directory."))
+   "Put the Tramp persistency file in the cache directory.")
+  (tramp-histfile-override
+   nil "We don't want to store remote shell history locally."))
 
 (use-package eshell
   :functions
