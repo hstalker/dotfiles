@@ -483,6 +483,12 @@
        :host github
        :repo "leathekd/erc-hl-nicks"))
     (straight-use-package
+     '(message-templ
+       :type git
+       :host nil
+       :repo "https://git.tethera.net/message-templ.git"
+       :files ("message-templ.el")))
+    (straight-use-package
      '(notmuch
        :type git
        :host nil
