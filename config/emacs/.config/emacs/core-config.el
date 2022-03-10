@@ -2894,12 +2894,43 @@ implementation: `X-Message-SMTP-Method'."
   (add-hook 'message-send-hook #'hgs--message-send-route-smtp)
 
   :custom
+  (message-send-mail-function
+   #'sendmail-query-once
+   "Query for mail send function on first use (NOTE: Only queries if
+`smtpmail-send-it' would require configuration).")
+  (message-sendmail-envelope-from
+   'header "Derive envelope from via outgoing mail headers for sendmail.")
+  (message-directory
+   (concat hgs-data-directory "mail") "Base directory for all core mail paths.")
+  (message-auto-save-directory
+   (concat hgs-emacs-state-directory "mail-drafts")
+   "Where to place draft messages")
+  (message-default-mail-headers
+   "Cc: \n" "Add CC header to new mail by default."))
+
+(use-package smtpmail
+  :custom
+  (smtpmail-local-domain
+   (if (>= emacs-major-version 25)
+       (car (split-string (shell-command-to-string "hostname -f")))
+     nil)
+   "SMTP servers expect FQDN, but `SYSTEM-NAME' (the default) returns short
+hostname after emacs 25."))
+
+(use-package mail-source
+  :custom
   (mail-source-directory
    (concat hgs-data-directory "mail")
-   "We don't use this, but point it at a sensible mail directory anyway.")
+   "We don't use this, but point it at a sensible mail directory anyway."))
+
+(use-package sendmail
+  :custom
   (mail-default-directory
    (concat hgs-emacs-state-directory "mail")
-   "Put mail auto-saves in the state directory"))
+   "Put mail auto-saves in the state directory")
+  (mail-specify-envelope-from t "Specify envelope from to the specified MUA.")
+  (mail-envelope-from
+   'header "Derive envelope from via outgoing mail headers."))
 
 (use-package notmuch
   :init
@@ -2953,9 +2984,33 @@ structured Notmuch configuration directory."
     :type 'function
     :group 'personal)
 
+  (defun hgs--notmuch-show-view-as-patch ()
+    "View the the current message as a patch via `DIFF-MODE'."
+    (interactive)
+    (let* ((id (notmuch-show-get-message-id))
+           (msg (notmuch-show-get-message-properties))
+           (part (notmuch-show-get-part-properties))
+           (subject (concat "Subject: " (notmuch-show-get-subject) "\n"))
+           (diff-default-read-only t)
+           (buf (get-buffer-create (concat "*notmuch-patch-" id "*")))
+           (map (make-sparse-keymap)))
+      (define-key map "q" 'notmuch-bury-or-kill-this-buffer)
+      (switch-to-buffer buf)
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert subject)
+        (insert (notmuch-get-bodypart-text msg part nil)))
+      (set-buffer-modified-p nil)
+      (diff-mode)
+      (let ((new-ro-bind (cons 'buffer-read-only map)))
+        (add-to-list 'minor-mode-overriding-map-alist new-ro-bind))
+      (goto-char (point-min))))
+
   :bind
   (:map notmuch-hello-mode-map
         ("C-c M-p" . hgs-notmuch-change-profile))
+  (:map notmuch-show-part-map
+        ("d" . hgs--notmuch-show-view-as-patch))
 
   :config
   (defun hgs-notmuch-change-profile (&optional)
@@ -2966,7 +3021,39 @@ structured Notmuch configuration directory."
            (completing-read "Select Notmuch profile: "
                             (funcall hgs-notmuch-list-profiles)
                             nil nil)))
-      (setenv profile-env-var new-profile))))
+      (setenv profile-env-var new-profile)))
+
+  :custom
+  (notmuch-address-command
+   'internal "Use `notmuch address' for address completion.")
+  (notmuch-address-save-filename
+   (concat hgs-emacs-cache-directory "notmuch-addresses")
+   "Cache file for notmuch completed addresses.")
+  (notmuch-crypto-process-mime
+   t "Read & verify encrypted/signed mime messages.")
+  (notmuch-saved-searches
+   '((:name "inbox"
+            :query "tag:inbox"
+            :key "i")
+     (:name "unread"
+            :query "tag:unread"
+            :key "u")
+     (:name "flagged"
+            :query "tag:flagged"
+            :key "f")
+     (:name "sent"
+            :query "tag:sent"
+            :key "t")
+     (:name "drafts"
+            :query "tag:draft"
+            :key "d")
+     (:name "mail list"
+            :query "tag:mail-list"
+            :key "m")
+     (:name "all mail"
+            :query "not (tag:draft or tag:sent or tag:trash or tag:spam)"
+            :key "a"))
+   "Saved searches accessible via jump table."))
 
 ;; Local Variables:
 ;; mode: emacs-lisp
