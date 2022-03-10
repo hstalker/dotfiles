@@ -88,19 +88,19 @@
 
 ;; Some convenient functions for figuring out current monitor dimensions
 (defun hgs-monitor-is-portrait ()
-  "Predicate returning `t' if the current display monitor is of portrait
-dimensions. This won't work as expected under daemon mode."
+  "Predicate determining if the current display is of portrait dimensions.
+This won't work as expected under daemon mode."
   (if (< (display-pixel-width) (display-pixel-height))
       t
     nil))
 
 (defun hgs-monitor-is-horizontal ()
-  "Predicate returning `t' if the current display monitor is wider than it is
-tall. This won't work as expected under daemon mode."
+  "Predicate determining if the current display is of landscape dimensions.
+This won't work as expected under daemon mode."
   (not (hgs-monitor-is-portrait)))
 
 (defun hgs-toggle-window-dedicated ()
-  "Toggle currently active window's dedication state"
+  "Toggle currently active window's dedication state."
   (interactive)
   (let ((window (get-buffer-window (current-buffer))))
     (if (set-window-dedicated-p window (not (window-dedicated-p window)))
