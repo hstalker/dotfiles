@@ -334,7 +334,7 @@ try_source() {
     return 255
   fi
 
-  if [ -r "$1" -a ! -d "$1" ]; then
+  if [ -r "$1" ] && [ ! -d "$1" ]; then
     . "$1"
   fi
 
@@ -453,7 +453,7 @@ inject_user_systemd_environment() (
     return 255
   fi
 
-  if [ $# -ge 1 -a $# -le 2 ]; then
+  if [ $# -ge 1 ] && [ $# -le 2 ]; then
     report_status "Injecting variable '$1' as value '$2' into Systemd..."
     systemctl --user set-environment "$1"
   else
@@ -577,32 +577,44 @@ assert_file_has_line() (
 
 # Checks if the given directory is empty of files, folders etc.
 is_directory_empty() {
-  if [ $# != 1 ]; then
-    report_error "USAGE: is_directory_empty PATH-TO-DIRECTORY"
+  if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+    report_error "USAGE: is_directory_empty PATH-TO-DIRECTORY [NAME-PATTERN]"
     return 255
   fi
+  SEARCH_DIR="$1"
+  if [ $# -gt 1 ]; then
+    NAME_PATTERN="$2"
+  fi
 
-  if [ $(find "$1" \
-      -mindepth 1 -maxdepth 1 2>/dev/null | wc -l) != 0 ]; then
+  if [ $(find "${SEARCH_DIR}" \
+      -mindepth 1 -maxdepth 1 ${NAME_PATTERN:+-iname "${NAME_PATTERN}"} \
+      2>/dev/null | wc -l) != 0 ]; then
     return 1
   else
     return 0
   fi
 }
 
-# Load every file matching in "$XDG_CONFIG_HOME/*/$1". Primarily used to load
-# modularized per-application login/logout/interactive/env configuration.
+# Load every file matching in "$XDG_CONFIG_HOME/shell/modules/$TYPE/*.sh".
+# Primarily used to load modularized per-application
+# login/logout/interactive/env configuration.
 load_per_application_modules() {
-  _ALLOWED_MODULE_NAMES="env login logout interactive"
-  if [ $# != 1 ] || ! echo "${_ALLOWED_MODULE_NAMES}" | grep -wq "$1"; then
+  _ALLOWED_MODULE_TYPES="env login logout interactive"
+  if [ $# != 1 ] || ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$1"; then
     report_error "USAGE: load_all_per_application MODULE-NAME where \
-MODULE-NAME is one of '${_ALLOWED_MODULE_NAMES}'"
+MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
     return 255
   fi
+  MODULE_TYPE="$1"
 
-  if ! is_directory_empty "${XDG_CONFIG_HOME:-$HOME/.config}"; then
-    for p in "${XDG_CONFIG_HOME:-$HOME/.config}"/*; do
-      try_source "${p}/.$1"
+  MODULE_BASE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/shell/modules/${MODULE_TYPE}"
+  if [ -d "${MODULE_BASE_DIR}" ] && \
+      [ -r "${MODULE_BASE_DIR}" ] && \
+      ! is_directory_empty "${MODULE_BASE_DIR}" '*.sh'; then
+    # Sadly there's not a good way of doing this with find, as sourcing needs to
+    # be done in the main context (doesn't work in pipe)
+    for MODULE in "${MODULE_BASE_DIR}"/*.sh; do
+      try_source "${MODULE}"
     done
   fi
 
@@ -611,18 +623,21 @@ MODULE-NAME is one of '${_ALLOWED_MODULE_NAMES}'"
 
 # Try to load the $XDG_CONFIG_HOME/$1/custom.$2 override module specified.
 load_override_module() {
-  _ALLOWED_SHELL_NAMES="shell sh ksh zsh bash"
-  _ALLOWED_MODULE_NAMES="env login logout interactive"
+  _ALLOWED_SHELL_TYPES="shell sh ksh zsh bash"
+  _ALLOWED_MODULE_TYPES="env login logout interactive"
   if [ $# != 2 ] || \
-      ! echo "${_ALLOWED_SHELL_NAMES}" | grep -wq "$1" ||
-      ! echo "${_ALLOWED_MODULE_NAMES}" | grep -wq "$2"; then
-    report_error "USAGE: load_override_module SHELL-NAME MODULE-TYPE where \
-SHELL-NAME is one of '${_ALLOWED_SHELL_NAMES}', \
-and MODULE-TYPE is one of '${_ALLOWED_MODULE_NAMES}'"
+      ! echo "${_ALLOWED_SHELL_TYPES}" | grep -wq "$1" ||
+      ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$2"; then
+    report_error "USAGE: load_override_module SHELL-TYPE MODULE-TYPE where \
+SHELL-TYPE is one of '${_ALLOWED_SHELL_TYPES}', \
+and MODULE-TYPE is one of '${_ALLOWED_MODULE_TYPES}'"
     return 255
   fi
+  SHELL_NAME="$1"
+  MODULE_TYPE="$2"
 
-  try_source "${XDG_CONFIG_HOME:-$HOME/.config}/$1/custom.$2"
+  try_source \
+    "${XDG_CONFIG_HOME:-$HOME/.config}/${SHELL_NAME}/custom.${MODULE_TYPE}"
 
   return 0
 }

@@ -239,14 +239,16 @@ It should go in `interactive` if:
 * It's an alias.
 * It's a shell session specific environment variable (not exported).
 
-Top-level {.env,.interactive,.login,.logout} sh compatible scripts can be
-placed in the subdirectories under `$XDG_CONFIG_HOME` and will be loaded
-automatically at the appropriate stage in subdirectory alphabetical order. This
-is in order to allow application specific shell configuration for more fine
-grained installation of these dotfiles (for example: tmux aliases could be
-placed in `$XDG_CONFIG_HOME/tmux/.interactive`, which then will only be
-installed/linked and loaded by the shell if the tmux configuration is
-installed).
+Per-application shell modules should be placed under
+`XDG_CONFIG_HOME/shell/modules/{env,login,logout,interactive}/` as a `*.sh`
+file, where they will be loaded by the shell at appropriate times by the shell
+in alphanumeric order. This is in order to allow application specific shell
+configuration for more fine grained installation of these dotfiles (for example:
+tmux aliases could be placed in `$XDG_CONFIG_HOME/tmux/.interactive`, which then
+will only be installed/linked and loaded by the shell if the tmux configuration
+is installed). Per-application shell modules should not assume the presence of
+other per-application shell modules (but can have shifted load order or
+workarounds to work in the presence of other per-application modules).
 
 Shells will load per-install per-shell override scripts as per the prior
 mentioned rules. These customization points can be found at:
