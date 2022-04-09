@@ -7,40 +7,19 @@
 
 ;;; Code:
 
-;; Defer garbage collection until end of initialization
-(customize-set-variable 'gc-cons-threshold most-positive-fixnum)
+(let ((default-directory (concat (file-name-directory load-file-name)
+                                 "lisp")))
+  (normal-top-level-add-to-load-path '("."))
+  (normal-top-level-add-subdirs-to-load-path))
+(require 'hgs-pre-init)
 
-;; Needed to force emacs to not use stale bytecode
-(customize-set-variable 'load-prefer-newer t)
-
-(when (and (fboundp 'native-comp-available)
-           (native-comp-available))
-  (when (boundp 'comp-deferred-compilation)
-    ;; Enable deferred compilation by default
-    (customize-set-variable 'comp-deferred-compilation t)))
-
-;; Stop package.el from starting by default
-(customize-set-variable 'package-enable-at-startup nil)
-(declare-function package--ensure-init-file "package")
-(advice-add #'package--ensure-init-file :override #'ignore)
-
-;; Hide GUI emacs remnants early
-(push '(menu-bar-lines . nil) default-frame-alist)
-(push '(tool-bar-lines . nil) default-frame-alist)
-(push '(vertical-scroll-bars . nil) default-frame-alist)
-(push '(horizontal-scroll-bars . nil) default-frame-alist)
-
-;; We don't want to use xresources for themes
-(advice-add #'x-apply-session-resources :override #'ignore)
-
-;; GTK Emacs will react to gconf settings for things like fonts by default. This
-;; turns that off.
-(define-key special-event-map [config-changed-event] 'ignore)
+(hgs-run-pre-init)
 
 ;; Local Variables:
 ;; coding: utf-8-unix
 ;; fill-column: 80
 ;; require-final-newline: t
+;; no-native-compile: nil
 ;; End:
 
 ;;; early-init.el ends here

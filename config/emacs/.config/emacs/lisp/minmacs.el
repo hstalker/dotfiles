@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(require 'hgs-core)
+
 (defgroup minmacs nil
   "Options for our declarative package management & system management
 wrappers."
@@ -39,9 +41,10 @@ and what files to include."
 
 ;; Define functions for somewhat declaratively managing packages
 ;; Satisfy the Emacs compiler
-(defvar hgs-emacs-data-directory)
-(defvar hgs-emacs-config-directory)
 (defvar bootstrap-version)
+(declare-function straight-use-package "straight")
+(declare-function straight-register-package "straight")
+(declare-function straight-use-recipes "straight")
 
 ;; Configure Straight
 (defvar straight-base-dir hgs-emacs-data-directory)

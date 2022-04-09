@@ -10,27 +10,13 @@
 (require 'cl-lib)
 (require 'files)
 (require 'custom)
-(require 'minmacs)
 (require 'use-package)
 
-(defvar hgs-config-directory)
-(defvar hgs-cache-directory)
-(defvar hgs-state-directory)
-(defvar hgs-data-directory)
-(defvar hgs-emacs-config-directory)
-(defvar hgs-emacs-cache-directory)
-(defvar hgs-emacs-state-directory)
-(defvar hgs-emacs-data-directory)
-(defvar hgs-project-directory)
-(defvar hgs-org-directory)
-(defvar hgs-has-dynamic-module-support)
-(defvar hgs-is-bsd)
-(defvar hgs-is-linux)
-(defvar hgs-is-mac)
-(defvar hgs-is-windows)
-(defvar hgs-frame-customization-hook)
-(defvar hgs-frame-customization-gui-hook)
-(defvar hgs-frame-customization-tui-hook)
+(let ((default-directory (concat (file-name-directory load-file-name)
+                                 "lisp")))
+  (normal-top-level-add-to-load-path '("."))
+  (normal-top-level-add-subdirs-to-load-path))
+(require 'hgs-core)
 
 ;; Personal functions
 
@@ -113,6 +99,12 @@ This won't work as expected under daemon mode."
 ;; global scope.
 (use-package emacs
   :no-require t ; Don't load `emacs.el' (obviously - it won't work)
+
+  :functions
+  hgs--setup-default-fonts
+  hgs--setup-default-tui
+  hgs--setup-default-gui
+  hgs--suspend-frame
 
   :init
   (defun hgs--setup-default-fonts (frame)
@@ -223,7 +215,7 @@ nil, 'prepend or 'append."
   (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 
   ;; Better support handling processes with large amounts of data like LSP
-  (setq read-process-ouput-max (* 1024 1024))
+  (setq read-process-output-max (* 1024 1024))
 
   ;; We always want to use the short form for confirmation prompts
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -721,9 +713,18 @@ American English."))
    "Don't autosave when operating on encrypted files."))
 
 (use-package erc
+  :defines
+  hgs-erc-freenode-server-regexp
+  hgs-erc-rizon-server-regexp
+  hgs-erc-libera-server-regexp
+  hgs-erc-oftc-server-regexp
+
   :functions
   erc
   erc-tls
+  hgs--erc-save-buffers-to-logs
+  hgs--erc-disable-whitespace-mode
+  hgs-erc-current-network-name
 
   :hook
   (erc-mode . hgs--erc-disable-whitespace-mode)
@@ -779,6 +780,7 @@ American English."))
     "Returns network name (not necessarily server).
 Will use the current buffer unless `BUFFER-TO-CHECK' is non-nil,
 in which case it will be used."
+    (require 'erc)
     (let ((channel-buffer (or buffer-to-check (current-buffer))))
       (with-current-buffer channel-buffer
         (or (and (fboundp 'erc-network-name) (erc-network-name))
@@ -984,6 +986,8 @@ files."
     "This computes a path to logs for a specific nick, server and channel.
 This results in a path based off of `hgs-erc-log-channels-directory', matching
 the pattern of $nick/$server/$channel/."
+    (defvar hgs-erc-log-channels-directory)
+    (defvar hgs-erc-log-auto-create-directories)
     (let* ((channel (if target
                         target
                       "server-channel"))
@@ -1326,6 +1330,9 @@ narrowing framework.")
   :diminish
   dimmer-mode
 
+  :functions
+  hgs--apply-dimmer-fix
+
   :init
   ;; Apply some fixes when/if these packages load to prevent dimmer from
   ;; interfering with their visibility.
@@ -1335,8 +1342,8 @@ narrowing framework.")
        (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
 
   :config
-  (dolist (_pkg '(magit which-key hydra org posframe gnus helm company-box))
-    (hgs--apply-dimmer-fix _pkg))
+  (dolist (pkg '(magit which-key hydra org posframe gnus helm company-box))
+    (hgs--apply-dimmer-fix pkg))
 
   (dimmer-mode +1)
 
@@ -1893,6 +1900,7 @@ emacsclient (invalid argument stringp errors)."
 
 (use-package async
   :init
+  (require 'async-bytecomp)
   (setq async-byte-compile-log-file
         (concat hgs-emacs-state-directory "async-bytecomp.log"))
 
@@ -2802,33 +2810,10 @@ Can be forced on by supplying >0 or t, and off via <0."
 
   :demand t
 
-  ;; Ordinarily it's recommended to setup a hook like the following, but this
-  ;; won't work for client/server Emacs.
-  ;; :hook
-  ;; (after-init . doom-modeline-mode)
-
-  :config
-  (doom-modeline-mode +1)
-
-  ;; Doom-modeline can cover up the bottom row of which-key sometimes when using
-  ;; side-windows, so this is a hack to fix that by adding a superfluous row.
-  ;; Remove when no longer necessary.
-  (with-eval-after-load 'which-key
-    (defun hgs--add-additional-which-key-line (fn &rest tail)
-      "Adds an additional line to the display height of which-key popups."
-      (let ((additional-lines 3))
-        (progn
-          (apply fn
-                 `(,(cons (+ additional-lines
-                             (caar tail))
-                          (cdar tail)))))))
-    (when-let ((which-key-display-fns
-                (pcase which-key-popup-type
-                  ('side-window '(which-key--show-buffer-side-window)))))
-      (mapc #'(lambda (display-fn)
-                (advice-add display-fn :around
-                            #'hgs--add-additional-which-key-line))
-            which-key-display-fns))))
+  :init
+  (defun hgs--enable-doom-modeline (&optional)
+    (doom-modeline-mode +1))
+  (hgs--enable-doom-modeline))
 
 (use-package erc-hl-nicks
   :after
@@ -3015,6 +3000,7 @@ structured Notmuch configuration directory."
   (defun hgs--notmuch-show-view-as-patch ()
     "View the the current message as a patch via `DIFF-MODE'."
     (interactive)
+    (require 'notmuch-lib)
     (let* ((id (notmuch-show-get-message-id))
            (msg (notmuch-show-get-message-properties))
            (part (notmuch-show-get-part-properties))
@@ -3044,6 +3030,7 @@ structured Notmuch configuration directory."
   (defun hgs-notmuch-change-profile (&optional)
     "Select from available Notmuch profiles to use."
     (interactive)
+    (declare-function hgs-notmuch-list-profiles "core-config")
     (let ((profile-env-var "NOTMUCH_PROFILE")
           (new-profile
            (completing-read "Select Notmuch profile: "
@@ -3082,6 +3069,8 @@ structured Notmuch configuration directory."
             :query "not (tag:draft or tag:sent or tag:trash or tag:spam)"
             :key "a"))
    "Saved searches accessible via jump table."))
+
+(provide 'core-config)
 
 ;; Local Variables:
 ;; mode: emacs-lisp

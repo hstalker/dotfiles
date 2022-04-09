@@ -8,8 +8,15 @@
 
 ;; Specify packages
 
-(require 'minmacs)
 (require 'straight)
+
+(let ((default-directory (concat (file-name-directory load-file-name)
+                                 "lisp")))
+  (normal-top-level-add-to-load-path '("."))
+  (normal-top-level-add-subdirs-to-load-path))
+(require 'minmacs)
+(require 'hgs-core)
+
 
 (minmacs-as-core-packages
   (let ((core-packages-progress
@@ -501,6 +508,8 @@
        :files ("emacs/*.el" "emacs/*.svg")))
 
     (progress-reporter-done core-packages-progress)))
+
+(provide 'core-package)
 
 ;; Local Variables:
 ;; coding: utf-8-unix
