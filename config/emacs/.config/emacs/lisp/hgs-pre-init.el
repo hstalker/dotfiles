@@ -7,7 +7,9 @@
 
 ;;; Code:
 
-(require 'comp)
+;; comp is only available with native-comp
+(unless (version< emacs-version "28")
+  (require 'comp))
 (require 'package)
 
 (defun hgs-run-pre-init ()
