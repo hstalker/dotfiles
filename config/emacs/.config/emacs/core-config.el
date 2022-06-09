@@ -2330,24 +2330,64 @@ automation."))
 
 (use-package hydra)
 
-(use-package undo-tree
-  :diminish
-  global-undo-tree-mode
-  undo-tree-mode-hook
+(use-package undo-fu
+  :defines
+  hgs--undo-prefix-map
 
-  :commands
-  global-undo-tree-mode
-  undo-tree-undo
-  undo-tree-redo
-  undo-tree-visualize
+  :bind
+  (:prefix "C-c u"
+           :prefix-map hgs--undo-prefix-map
+           :prefix-docstring "Undo commands"
+           ("u" . undo-fu-only-undo)
+           ("r" . undo-fu-only-redo)
+           ("R" . undo-fu-only-redo-all)
+           ("c" . undo-fu-disable-checkpoint))
+  (:map global-map
+        ([remap undo] . undo-fu-only-undo)
+        ([remap undo-redo] . undo-fu-only-redo))
 
-  :hook
-  ((prog-mode text-mode) . undo-tree-mode)
+  :init
+  (which-key-add-key-based-replacements
+    "C-c u" "Undo")
 
   :custom
-  (undo-tree-history-directory-alist
-   `(("." . ,(concat hgs-emacs-state-directory "undo-tree")))
-   "Put history backups in the state directory."))
+  (undo-fu-allow-undo-in-region
+   nil "Don't allow undo-in-region.")
+  (undo-fu-ignore-keyboard-quit
+   nil "Use C-g for non-linear traversal behavior."))
+
+(use-package undo-fu-session
+  :diminish
+  global-undo-fu-session-mode
+  undo-fu-session-mode
+
+  :commands
+  global-undo-fu-session-mode
+  undo-fu-session-save
+  undo-fu-session-recover
+  undo-fu-session-compression-update
+
+  :hook
+  ((prog-mode text-mode) . undo-fu-session-mode)
+
+  :custom
+  (undo-fu-session-incompatible-files
+   '("/COMMIT_EDITMSG\\'" "git-rebase-todo\\'")
+   "Regexes for files for which to not persist undo state.")
+  (undo-fu-session-incompatible-major-modes
+   nil "List of major modes for which to not persist undo state.")
+  (undo-fu-session-linear nil "Persist a non-linear undo history.")
+  (undo-fu-session-compression 'gz "Use gzip to compress session info.")
+  (undo-fu-session-file-limit
+   nil "Don't limit the number of persisted state files.")
+  (undo-fu-session-directory
+   (concat hgs-emacs-state-directory "undo-fu-session")
+   "Put persisted undo state in the state directory."))
+
+(use-package vundo
+  :bind
+  (:map hgs--undo-prefix-map
+        ("v" . vundo)))
 
 (use-package projectile
   :commands

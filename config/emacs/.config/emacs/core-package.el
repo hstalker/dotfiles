@@ -86,6 +86,17 @@
     ;; files/profiles is great.
 
     (straight-use-package
+     '(f
+       :type git
+       :host github
+       :repo "rejeep/f.el"
+       :files ("f.el" "f-shortdoc.el")))
+    (straight-use-package
+     '(compat
+       :type git
+       :host github
+       :repo "phikal/compat.el"))
+    (straight-use-package
      '(vimrc-mode
        :type git
        :host github
@@ -337,10 +348,20 @@
        :host github
        :repo "flycheck/flycheck"))
     (straight-use-package
-     '(undo-tree
+     '(vundo
        :type git
-       :host gitlab
-       :repo "tsc25/undo-tree"))
+       :host github
+       :repo "casouri/vundo"))
+    (straight-use-package
+     '(undo-fu
+       :type git
+       :host github
+       :repo "emacsmirror/undo-fu"))
+    (straight-use-package
+     '(undo-fu-session
+       :type git
+       :host github
+       :repo "emacsmirror/undo-fu-session"))
     (straight-use-package
      '(projectile
        :type git
