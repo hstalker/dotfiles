@@ -1758,9 +1758,6 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   ;; Add thin lines, sorting and hide the mode line of the register preview
   ;; window
   (advice-add #'register-preview :override #'consult-register-window)
-  ;; Replace `completing-read-multiple' with an enhanced version
-  (advice-add #'completing-read-multiple :override
-              #'consult-completing-read-multiple)
 
   :custom
   (xref-show-xrefs-function #'consult-xref "Use Consult for xref.")
