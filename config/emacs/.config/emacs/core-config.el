@@ -1803,24 +1803,28 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 
 (use-package embark
   :defines
+  hgs--embark-prefix-map
   embark-file-map
 
   :bind
+  (:prefix "C-c e"
+           :prefix-map hgs--embark-prefix-map
+           :prefix-docstring "Embark commands"
+           ;; Contextual actions on object at point
+           ("a" . embark-act)
+           ;; Change current command w/o quitting
+           ("b" . embark-become)
+           ;; Export candidates to mode buffer
+           ("e" . embark-export)
+           ;; Collect candidates into live updating collect buffer
+           ("c" . embark-collect-live)
+           ;; Collect candidates into a frozen collect buffer
+           ("C" . embark-collect-snapshot)
+           ;; Do the default action to thing at point
+           ("d" . embark-dwim))
   (:map global-map
-        ;; Contextual actions on object at point
-        ("C-c e a" . embark-act)
-        ;; Change current command w/o quitting
-        ("C-c e b" . embark-become)
-        ;; Export candidates to mode buffer
-        ("C-c e e" . embark-export)
-        ;; Collect candidates into live updating collect buffer
-        ("C-c e c" . embark-collect-live)
-        ;; Collect candidates into a frozen collect buffer
-        ("C-c e C" . embark-collect-snapshot)
-        ;; Do the default action to thing at point
-        ("C-c e d" . embark-dwim)
-        ;; Improved bindings help
-        ([remap describe-bindings] . embark-bindings))
+   ;; Improved bindings help
+   ([remap describe-bindings] . embark-bindings))
   (:map minibuffer-local-map
         ;; Convenience bindings for inside a minibuffer. My general thoughts are
         ;; that beyond act/become which are frequent and short operations one
