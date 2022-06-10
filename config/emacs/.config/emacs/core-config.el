@@ -247,6 +247,12 @@ nil, 'prepend or 'append."
 
   :custom
   (require-final-newline t "We should always require a final newline.")
+  (completion-ignore-case t "Ignore case for built-in completion matching in
+general.")
+  (read-file-name-completion-ignore-case t "Ignore case for file name completion
+matching.")
+  (read-buffer-completion-ignore-case t "Ignore case for buffer name completion
+matching.")
   (case-fold-search t "Should have non-case-sensitive search by default.")
   (use-dialog-box nil "All dialog boxes should instead be mini-buffer prompts.")
   (kill-whole-line nil "C-k shouldn't kill entire line.")
@@ -632,6 +638,17 @@ open."))
   (desktop-base-file-name "autosave" "Name of the desktop save file.")
   (desktop-base-lock-name "autosave-lock" "Name of the lock for desktop
 package."))
+
+(use-package savehist
+  :diminish
+  savehist-mode
+
+  :hook
+  (after-init . savehist-mode)
+
+  :custom
+  (savehist-file (concat hgs-emacs-cache-directory "history")
+                 "Cache history in cache directory."))
 
 (use-package eww
   :bind
@@ -1555,59 +1572,50 @@ to point."))
   :commands
   pass)
 
-(use-package selectrum
+(use-package vertico
   :demand t
 
   :diminish
-  selectrum-mode
+  vertico-mode
 
-  :config
-  (selectrum-mode +1))
+  :hook
+  (after-init . vertico-mode)
 
-
-(use-package prescient
-  :after
-  selectrum
-
-  :demand t
-
-  :diminish
-  prescient-persist-mode
-
-  :config
-  (prescient-persist-mode +1)
+  :init
+  (defun hgs--vertico-completion-in-region (&rest args)
+    "Use `consult-copmletion-in-region' if Vertico and Consult are available.
+Otherwise use the default `completion--in-region' function."
+    (apply (if (and vertico-mode (fboundp #'consult-completion-in-region))
+               #'consult-completion-in-region
+             #'completion--in-region)
+           args))
 
   :custom
-  (prescient-history-length
-   100
-   "Number of recently selected candidates to show at the top of the list.")
-  (prescient-frequency-decay
-   0.997
-   "How much to decrease candidates' priorities for subsequent non-selections.")
-  (prescient-save-file
-   (concat hgs-emacs-state-directory "prescient-statistics")
-   "Where to save Prescient statistics to on disk.")
-  (prescient-filter-method
-   '(literal
-     regexp
-     initialism)
-   "List of algorithms to use for filtering candidates. This is the power of
-Prescient")
-  (prescient-filter-alist
-   '((literal . prescient-literal-regexp)
-     (literal-prefix . prescient-literal-prefix-regexp)
-     (initialism . prescient-initials-regexp)
-     (regexp . prescient-regexp-regexp)
-     (fuzzy . prescient-fuzzy-regexp)
-     (prefix . prescient-prefix-regexp)
-     (anchored . prescient-anchored-regexp))
-   "Alist for associating symbols with custom filter methods.")
-  (prescient-sort-full-matches-first t "Put full matches ahead of partial in the
-list.")
-  (prescient-use-char-folding t "Whether the literal and literal-prefix
-filters use character folding.")
-  (prescient-use-case-folding 'smart "Whether filters should be
-case-insensitive. Smart disables case insensitivity when upper case is used."))
+  (completion-in-region-function #'hgs--vertico-completion-in-region
+                                 "Use custom `completion-in-region' function.")
+  (vertico-scroll-margin 0 "Show no scroll margin.")
+  (vertico-resize t "Dynamically resize minibuffer.")
+  (vertico-count 15 "Show more candidates.")
+  (vertico-cycle t "Enable cycling through candidate list."))
+
+(use-package orderless
+  :demand t
+
+  :custom
+  (completion-styles
+   '(orderless basic)
+   "Use orderless completion style. `basic' must be provided as a fallback in
+order to ensure dynamic completion tables work correctly.")
+  (completion-category-defaults
+   nil
+   "Disable all the default per-category completion styles.")
+  (completion-category-overrides
+   '((file (styles basic partial-completion)))
+   "Enable partial completion for files for wildcard & partial path matching
+support.")
+  (orderless-matching-styles
+   '(orderless-initialism orderless-literal orderless-regexp)
+   "List of matching styles to use for orderless completion"))
 
 (use-package company
   :hook
@@ -1798,7 +1806,8 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
 
 (use-package marginalia
   :after
-  selectrum
+  ;; selectrum
+  vertico
 
   :demand t
 
@@ -2424,40 +2433,6 @@ automation."))
   (project-switch-use-entire-map t "Use entire `project-prefix-map' as a basis
 for project switch command dispatch."))
 
-(use-package selectrum-prescient
-  :after
-  selectrum
-  prescient
-
-  :demand t
-
-  :diminish
-  selectrum-prescient-mode
-
-  :config
-  (selectrum-prescient-mode +1)
-
-  :custom
-  (selectrum-prescient-enable-filtering t "Enable filtering for selectrum.")
-  (selectrum-prescient-enable-sorting t "Enable sorting for selectrum."))
-
-(use-package company-prescient
-  :after
-  company
-  prescient
-
-  :demand t
-
-  :diminish
-  company-prescient-mode
-
-  :config
-  (company-prescient-mode +1)
-
-  :custom
-  (company-prescient-sort-length-enable nil "Don't resort company's already
-partially sorted lists by length, as this ruins the sort order."))
-
 (use-package embark-consult
   :after
   embark
@@ -2509,7 +2484,11 @@ partially sorted lists by length, as this ruins the sort order."))
   :bind
   (:map global-map
         ("C-x g" . magit-status)
-        ("C-x M-g" . magit-dispatch)))
+        ("C-x M-g" . magit-dispatch))
+
+  :custom
+  (magit-bind-magit-project-status t "Add magit project status to the project.el
+switch list."))
 
 ;; Largely a performance optimization that can be safely disabled if necessary.
 ;; Requires some additional packages and compilation.

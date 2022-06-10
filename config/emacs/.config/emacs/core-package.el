@@ -183,10 +183,10 @@
        :host github
        :repo "purcell/exec-path-from-shell"))
     (straight-use-package
-     '(selectrum
+     '(vertico
        :type git
        :host github
-       :repo "raxod502/selectrum"))
+       :repo "minad/vertico"))
     (straight-use-package
      '(company
        :type git
@@ -358,20 +358,10 @@
        :host github
        :repo "emacsmirror/undo-fu-session"))
     (straight-use-package
-     '(prescient
+     '(orderless
        :type git
        :host github
-       :repo "raxod502/prescient.el"))
-    (straight-use-package
-     '(selectrum-prescient
-       :type git
-       :host github
-       :repo "raxod502/prescient.el"))
-    (straight-use-package
-     '(company-prescient
-       :type git
-       :host github
-       :repo "raxod502/prescient.el"))
+       :repo "oantolin/orderless"))
     (straight-use-package
      '(embark-consult
        :type git
