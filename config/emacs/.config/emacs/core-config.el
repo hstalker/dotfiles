@@ -405,6 +405,19 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
     :hook
     ((prog-mode text-mode) . hl-line-mode)))
 
+(unless (version<= emacs-version "27.1.0")
+  (use-package tab-bar
+    :diminish
+    tab-bar-mode
+
+    :hook
+    (after-init . tab-bar-mode)
+
+    :custom
+    (tab-bar-show nil "Don't show the tab bar. Rely on the mode-line to display
+current tab, and using `tab-switch' for searching tabs.")
+    (tab-bar-new-tab-choice t "Start new tab on current buffer.")))
+
 (use-package simple
   :diminish
   line-number-mode
