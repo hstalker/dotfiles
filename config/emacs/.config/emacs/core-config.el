@@ -1365,7 +1365,7 @@ narrowing framework.")
        (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
 
   :config
-  (dolist (pkg '(magit which-key hydra org posframe gnus helm company-box))
+  (dolist (pkg '(magit which-key org posframe gnus helm company-box))
     (hgs--apply-dimmer-fix pkg))
 
   (dimmer-mode +1)
@@ -2354,8 +2354,6 @@ text banners, or a path to an image or text file.")
    nil
    "If we can't find a .clang-format, then we should not enable this
 automation."))
-
-(use-package hydra)
 
 (use-package undo-fu
   :defines

@@ -338,11 +338,6 @@
        :host github
        :repo "SavchenkoValeriy/emacs-clang-format-plus"))
     (straight-use-package
-     '(hydra
-       :type git
-       :host github
-       :repo "abo-abo/hydra"))
-    (straight-use-package
      '(flycheck
        :type git
        :host github

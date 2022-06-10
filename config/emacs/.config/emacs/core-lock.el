@@ -46,7 +46,6 @@
  ("ghub" . "f14c1bc84135fe149c42348dce6eaa23ba610224")
  ("gnu-elpa-mirror" . "808923d95777d378ca340b8020dd571e6a62460a")
  ("ht.el" . "c4c1be487d6ecb353d07881526db05d7fc90ea87")
- ("hydra" . "9e9e00cb240ea1903ffd36a54956b3902c379d29")
  ("jq-mode" . "1af31ba701cf844f938f840ed78867c9a28174b6")
  ("json-mode" . "eedb4560034f795a7950fa07016bd4347c368873")
  ("json-snatcher" . "b28d1c0670636da6db508d03872d96ffddbc10f2")
