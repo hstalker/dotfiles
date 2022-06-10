@@ -74,7 +74,6 @@
  ("pkg-info" . "76ba7415480687d05a4353b27fea2ae02b8d9d61")
  ("posframe" . "0d23bc5f7cfac00277d83ae7ba52c48685bcbc68")
  ("prescient.el" . "07d61b7779c4cca3009390383e7f98a55de7e17e")
- ("projectile" . "e60883ff370c1545499b97cf56479de1a58c5b3b")
  ("protobuf" . "0a16bdfbe6e0d4f270f8af47ba30979b02304d15")
  ("rainbow-delimiters" . "a32b39bdfe6c61c322c37226d66e1b6d4f107ed0")
  ("restclient.el" . "ae79e7dd283890072da69b8f48aeec1afd0d9442")

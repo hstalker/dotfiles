@@ -369,6 +369,16 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
 (use-package gud)
 
+(use-package find-file
+  :custom
+  (ff-case-fold-search t "Ignore case in matching.")
+  (ff-always-in-other-window nil "Don't open other file in other window always")
+  (ff-ignore-include
+   nil "Use special automation for jumping to include under cursor.")
+  (ff-always-try-to-create
+   nil "Don't try to create the other file if it doesn't exist.")
+  (ff-quiet-mode t "Don't trace searched directories."))
+
 (use-package ediff
   :config
   ;; Attempt to undo the window configuration change when exiting an Ediff
@@ -1783,8 +1793,8 @@ case-insensitive. Smart disables case insensitivity when upper case is used."))
   (consult-widen-key "<" "Specify key used for explicit widening.")
   (consult-preview-key 'any "Trigger Consult previews with any key press.")
   (consult-project-root-function
-   #'projectile-project-root
-   "Use Projectile for finding the project root."))
+   #'project-root
+   "Use built-in project.el for finding the project root."))
 
 (use-package marginalia
   :after
@@ -2311,8 +2321,11 @@ text banners, or a path to an image or text file.")
   (dashboard-set-navigator t "Show the navigator below the banner.")
   (dashboard-set-init-info t "Show packages loaded and initialization time.")
   (dashboard-set-footer t "Enable the randomly selected footnote.")
+  (dashboard-projects-backend
+   'project-el
+   "Use project.el as a backend for project related stuff.")
   (dashboard-projects-switch-function
-   #'projectile-switch-project-by-name
+   #'project-switch-project
    "Which function to use for switching projects from the dashboard.")
   (dashboard-week-agenda t "Show upcoming seven days' agenda.")
   (dashboard-page-separator
@@ -2403,76 +2416,15 @@ automation."))
   (:map hgs--undo-prefix-map
         ("v" . vundo)))
 
-(use-package projectile
-  :commands
-  projectile-switch-project-by-name
-  projectile-project-root
-
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-
-  :init
-  (projectile-mode +1)                  ; :hook seems to cause an infinite
-                                        ; require loop
-  (which-key-add-key-based-replacements
-    "C-c p" "Projectile")
-
-  :config
-  ;; Make setting the projectile build-related variables via local variables
-  ;; safe.
-  (put 'projectile-project-configure-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-compilation-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-test-cmd 'safe-local-variable #'stringp)
-  (put 'projectile-project-run-cmd 'safe-local-variable #'stringp)
+(use-package project
+  :demand t
 
   :custom
-  (projectile-completion-system
-   'default
-   "Use Selectrum (or rather: `completing-read') as the completion backend.")
-  (projectile-project-search-path
-   `(,hgs-project-directory ,hgs-user-directory)
-   "Where should projectile search?")
-  (projectile-known-projects-file
-   (concat hgs-emacs-state-directory "projectile-bookmarks.eld")
+  (project-list-file
+   (concat hgs-emacs-state-directory "projects")
    "Where to cache known projects.")
-  (projectile-use-git-grep nil "Don't use git-grep over other tools.")
-  (projectile-cache-file
-   (concat hgs-emacs-cache-directory "projectile.cache")
-   "Place the projectile cache file into our cache directory.")
-  (projectile-other-file-alist
-   '(;; General C/C++ extensions
-     ("C" . ("H")) ("H" . ("C"))
-     ("cpp" . ("h" "hpp" "ipp"))
-     ("ipp" . ("h" "hpp" "cpp"))
-     ("hpp" . ("h" "ipp" "cpp" "cc"))
-     ("cxx" . ("h" "hxx" "ixx"))
-     ("ixx" . ("h" "hxx" "cxx"))
-     ("hxx" . ("h" "ixx" "cxx"))
-     ("c" . ("h"))
-     ("m" . ("h"))
-     ("mm" . ("h"))
-     ("h" . ("c" "cc" "cpp" "ipp" "hpp" "cxx" "ixx" "hxx" "m" "mm"))
-     ("cc" . ("h" "hh" "hpp"))
-     ("hh" . ("cc"))
-
-     ;; OCaml extensions
-     ("ml" . ("mli"))
-     ("mli" . ("ml" "mll" "mly"))
-     ("mll" . ("mli"))
-     ("mly" . ("mli"))
-     ("eliomi" . ("eliom"))
-     ("eliom" . ("eliomi"))
-
-     ;; Typical vertex & fragment shader language extensions
-     ("vert" . ("frag"))
-     ("frag" . ("vert"))
-
-     ;; Handle files with no extension
-     (nil . ("lock" "gpg"))
-     ("lock" . (""))
-     ("gpg" . ("")))
-   "Alist of extensions for switching to file with the same name, using other
-extensions based on the extension of the current file."))
+  (project-switch-use-entire-map t "Use entire `project-prefix-map' as a basis
+for project switch command dispatch."))
 
 (use-package selectrum-prescient
   :after
@@ -2766,11 +2718,6 @@ the mouse."))
   :after
   treemacs
   magit)
-
-(use-package treemacs-projectile
-  :after
-  treemacs
-  projectile)
 
 (use-package treemacs-all-the-icons
   :after

@@ -363,11 +363,6 @@
        :host github
        :repo "emacsmirror/undo-fu-session"))
     (straight-use-package
-     '(projectile
-       :type git
-       :host github
-       :repo "bbatsov/projectile"))
-    (straight-use-package
      '(prescient
        :type git
        :host github
@@ -444,11 +439,6 @@
        :repo "Alexander-Miller/treemacs"))
     (straight-use-package
      '(treemacs-all-the-icons
-       :type git
-       :host github
-       :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
-     '(treemacs-projectile
        :type git
        :host github
        :repo "Alexander-Miller/treemacs"))
