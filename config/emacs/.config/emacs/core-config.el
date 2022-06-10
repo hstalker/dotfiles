@@ -1583,7 +1583,7 @@ to point."))
 
   :init
   (defun hgs--vertico-completion-in-region (&rest args)
-    "Use `consult-copmletion-in-region' if Vertico and Consult are available.
+    "Use `consult-completion-in-region' if Vertico and Consult are available.
 Otherwise use the default `completion--in-region' function."
     (apply (if (and vertico-mode (fboundp #'consult-completion-in-region))
                #'consult-completion-in-region
@@ -1687,7 +1687,6 @@ support.")
 
 (use-package marginalia
   :after
-  ;; selectrum
   vertico
 
   :demand t
@@ -1893,6 +1892,65 @@ emacsclient (invalid argument stringp errors)."
   :bind
   (:map global-map
         ("C-=" . er/expand-region)))
+
+(use-package corfu
+  :init
+  (defun hgs-corfu-move-to-minibuffer ()
+    "Transfer corfu completion to the minibuffer."
+    ;; Corfu hijacks the completion in completion-in-region/at-point capf
+    ;; entrypoints, so using this is a way to go from corfu to minibuffer for
+    ;; consult. It may be preferable in the future to remove corfu in favor of
+    ;; minibuffer completion only.
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'hgs--vertico-completion-in-region completion-in-region--data)))
+
+  :hook
+  (prog-mode . corfu-mode)
+
+  :bind
+  (:map corfu-map
+        ("M-m" . hgs-corfu-move-to-minibuffer))
+
+  :config
+  ;; There is no point in hijacking C-p/n when M-p/n are already used
+  (unbind-key [remap previous-line] corfu-map)
+  (unbind-key [remap next-line] corfu-map)
+
+  ;; The whole point of using something like Corfu is:
+  ;;  * To narrow via typing.
+  ;;  * To cycle a couple of times to select specific entries.
+  ;; You should never, ever really need to do anything else.
+  ;;
+  ;; The minibuffer serves as a better place for scanning through very long
+  ;; lists than a pop-up.
+  (unbind-key [remap beginning-of-buffer] corfu-map)
+  (unbind-key [remap end-of-buffer] corfu-map)
+  (unbind-key [remap scroll-up-command] corfu-map)
+  (unbind-key [remap scroll-down-command] corfu-map)
+
+  :custom
+  (corfu-cycle t "Enable cycling through corfu candidate set.")
+  (corfu-auto t "Enable auto-completion.")
+  (corfu-auto-delay 0.5 "Delay for auto-complete in seconds.")
+  (corfu-auto-prefix 3 "Character prefix length before auto-complete occurs.")
+  (corfu-quit-no-match 'separator "Quit eagerly if no match to avoid popup
+getting in the way.")
+  (corfu-preselect-first nil "Don't preselect a candidate.")
+  (corfu-echo-documentation t "Show documentation of completion in echo area.")
+  (corfu-on-exact-match 'insert "Insert on an exact match.")
+  (corfu-quit-at-boundary nil "Stay alive even if there is no match.")
+  ;; Note: M-SPC is already hijacked under Gnome for some other purpose
+  (corfu-separator ?\s "Use M-SPC as the separator.")
+  (corfu-preview-current nil "Preview the currently selected candidate.")
+  (corfu-scroll-margin 2 "Show small scroll margin."))
+
+(use-package cape
+  ;; This is a cool package for providing some good default CAPF backends and
+  ;; converting company backend to CAPF compatible backends, but at the moment
+  ;; we don't really need it. We load it anyway. May remove at a later date.
+  )
 
 (when hgs-has-dynamic-module-support
   (use-package tree-sitter

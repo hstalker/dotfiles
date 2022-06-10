@@ -193,6 +193,16 @@
        :host github
        :repo "minad/consult"))
     (straight-use-package
+     '(corfu
+       :type git
+       :host github
+       :repo "minad/corfu"))
+    (straight-use-package
+     '(cape
+       :type git
+       :host github
+       :repo "minad/cape"))
+    (straight-use-package
      '(marginalia
        :type git
        :host github
