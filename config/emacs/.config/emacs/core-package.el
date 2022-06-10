@@ -188,11 +188,6 @@
        :host github
        :repo "minad/vertico"))
     (straight-use-package
-     '(company
-       :type git
-       :host github
-       :repo "company-mode/company-mode"))
-    (straight-use-package
      '(consult
        :type git
        :host github

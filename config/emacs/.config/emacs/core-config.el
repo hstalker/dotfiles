@@ -1382,7 +1382,7 @@ narrowing framework.")
        (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
 
   :config
-  (dolist (pkg '(magit which-key org posframe gnus helm company-box))
+  (dolist (pkg '(magit selectrum which-key org posframe gnus helm company-box))
     (hgs--apply-dimmer-fix pkg))
 
   (dimmer-mode +1)
@@ -1616,125 +1616,6 @@ support.")
   (orderless-matching-styles
    '(orderless-initialism orderless-literal orderless-regexp)
    "List of matching styles to use for orderless completion"))
-
-(use-package company
-  :hook
-  (prog-mode . company-mode)
-  ((org-mode text-mode) . company-mode)
-  (prog-mode . hgs--set-prog-mode-company-backends)
-  ((org-mode text-mode) . hgs--set-text-mode-company-backends)
-
-  :init
-  ;; Basic Overview of Company Backends (because I forget):
-  ;;
-  ;; Backends are functions that can be called in multiple ways. Two of the most
-  ;; important are: 1) As a prefix function. 2) As a candidate function. This is
-  ;; oversimplified, and there are other methods of calling backends, such as
-  ;; for fetching meta-information about a specific candidate.
-  ;;
-  ;; When called as a prefix function, the backend either recognizes a prefix
-  ;; string at point as a prefix to a possible completion and returns the
-  ;; prefix, or it returns nil. When called as a candidate function, the backend
-  ;; returns a list of target string candidates for completion.
-  ;;
-  ;; Backends can be combined into groups. Groups are ordered lists of backends
-  ;; that have their candidate lists merged. The next group is then moved onto
-  ;; if no backends in the current group can recognize a prefix at point.
-  ;; Candidate lists for multiple backends within a group are merged based on a
-  ;; same-prefix policy.
-  ;;
-  ;; `:separate' forces backends within a group to be split into different sort
-  ;; groups in the candidate list (the ordering of these subgroups is defined by
-  ;; the ordering within the backend group).
-  ;;
-  ;; `:with' ignores the backend within the group for the purpose of the prefix
-  ;; call. In practice this means that a) The backend will always fallback if
-  ;; all non-:with backends in the group return nil on their prefix call, and b)
-  ;; Candidates will always be merged in the group candidate list (<- not sure
-  ;; about this one). for all backends after it within the group. A practical
-  ;; use-case is for backends within a group that should only run if non-:with
-  ;; backends do.
-
-  ;; Some backends can cause some interact poorly together. For example: capf
-  ;; and dabbrev, where capf can sometimes provide a subset of less useful
-  ;; results than those that would be provided by the dabbrev group, and the
-  ;; dabbrev candidates might never be visible if in a later group to the capf
-  ;; backend.
-  ;;
-  ;; Backends like dabbrev and ispell should always be last when active, as they
-  ;; will always have a candidate for the prefix and so their prefix call will
-  ;; never return nil, and never defer to the next backend. Due to all these
-  ;; caveats, it's generally preferable to have as few groups as possible, and
-  ;; use an "hourglass" ordering of backends — more general mode-specific
-  ;; backends grouped together -> group of highly specific specific backends as
-  ;; a fallback -> fallback backends for when all else fails.
-  ;;
-  ;; Capf should usually be sufficient for language specific completion
-  ;; nowadays, and has its own mode-specific completion function list variables.
-  ;; Capf is also used by lsp-mode for completion.
-  (defun hgs--set-prog-mode-company-backends ()
-    "Set appropriate Company back-ends for programming mode buffers."
-    (make-local-variable 'company-backends)
-    (setq-local company-backends
-                '((company-capf
-                   company-files
-                   ;; `company-yasnippet' seems to deliberately shadow all
-                   ;; backends after it by returning non-nil results for a
-                   ;; prefix call when there are snippets defined for the
-                   ;; current mode, so we either have to have it in the last
-                   ;; group, or use :with to disable prefix functionality.
-                   ;; Perhaps a better approach is to manually trigger
-                   ;; company-yasnippet separately, but at that point you may as
-                   ;; well just use a narrowing framework instead.
-                   :with
-                   company-yasnippet)
-                  (company-gtags
-                   company-etags)
-                  (company-keywords
-                   company-dabbrev-code
-                   company-dabbrev
-                   company-ispell))))
-
-
-  (defun hgs--set-text-mode-company-backends ()
-    "Set appropriate Company back-ends for text mode buffers."
-    (make-local-variable 'company-backends)
-    (setq-local company-backends
-                '((company-capf
-                   company-files
-                   :with
-                   company-yasnippet)
-                  (company-dabbrev
-                   company-ispell))))
-
-  :custom
-  (company-backends
-   '((company-capf
-      company-files
-      :with
-      company-yasnippet)
-     (company-gtags
-      company-etags)
-     (company-keywords
-      company-dabbrev-code
-      company-dabbrev
-      company-ispell))
-   "Set default company backends to use.")
-  (company-echo-delay 0.5 "How long to wait before echoing.")
-  (company-idle-delay 0.5 "How long to wait before offering completion.")
-  (company-show-numbers t "Number the completion options.")
-  (company-tooltip-limit 20 "Cap the number of candidates on display.")
-  (company-minimum-prefix-length
-   2
-   "Minimum length of prefix before completion.")
-  (company-tooltip-align-annotations t "Align candidates to the right.")
-  (company-tooltip-flip-when-above
-   nil
-   "Don't invert navigation direction when near the bottom of the page.")
-  (company-ispell-dictionary
-   "/usr/share/dict/words"
-   "Default to default plaintext words list for company ispell")
-  (company-dabbrev-downcase nil "Don't downcase return value of dabbrev."))
 
 (use-package consult
   :demand t

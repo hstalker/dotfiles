@@ -8,7 +8,6 @@
  ("clang-format" . "e48ff8ae18dc7ab6118c1f6752deb48cb1fc83ac")
  ("closql" . "87d2edae8bc3d390bcfc5e909e9c13ff9fce994a")
  ("cmake-mode" . "d5d77de8c4c69e348b182eeb30222b2f1ba8db7b")
- ("company-mode" . "d5145006b948f93e673f439a766da01f636d39fc")
  ("compat.el" . "8c514176612add24d1d5d8554510547ccc841a25")
  ("consult" . "b816d1c42f420411c31fe0968ddc868aa2186de7")
  ("consult-flycheck" . "9b40f136c017fadf6239d7602d16bf73b4ad5198")
