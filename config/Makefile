@@ -16,6 +16,7 @@ PACKAGES ?= shells \
 	aspell \
 	docker \
 	vagrant \
+	emscripten \
 	gnupg \
 	pass \
 	openssl \
