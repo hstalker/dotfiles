@@ -17,20 +17,27 @@ wrappers."
   :version "26.1")
 
 (defcustom minmacs-core-recipe-sources
-  '((org-elpa :local-repo nil)
-    (melpa
+  '((melpa
      :type git
      :host github
+     :local-repo "melpa"
      :repo "melpa/melpa"
+     :no-build t)
+    (nongnu-elpa
+     :type git
+     :local-repo "nongnu-elpa"
+     :repo "https://git.savannah.gnu.org/git/emacs/nongnu.git"
      :no-build t)
     (gnu-elpa-mirror
      :type git
      :host github
+     :local-repo "gnu-elpa-mirror"
      :repo "emacs-straight/gnu-elpa-mirror"
      :no-build t)
     (emacsmirror-mirror
      :type git
      :host github
+     :local-repo "emacsmirror-mirror"
      :repo "emacs-straight/emacsmirror-mirror"
      :no-build t))
   "A list of recipe sources for straight to use
@@ -129,7 +136,7 @@ effect.")
     (let* ((bootstrap-file (concat straight-base-dir
                                    "straight/repos/straight.el/bootstrap.el"))
            (bootstrap-version 5)
-           (repo "raxod502/straight.el")
+           (repo "radian-software/straight.el")
            (bootstrap-branch "develop")
            (bootstrap-protocol "https"))
       (unless (file-exists-p bootstrap-file)
