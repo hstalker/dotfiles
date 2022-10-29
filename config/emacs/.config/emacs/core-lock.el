@@ -12,6 +12,7 @@
  ("consult-flycheck" . "1d43437c1f8305051954b972aa9dd18413b3379b")
  ("corfu" . "3408e41bf0d2264d754a59b0326c622d874d5537")
  ("csv-mode" . "d10d68c382e17960fc9aaef072fd18a23ea92a86")
+ ("daemons.el" . "e18e84ccc13101f1609c213029cf011ae0ad1178")
  ("dash.el" . "3df46d7d9fe74f52a661565888e4d31fd760f0df")
  ("dimmer.el" . "a5b697580e5aed6168b571ae3d925753428284f8")
  ("docker-tramp.el" . "930d7b46c180d8a13240a028c1b40af84f2a3219")

@@ -2879,6 +2879,18 @@ structured Notmuch configuration directory."
             :key "a"))
    "Saved searches accessible via jump table."))
 
+;; Simple tabulated list UI package for different types of daemons on a linux
+;; system
+(use-package daemons
+  :commands
+  daemons
+
+  :custom
+  (daemons-always-sudo nil "Don't always sudo on daemon commands")
+  ;; This is a poor interface really. We have to change the variable to enter
+  ;; system mode
+  (daemons-systemd-is-user t "Run systemd commands in user mode"))
+
 (provide 'core-config)
 
 ;; Local Variables:

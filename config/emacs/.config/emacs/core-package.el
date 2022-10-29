@@ -482,6 +482,11 @@
        :host nil
        :repo "https://git.notmuchmail.org/git/notmuch"
        :files ("emacs/*.el" "emacs/*.svg")))
+    (straight-use-package
+     '(daemons
+       :type git
+       :host github
+       :repo "cbowdon/daemons.el"))
 
     (progress-reporter-done core-packages-progress)))
 
