@@ -75,7 +75,7 @@
     ;;
     ;;   THOUGHTS:
     ;;
-    ;; If you read all this an thought "well that's over-complicated", you are
+    ;; If you read all this and thought "well that's over-complicated", you are
     ;; correct. Emacs package management is pretty much a mess, and generally
     ;; people fail when trying to add reproducibility. Straight does an
     ;; admirable job, but has a bit too much implicit reliance on recipe mirrors
@@ -398,21 +398,6 @@
        :host github
        :repo "minad/consult-flycheck"))
     (straight-use-package
-     '(lsp-mode
-       :type git
-       :host github
-       :repo "emacs-lsp/lsp-mode"))
-    (straight-use-package
-     '(lsp-ui
-       :type git
-       :host github
-       :repo "emacs-lsp/lsp-ui"))
-    (straight-use-package
-     '(consult-lsp
-       :type git
-       :host github
-       :repo "gagbo/consult-lsp"))
-    (straight-use-package
      '(treemacs
        :type git
        :host github
@@ -432,16 +417,6 @@
        :type git
        :host github
        :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
-     '(lsp-treemacs
-       :type git
-       :host github
-       :repo "emacs-lsp/lsp-treemacs"))
-    (straight-use-package
-     '(dap-mode
-       :type git
-       :host github
-       :repo "emacs-lsp/dap-mode"))
     (straight-use-package
      '(docker
        :type git
