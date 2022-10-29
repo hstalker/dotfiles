@@ -2025,6 +2025,39 @@ getting in the way.")
   :config
   (yasnippet-snippets-initialize))
 
+(use-package eglot
+  :commands
+  eglot
+
+  :hook
+  ;; Mostly we can get away with using manual invocation where needed
+  ;; per-session
+  ((c-mode c++-mode python-mode) . eglot-ensure)
+
+  :bind
+  (:map eglot-mode-map
+        ;; None as of yet
+        )
+
+  :custom
+  (eglot-autoreconnect 3 "Only attempt reconnect to LSP server if the previous
+connection lasted at least N seconds.")
+  (eglot-connect-timeout 30 "Time given before a connection should be considered
+timed-out.")
+  (eglot-sync-connect 3 "Synchronously block UI for only up to N seconds on
+connect.")
+  (eglot-events-buffer-size 2000000 "Maximum number of characters allowed in the
+Eglot events buffer.")
+  (eglot-autoshutdown nil "Don't shutdown LSP servers automatically when there
+are no more using buffers. Prefer `eglot-shutdown'.")
+  (eglot-extend-to-xref nil "Don't transiently consider out-of-project files you
+jump to as part of the current workspace.")
+  (eglot-confirm-server-initiated-edits t "Ask for confirmation when the server
+tries to alter buffers.")
+  (eglot-ignored-server-capabilities
+   '()
+   "List of Eglot capabilities you want to turn off."))
+
 (use-package which-key
   :diminish
   which-key-mode

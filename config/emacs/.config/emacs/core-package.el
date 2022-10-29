@@ -203,6 +203,11 @@
        :host github
        :repo "minad/cape"))
     (straight-use-package
+     '(eglot
+       :type git
+       :host github
+       :repo "joaotavora/eglot"))
+    (straight-use-package
      '(marginalia
        :type git
        :host github
