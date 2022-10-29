@@ -393,11 +393,6 @@
        :host github
        :repo "magit/magit"))
     (straight-use-package
-     '(forge
-       :type git
-       :host github
-       :repo "magit/forge"))
-    (straight-use-package
      '(consult-flycheck
        :type git
        :host github

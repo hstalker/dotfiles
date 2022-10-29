@@ -43,8 +43,6 @@
  ("f.el" . "d50dca48929575642912bb5bbb2585709ba38f82")
  ("flycheck" . "d72c29fec85f1da6584475d88c1265f80e1275ad")
  ("flyspell-correct" . "7d7b6b01188bd28e20a13736ac9f36c3367bd16e")
- ("forge" . "45b06b80137e981bca268b800469dada0ef7acb0")
- ("ghub" . "717f6b2af69c1c8d69f8eee92b291c2146785385")
  ("gnu-elpa-mirror" . "5763f1b3f5c5b4d82f7aa79655665c48fef2db84")
  ("ht.el" . "cdc76669a5032c42a2b9f7cddcbc33c5deeb6beb")
  ("hydra" . "317e1de33086637579a7aeb60f77ed0405bf359b")

@@ -2438,15 +2438,6 @@ switch list."))
     magit
     libgit))
 
-(use-package forge
-  :after
-  magit
-
-  :custom
-  (forge-database-file
-   (concat hgs-emacs-state-directory "forge-database.sqlite")
-   "Place the forge database into the data directory."))
-
 (use-package consult-flycheck
   :after
   consult
