@@ -24,14 +24,10 @@ else
       echo "${vcs_info_msg_0_}%{$reset_color%}"
     fi
   }
-  precmd_functions+='vcs_info_wrapper'
-  chpwd_functions+='vcs_info_wrapper'
-  preexec_functions+='vcs_info_wrapper'
-  unset PS1 # Just to make sure a previous setting isn't interfering
-  PROMPT='[$(whoami)@$(hostname):zsh]' # System info
-  PROMPT+='%{$fg[red]%}<%1//>%{$reset_color%}' # Path
-  PROMPT+='$(vcs_info_wrapper)' # VCS info
-  PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Separator
+  PROMPT='[%n@%m:zsh]' # [$HOST@$USER:zsh]
+  PROMPT+='%{$fg[red]%}<%1~/>%{$reset_color%}' # CWD depth 1
+  PROMPT+='$(vcs_info_wrapper)' # Print VCS info
+  PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Prompt separator
 fi
 
 zmodload zsh/zle
