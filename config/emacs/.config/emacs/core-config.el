@@ -2462,15 +2462,6 @@ for project switch command dispatch."))
   (magit-bind-magit-project-status t "Add magit project status to the project.el
 switch list."))
 
-;; Largely a performance optimization that can be safely disabled if necessary.
-;; Requires some additional packages and compilation.
-(when hgs-has-dynamic-module-support
-  (use-package libgit)
-  (use-package magit-libgit
-    :after
-    magit
-    libgit))
-
 (use-package consult-flycheck
   :after
   consult

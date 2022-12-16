@@ -49,7 +49,6 @@
  ("json-mode" . "eedb4560034f795a7950fa07016bd4347c368873")
  ("json-snatcher" . "b28d1c0670636da6db508d03872d96ffddbc10f2")
  ("jsonrpc" . "b5f6171bbcbb16844c8cee60fcb6d9c8dfef72ec")
- ("libegit2" . "3f3d600f1708afbac449d02046e05782ac974866")
  ("lua-mode" . "3e783c93aa8a3d3ca985686438aa8d140cbddae6")
  ("magit" . "28d086270ceac61c10548dfb50321222152f5c80")
  ("marginalia" . "ce8db0acf7e81b78cb47d6cbb234ef93f2cbb822")
