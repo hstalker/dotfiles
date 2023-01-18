@@ -95,7 +95,7 @@
      '(compat
        :type git
        :host github
-       :repo "phikal/compat.el"))
+       :repo "emacs-compat/compat"))
     (straight-use-package
      '(vimrc-mode
        :type git
