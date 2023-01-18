@@ -40,6 +40,8 @@
     program = gpg
 [github]
     user = hstalker
+[protocol "file"]
+    allow = always
 [filter "lfs"]
     required = true
     clean = git-lfs clean -- %f
