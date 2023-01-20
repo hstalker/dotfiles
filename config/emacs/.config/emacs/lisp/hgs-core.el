@@ -184,12 +184,32 @@ enabled.")))
       (run-hook-with-args 'hgs-frame-customization-hook this-frame)
 
       (if (display-graphic-p)
-          (run-hook-with-args 'hgs-frame-customization-gui-hook this-frame)
-        (run-hook-with-args 'hgs-frame-customization-tui-hook this-frame)))
+          (progn
+            (message "Detected graphics display")
+            (run-hook-with-args 'hgs-frame-customization-gui-hook this-frame))
+        (progn
+          (message "Detected terminal display")
+          (run-hook-with-args 'hgs-frame-customization-tui-hook this-frame))))
     (progress-reporter-done frame-setup-progress)))
 
 (defun hgs-enable-new-frame-setup ()
-  (add-hook 'after-make-frame-functions #'hgs--new-frame-setup))
+  ;; Setting up a function that runs for all new frames in all contexts (useful
+  ;; or custom styling) is an utter mess in Emacs, and is both poorly
+  ;; understood and documented.
+  ;; N.B. There is still a minor bug here that
+  ;; causes the hook to be run twice upon initial frame
+  (if (daemonp)
+      (progn
+        ;; Needed for configuring 2nd frame onwards
+        (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
+        (when (version<= "27.0" emacs-version)
+          ;; Needed for configuring initial client frame
+          (add-hook 'server-after-make-frame-hook #'hgs--new-frame-setup)))
+    (progn
+      ;; Needed for configuring 2nd frame onwards
+      (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
+      ;; Needed for configuring initial frame
+      (add-hook 'window-setup-hook #'hgs--new-frame-setup))))
 
 (defun hgs-fix-init-paths ()
   ;; Change the built-in init directories for old emacs versions using ~/.emacs

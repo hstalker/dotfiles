@@ -2605,15 +2605,23 @@ switch list."))
       (setq docker-run-as-root nil))))
 
 (use-package doom-modeline
-  :after
-  all-the-icons
-
   :demand t
 
+  ;; N.B Having all-the-icons marked as a dependency causes this to refuse to
+  ;; properly setup hooks
+  ;;
+  ;; :after
+  ;; all-the-icons
+
   :init
-  (defun hgs--enable-doom-modeline (&optional)
+  (defun hgs--enable-doom-modeline (&optional frame)
+    (message "Enabling doom modeline!")
     (doom-modeline-mode +1))
-  (hgs--enable-doom-modeline))
+
+  ;; We utilize frame creation hooks for force enabling the doom modeline
+  ;; package
+  :hook
+  ((hgs-frame-customization) . hgs--enable-doom-modeline))
 
 (use-package erc-hl-nicks
   :after
