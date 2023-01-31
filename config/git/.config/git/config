@@ -16,9 +16,12 @@
     f = fetch
     df = diff
     dt = difftool
+    rp = rev-parse
+    rl = rev-list
     cl = clone
     me = merge
     rb = rebase
+    cp = cherry-pick
     fap = fetch --all --prune
     sur = submodule update --init --recursive
     unstage = reset HEAD --
