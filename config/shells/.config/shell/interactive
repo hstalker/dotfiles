@@ -76,7 +76,7 @@ alias diskinfo='df -H'
 # PS1 related functions
 # VCS branch display mechanism
 get_vcs_branch() {
-  if [ -n "$(command -v svn)" -a -n "$(svn info 2>/dev/null)" ]; then
+  if [ -n "$(command -v svn)" ] && [ -n "$(svn info 2>/dev/null)" ]; then
     svn_branch="$(svn info | \
       grep '^URL:' | \
       egrep -o '(tags|branches)/[^/]+|trunk' | \

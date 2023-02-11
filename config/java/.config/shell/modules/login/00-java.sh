@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
 
-silence_output assert_directory "${JAVA_HOME}"
+if [ -n "${JAVA_HOME}" ]; then
+  silence_output assert_directory "${JAVA_HOME}"
+fi

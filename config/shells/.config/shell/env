@@ -26,7 +26,7 @@ silence_error() {
 # Check for whether we have the baseline tools for this script to even work
 # installed.
 _check_for_base_tools() {
-  if [ $# != 0 ]; then
+  if [ $# -ne 0 ]; then
     echo "USAGE: _check_for_base_tools"
     return 255
   fi
@@ -49,7 +49,7 @@ _check_for_base_tools
 
 # Grab the value of environment variable $1 indirectly
 indirect_expand() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     echo "USAGE: indirect_expand VAR-NAME"
     return 255
   fi
@@ -160,7 +160,7 @@ text_reset() {
 # Generic function for printing messages to output with a given color and
 # category.
 _report_message() {
-  if [ $# != 3 ]; then
+  if [ $# -ne 3 ]; then
     echo "USAGE: _report_message TPUT-COLOR-CODE CATEGORY-STRING MESSAGE-STRING"
     return 255
   fi
@@ -173,7 +173,7 @@ _report_message() {
 # Report a colored error message. Also finishes as false, so it can be
 # effectively used in branching.
 report_error() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     echo "USAGE: report_error ERROR-STRING"
     return 255
   fi
@@ -184,7 +184,7 @@ report_error() {
 
 # Report a colored warning message
 report_warning() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     echo "USAGE: report_warning WARNING-STRING"
     return 255
   fi
@@ -195,7 +195,7 @@ report_warning() {
 
 # Report a colored status message
 report_status() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     echo "USAGE: report_status STATUS-STRING"
     return 255
   fi
@@ -229,7 +229,7 @@ error_and_die() {
 # Will store latest state of set options for restoring them later via a
 # matching pop_set_state. The naming implies a stack nature, but it isn't.
 push_set_state() {
-  if [ $# != 0 ]; then
+  if [ $# -ne 0 ]; then
     report_error "USAGE: push_set_state"
     return 255
   fi
@@ -240,7 +240,7 @@ push_set_state() {
 
 # Reset state of the shell set options from the latest backup.
 pop_set_state() {
-  if [ $# != 0 ]; then
+  if [ $# -ne 0 ]; then
     report_error "USAGE: pop_set_state"
     return 255
   fi
@@ -329,7 +329,7 @@ path_append() {
 
 # Source if file is readable
 try_source() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     report_error "USAGE: try_source FILE-NAME"
     return 255
   fi
@@ -345,7 +345,7 @@ try_source() {
 # clearer what the problem is, as shells are notoriously bad at giving good
 # errors.
 require_source() {
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     error_and_die "USAGE: require_source FILE-NAME"
   fi
 
@@ -368,7 +368,7 @@ require_source() {
 
 # Determine whether we are running under a particular session type
 is_session() (
-  if [ $# != 1 ]; then
+  if [ $# -ne 1 ]; then
     report_error "USAGE: is_session MATCH-STR"
   fi
 
@@ -438,7 +438,7 @@ load_user_systemd_environment_d() {
 # from the current session. Probably shouldn't be used, but allows for simple
 # matching of shell environment with Systemd.
 inject_user_systemd_environment() (
-  if [ $# != 0 ]; then
+  if [ $# -ne 0 ]; then
     report_error "Usage: inject_user_systemd_environment \
 [VARIABLE-NAME VARIABLE-VALUE]"
   fi
@@ -584,11 +584,12 @@ is_directory_empty() {
   SEARCH_DIR="$1"
   if [ $# -gt 1 ]; then
     NAME_PATTERN="$2"
+    RESULT="$(find "${SEARCH_DIR}" -mindepth 1 -maxdepth 1 \
+      -iname "${NAME_PATTERN}" 2>/dev/null | wc -l)"
+  else
+    RESULT="$(find "${SEARCH_DIR}" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l)"
   fi
-
-  if [ $(find "${SEARCH_DIR}" \
-      -mindepth 1 -maxdepth 1 ${NAME_PATTERN:+-iname "${NAME_PATTERN}"} \
-      2>/dev/null | wc -l) != 0 ]; then
+  if [ "${RESULT}" -ne 0 ]; then
     return 1
   else
     return 0
@@ -600,7 +601,7 @@ is_directory_empty() {
 # login/logout/interactive/env configuration.
 load_per_application_modules() {
   _ALLOWED_MODULE_TYPES="env login logout interactive"
-  if [ $# != 1 ] || ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$1"; then
+  if [ $# -ne 1 ] || ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$1"; then
     report_error "USAGE: load_all_per_application MODULE-NAME where \
 MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
     return 255
@@ -609,8 +610,8 @@ MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
 
   MODULE_BASE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/shell/modules/${MODULE_TYPE}"
   if [ -d "${MODULE_BASE_DIR}" ] && \
-      [ -r "${MODULE_BASE_DIR}" ] && \
-      ! is_directory_empty "${MODULE_BASE_DIR}" '*.sh'; then
+     [ -r "${MODULE_BASE_DIR}" ] && \
+     ! is_directory_empty "${MODULE_BASE_DIR}" '*.sh'; then
     # Sadly there's not a good way of doing this with find, as sourcing needs to
     # be done in the main context (doesn't work in pipe)
     for MODULE in "${MODULE_BASE_DIR}"/*.sh; do
@@ -625,7 +626,7 @@ MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
 load_override_module() {
   _ALLOWED_SHELL_TYPES="shell sh ksh zsh bash"
   _ALLOWED_MODULE_TYPES="env login logout interactive"
-  if [ $# != 2 ] || \
+  if [ $# -ne 2 ] || \
       ! echo "${_ALLOWED_SHELL_TYPES}" | grep -wq "$1" ||
       ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$2"; then
     report_error "USAGE: load_override_module SHELL-TYPE MODULE-TYPE where \
