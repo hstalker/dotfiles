@@ -76,6 +76,7 @@ Currently includes some configuration for the following pieces of software:
   * Ack - Classic search tool
   * Aspell - Spelling aid
   * Docker - Containerization
+  * Direnv - Environment variable daemon
   * Git - Distributed VCS
   * GnuPG - Signing and encryption tools
   * Less - Pager that's better than the basic `more` pager

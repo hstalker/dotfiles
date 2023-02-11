@@ -14,6 +14,7 @@ PACKAGES ?= shells \
 	emacs \
 	ack \
 	aspell \
+	direnv \
 	docker \
 	vagrant \
 	emscripten \
