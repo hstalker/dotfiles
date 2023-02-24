@@ -153,6 +153,11 @@
        :host github
        :repo "dryman/toml-mode.el"))
     (straight-use-package
+     '(go-mode
+       :type git
+       :host github
+       :repo "dominikh/go-mode.el"))
+    (straight-use-package
      '(dimmer
        :type git
        :host github

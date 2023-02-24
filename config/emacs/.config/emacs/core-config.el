@@ -1331,6 +1331,10 @@ narrowing framework.")
 
 ;; Third-party package configuration
 
+(use-package go-mode
+  :mode
+  (("\\.go\\'" . go-mode)))
+
 (use-package vimrc-mode
   :mode
   (("\\.vim\\'" . vimrc-mode)

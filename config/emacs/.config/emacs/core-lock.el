@@ -41,6 +41,7 @@
  ("flymake" . "480ab33e649fe841b83caafc0a2be2a112879796")
  ("flyspell-correct" . "7d7b6b01188bd28e20a13736ac9f36c3367bd16e")
  ("gnu-elpa-mirror" . "c1eac9ab251d13d9a37cfba975246f30878ee2b8")
+ ("go-mode.el" . "166dfb1e090233c4609a50c2ec9f57f113c1da72")
  ("ht.el" . "3c1677f1bf2ded2ab07edffb7d17def5d2b5b6f6")
  ("hydra" . "317e1de33086637579a7aeb60f77ed0405bf359b")
  ("jq-mode" . "071c1c29bac30351ad338136f2b625e5601365cd")
