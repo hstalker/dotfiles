@@ -168,10 +168,10 @@
        :host github
        :repo "domtronn/all-the-icons.el"))
     (straight-use-package
-     '(clang-format
+     '(reformatter
        :type git
        :host github
-       :repo "emacsmirror/clang-format"))
+       :repo "purcell/emacs-reformatter"))
     (straight-use-package
      '(org-bullets
        :type git
@@ -342,11 +342,6 @@
        :type git
        :host github
        :repo "akermu/emacs-libvterm"))
-    (straight-use-package
-     '(clang-format+
-       :type git
-       :host github
-       :repo "SavchenkoValeriy/emacs-clang-format-plus"))
     (straight-use-package
      '(flycheck
        :type git

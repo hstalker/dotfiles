@@ -1176,6 +1176,23 @@ information.")
    t
    "Guess indent offset and set it appropriately."))
 
+;; C/C++
+(use-package cc-mode
+  :init
+  (defcustom hgs-clang-format-command
+    ;; (PROGRAM ARGS...)
+    '("clang-format")
+    "Command to run clang formatting."
+    :type 'list
+    :group 'personal)
+
+  :config
+  (reformatter-define clang-format
+    :program (car hgs-clang-format-command)
+    :args (cdr hgs-clang-format-command)
+    :group 'cpp
+    :lighter " CF"))
+
 (use-package org
   :mode
   ("\\.org\\'" . org-mode)
@@ -2317,24 +2334,10 @@ text banners, or a path to an image or text file.")
      (get-buffer "*dashboard*"))
    "Show the dashboard as the initial buffer even for the Emacs client."))
 
-(use-package clang-format)
-
-(use-package clang-format+
-  :after
-  clang-format
-
-  :hook
-  ((c-mode c++-mode objc-mode) . clang-format+-mode)
-
-  :custom
-  (clang-format+-context
-   'modification
-   "Only reformat the modified lines. Prevents unnecessary changes in PRs.")
-  (clang-format+-offset-modified-region 0 "")
-  (clang-format+-always-enable
-   nil
-   "If we can't find a .clang-format, then we should not enable this
-automation."))
+(use-package reformatter
+  :functions
+  ;; Autoload this package when other modes try to define formatters
+  reformatter-define)
 
 (use-package undo-fu
   :defines
