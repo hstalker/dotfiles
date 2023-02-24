@@ -1335,6 +1335,14 @@ narrowing framework.")
   :mode
   (("\\.go\\'" . go-mode)))
 
+(use-package rustic-mode
+  :mode
+  (("\\.rs\\'" . rustic-mode))
+
+  :custom
+  (rustic-lsp-setup-p nil "Don't automatically try to setup lsp-mode")
+  (rustic-format-trigger 'on-save "Format Rust code on save."))
+
 (use-package vimrc-mode
   :mode
   (("\\.vim\\'" . vimrc-mode)

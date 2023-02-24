@@ -158,6 +158,26 @@
        :host github
        :repo "dominikh/go-mode.el"))
     (straight-use-package
+     '(spinner
+       :type git
+       :host github
+       :repo "Malabarba/spinner.el"))
+    (straight-use-package
+     '(xterm-color
+       :type git
+       :host github
+       :repo "atomontage/xterm-color"))
+    (straight-use-package
+     '(rust-mode
+       :type git
+       :host github
+       :repo "rust-lang/rust-mode"))
+    (straight-use-package
+     '(rustic-mode
+       :type git
+       :host github
+       :repo "brotzeit/rustic"))
+    (straight-use-package
      '(dimmer
        :type git
        :host github
