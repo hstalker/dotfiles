@@ -1749,18 +1749,15 @@ support.")
   (:prefix "C-c e"
            :prefix-map hgs--embark-prefix-map
            :prefix-docstring "Embark commands"
+           ;; You can access most fundamental embark operations such as
+           ;; export/become/collect/live via act, so there's no need to rebind
+           ;; them here.
+           ;;
            ;; Contextual actions on object at point
            ("a" . embark-act)
-           ;; Change current command w/o quitting
-           ("b" . embark-become)
-           ;; Export candidates to mode buffer
-           ("e" . embark-export)
-           ;; Collect candidates into live updating collect buffer
-           ("c" . embark-collect-live)
-           ;; Collect candidates into a frozen collect buffer
-           ("C" . embark-collect-snapshot)
            ;; Do the default action to thing at point
            ("d" . embark-dwim))
+
   (:map global-map
    ;; Improved bindings help
    ([remap describe-bindings] . embark-bindings))
@@ -1769,8 +1766,7 @@ support.")
         ;; that beyond act/become which are frequent and short operations one
         ;; shouldn't need shortcuts for embark in the minibuffer.
         ("C-;" . embark-act)
-        ("C-:" . embark-become)
-        ("C-'" . embark-export))
+        ("C-:" . embark-dwim))
   (:map embark-file-map
         ("j" . dired-jump))
 
