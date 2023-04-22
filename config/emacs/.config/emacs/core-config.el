@@ -375,6 +375,38 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
 (use-package gud)
 
+(use-package pulse
+  :init
+  ;; Note this currently is effectively constant
+  (defcustom hgs--line-pulse-commands
+    '(scroll-up-command
+      scroll-down-command
+      recenter-top-bottom
+      other-window)
+    "Commands which should be considered pulse-worthy events."
+    :type '(repeat symbol)
+    :group 'personal)
+
+  (defun hgs--pulse-current-line (&rest _)
+    "Pulse the current line."
+    (pulse-momentary-highlight-one-line (point)))
+
+  (defun hgs--add-pulse-advice ()
+    "Enable Emacs pulsing the current line on certain jump navigation events."
+    (dolist (command hgs--line-pulse-commands)
+      (advice-add command :after #'hgs--pulse-current-line)))
+
+  (defun hgs--remove-pulse-advice ()
+    "Disable Emacs pulsing the current line on certain jump navigation events."
+    (dolist (command hgs--line-pulse-commands)
+      (advice-remove command :after #'hgs--pulse-current-line)))
+
+  (hgs--add-pulse-advice)
+
+  :custom
+  (pulse-delay 0.03 "Delay between pulse iterations (seconds).")
+  (pulse-iterations 10 "Number of iterations per pulse."))
+
 (use-package find-file
   :custom
   (ff-case-fold-search t "Ignore case in matching.")
