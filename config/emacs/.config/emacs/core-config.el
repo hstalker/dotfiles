@@ -1429,6 +1429,7 @@ mouse navigation."))
   avy-order-closest
 
   :commands
+  avy-goto-char
   avy-goto-char-2
   avy-goto-char-timer
   avy-goto-word
@@ -1436,9 +1437,22 @@ mouse navigation."))
 
   :bind
   (:map global-map
-        ("C-'" . avy-goto-char))
+        ("C-'" . avy-goto-char-timer))
   (:map isearch-mode-map
         ("C-'". avy-isearch))
+
+  :config
+  (defun avy-action-embark (pt)
+    "Run `embark-act' on avy filtered candidates."
+    (unwind-protect
+        (save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+
+  (setf (alist-get ?\; avy-dispatch-alist) #'avy-action-embark)
 
   :custom
   (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
@@ -1449,6 +1463,8 @@ back to `avy-keys'")
   (avy-background nil "Use a gray background during selection.")
   (avy-all-windows t "Scan all windows on the selected for selection.")
   (avy-case-fold-search t "Ignore case for search.")
+  (avy-single-candidate-jump nil "Don't auto-jump on single candidates to allow applying
+actions.")
   (avy-highlight-first nil "Don't highlight the first decision character, only
 first non-terminating decision characters.")
   (avy-timeout-seconds 0.5 "How long `*-timer' commands should wait.")
