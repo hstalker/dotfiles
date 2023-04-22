@@ -240,7 +240,15 @@ nil, 'prepend or 'append."
   (put 'narrow-to-page 'disabled nil)
 
   (bind-keys :map global-map
-             ([remap suspend-frame] . hgs--suspend-frame))
+             ;; Prevent us from accidentally suspending frame in non-graphical
+             ;; displays.
+             ([remap suspend-frame] . hgs--suspend-frame)
+
+             ;; Replace the case altering bindings with their dwim variants to
+             ;; make life easier for free!
+             ([remap upcase-word] . upcase-dwim)
+             ([remap downcase-word] . downcase-dwim)
+             ([remap capitalize-word] . capitalize-dwim))
 
   ;; Indicate the depth of recursion of the mini-buffer in the mode-line
   (minibuffer-depth-indicate-mode +1)
