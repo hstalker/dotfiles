@@ -143,16 +143,14 @@ significant - especially loading packages."
                             "A sensible number for security.")
     (customize-set-variable
      'gnutls-algorithm-priority
-     (concat "SECURE192:+SECURE128:-VERS-ALL"
-             (if (and (version< "26.3" emacs-version)
-                      (>= libgnutls-version 30605)
-                      (not hgs-is-windows))
-                 ;; Use TLS 1.3 if GnuTLS is both available and high enough
-                 ;; version
-                 ":+VERS-TLS1.3"
-               ;; Otherwise fallback to 1.2
-               ":+VERS-TLS1.2")))
-    "Set a relatively secure default priority list of cipher algorithms.")
+     (let ((supports-tls1.3 (and (version< "26.3" emacs-version)
+                                 (>= libgnutls-version 30605)
+                                 (not hgs-is-windows))))
+       (concat "SECURE192:+SECURE128:-VERS-ALL"
+               ;; Use TLS 1.3 if GnuTLS is both available & high enough version
+               (if supports-tls1.3 ":+VERS-TLS1.3" nil)
+               ":+VERS-TLS1.2"))
+    "Set a relatively secure default priority list of cipher algorithms."))
   ;; Non-GnuTLS path - Note that `tls' is deprecated, so this may no longer work
   ;; in future versions
   (when (require 'tls nil 'noerror)
@@ -166,7 +164,7 @@ significant - especially loading packages."
 -no_tls1_1 -ign_eof"
        ;; Use gnutls if we can't use openssl
        "gnutls-cli -p %p --dh-bits=3072 --ocsp -x509cafile=%t --strict-tofu \
---priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.2:+VERS-TLS1.3' %h"
+--priority='SECURE192:+SECURE128:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2' %h"
        ;; If all else fails...
        "gnutls-cli -p %p %h")
      "Sensible TLS program invocations (in-order of priority) when GnuTLS isn't
