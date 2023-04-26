@@ -2695,71 +2695,8 @@ switch list."))
   erc)
 
 (use-package message
-  :defines
-  hgs-smtp-routes
-
-  :functions
-  hgs--generate-smtp-routes
-  hgs--generate-smtp-method-header
-  hgs--gmail-from-addr-to-smtp-route-spec
-
-  :init
-  (defcustom hgs-smtp-routes '()
-    "List of mappings of `From' headers to SMTP servers for outgoing messages."
-    :group 'personal
-    :type '(alist :key-type regexp :value-type function))
-
-  (defun hgs--gmail-from-addr-to-smtp-route-spec (from-addr)
-    "Maps a Gmail From address to an smtp route specification."
-    `(:from-addr ,from-addr
-                 :smtp-user ,from-addr
-                 :smtp-server "smtp.gmail.com"
-                 :smtp-port 587))
-
-  (defun hgs--generate-smtp-routes (routing-table from-addr)
-    "Maps a `From' address to an smtp route for use with `HGS-SMTP-ROUTES'.
-This function relies on regex matching based on the `From' mail address"
-    (let ((results
-           (cl-loop for (regex . generator)
-                    in routing-table
-                    collect (when (string-match-p regex from-addr)
-                              (funcall generator from-addr)))))
-      (when (cl-every #'null results)
-        (warn "Unable to generate matching route using your From address `%s'"
-              from-addr))
-      results))
-
-  (defun hgs--generate-smtp-method-header (sender &optional routing-table)
-    "Generate a `X-Message-SMTP-Method' header to SMTP route outgoing mail.
-This function uses `HGS-SMTP-ROUTES' to perform the From: -> SMTP
-server mappings if no mapping supplied via `ROUTING-TABLE'."
-    (unless (or routing-table hgs-smtp-routes)
-      (error "Unable to find non-empty routing table!"))
-    (unless (> (length sender) 0)
-      (error "Expected non-empty from address!"))
-    (let* ((routes
-            (cl-loop for route
-                     in (hgs--generate-smtp-routes (or routing-table
-                                                       hgs-smtp-routes)
-                                                   sender)
-                     when (not (null route))
-                     collect (cl-destructuring-bind
-                                 (&key from-addr smtp-server smtp-port
-                                       smtp-user)
-                                 route
-                               (when (string-match from-addr sender)
-                                 (format "smtp %s %d %s"
-                                         smtp-server
-                                         smtp-port
-                                         smtp-user)))))
-           (first-route (seq-find #'identity routes)))
-      (unless first-route
-        (warn "Could not find SMTP Server for this Sender address: %s.
-You might want to add it to the SMTP routing table `HGS-SMTP-ROUTES'"
-              sender))
-      first-route))
-
   :custom
+  (message-fill-column 72 "Use sensible wrapping for plain-text emails.")
   (message-send-mail-function
    #'sendmail-query-once
    "Query for mail send function on first use (NOTE: Only queries if
@@ -2772,10 +2709,7 @@ You might want to add it to the SMTP routing table `HGS-SMTP-ROUTES'"
    (concat hgs-emacs-state-directory "mail-drafts")
    "Where to place draft messages")
   (message-default-mail-headers
-   "Cc: \n" "Add CC header to new mail by default.")
-  (hgs-smtp-routes
-   '((".*@gmail.com$" . hgs--gmail-from-addr-to-smtp-route-spec))
-   "Alist of From address matching regex to smtp route spec generators."))
+   "Cc: \n" "Add CC header to new mail by default."))
 
 (use-package smtpmail
   :custom
@@ -2815,10 +2749,22 @@ hostname after emacs 25."))
         ("C-c s" . message-templ-select))
 
   :custom
+;;   Example of Multiple Account Handling:
+;;   (message-templ-config-alist
+;;    '(("^From:.*me@email.com.*"
+;;       (lambda ()
+;;         (message-templ-apply "me-smtp-header")))
+;;      "Alist for automatically applying templates on mail based on a regexp.")
+;;  (message-templ-alist
+;;   '(("me-smtp-header"
+;;      ;; Add the following headers
+;;      ("From" . "My Name <me@email.com>")
+;;      ("X-Message-SMTP-Method" . "smtp smtp.server.com 587 me@email.com")))
+;;   "Alist for defining named mail templates.")
   (message-templ-alist
-   '() "Define empty defaults for template contents.")
+   '() "Define empty defaults for mail templates.")
   (message-templ-config-alist
-   '() "Define empty defaults for mapping mail headers to templates."))
+   '() "Define empty defaults for automatically applying templates to mail."))
 
 (use-package notmuch
   :init
