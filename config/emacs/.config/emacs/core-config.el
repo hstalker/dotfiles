@@ -1711,7 +1711,6 @@ support.")
   :bind
   (:map global-map
         ([remap yank-pop] . consult-yank-pop)
-        ([remap apropos-command] . consult-apropos)
         ("C-h M" . consult-man)
         ("C-c H" . consult-history)
         ("M-s e" . consult-isearch-history)
