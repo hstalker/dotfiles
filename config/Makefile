@@ -48,7 +48,6 @@ PACKAGES ?= shells \
 	weechat \
 	feh \
 	zoom \
-	sway \
 	nvidia \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
