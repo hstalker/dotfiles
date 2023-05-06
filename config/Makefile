@@ -46,7 +46,6 @@ PACKAGES ?= shells \
 	dircolors \
 	redshift \
 	mozc \
-	weechat \
 	feh \
 	zoom \
 	nvidia \
