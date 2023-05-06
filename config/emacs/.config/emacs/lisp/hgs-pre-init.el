@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(require 'hgs-core)
+
 ;; comp is only available with native-comp
 (unless (version< emacs-version "28")
   (require 'comp))
@@ -23,16 +25,22 @@
       (message "Native JSON is available.")
     (message "Native JSON is not available."))
 
-
   (if (and (fboundp 'native-comp-available-p)
            (native-comp-available-p))
       (progn
         (message "Native compilation is available.")
+
+        ;; Redirect cache to to my cache directory
+        (when (fboundp 'startup-redirect-eln-cache)
+          (startup-redirect-eln-cache
+           (expand-file-name hgs-emacs-cache-directory)))
+
         ;; Log async native-compilation warnings, but don't pop up the window
         (customize-set-variable 'native-comp-async-report-warnings-errors
                                 'silent)
+
+        ;; Enable deferred compilation by default, reasonably early
         (when (boundp 'native-comp-deferred-compilation)
-          ;; Enable deferred compilation by default, reasonably early
           (customize-set-variable 'native-comp-deferred-compilation t)))
     (message "Native compilation is not available."))
 
