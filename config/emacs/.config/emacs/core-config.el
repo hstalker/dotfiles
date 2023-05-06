@@ -278,9 +278,9 @@ echo area.")
   (inhibit-default-init t "Don't load the default library.")
   (initial-scratch-message nil "Don't show an initial message in the scratch
 buffer.")
-  (auto-save-list-file-prefix (concat hgs-emacs-state-directory
-                                      "auto-save-list")
-                              "Put autosaves in our cache directory.")
+  (auto-save-list-file-prefix
+   (concat hgs-emacs-state-directory "auto-save/sessions/")
+   "Put autosaves in our state directory.")
   (sentence-end-double-space nil "Tell Emacs that we don't use double spacing
 for sentences.")
   (bidi-paragraph-direction 'left-to-right "We don't use Emacs for
@@ -340,6 +340,10 @@ predictable."))
   :config
   (setq gamegrid-user-score-file-directory
         (concat hgs-emacs-state-directory "games/gamegrid")))
+
+(use-package timeclock
+  :custom
+  (timeclock-file (concat hgs-emacs-data-directory "timeclock/log")))
 
 (use-package help
   :config
@@ -603,8 +607,8 @@ file when it changes on disk.")
   ((prog-mode text-mode special-mode) . recentf-mode)
 
   :custom
-  (recentf-save-file (concat hgs-emacs-state-directory "recentf")
-                     "Place the recentf cache into our cache directory.")
+  (recentf-save-file (concat hgs-emacs-state-directory "recentf/save.el")
+                     "Place the recentf cache into our state directory.")
   (recentf-max-menu-items 25 "Maximum number of menu items to show.")
   (recentf-max-saved-items 25 "Maximum number of items to save."))
 
@@ -617,6 +621,12 @@ file when it changes on disk.")
   (abbrev-suggest-hint-threshold 3 "Threshold for abbrev suggestion.")
   (abbrev-all-caps nil "Don't reflect upper-case abbrevs in expansion."))
 
+(use-package autoinsert
+  :custom
+  (auto-insert-directory
+   (concat hgs-emacs-config-directory "autoinsert/")
+   "Home for autoinsert files."))
+
 (use-package vc
   :bind-keymap
   ("C-x v" . vc-prefix-map)
@@ -628,6 +638,44 @@ file when it changes on disk.")
   :custom
   (vc-follow-symlinks t "Make the version control functionality automatically
 follow symlinks to files potentially outside of the VCS (or inside another)."))
+
+(use-package eudc-vars
+  :custom
+  (eudc-options-file
+   (concat hgs-emacs-config-directory "eudc/options.el")))
+
+(use-package remember
+  :custom
+  (remember-data-file (concat hgs-emacs-data-directory "remember/notes"))
+  (remember-data-directory (concat hgs-emacs-data-directory "remember/")))
+
+(use-package ido
+  :custom
+  (ido-save-directory-list-file
+   (concat hgs-emacs-state-directory "ido/save-directory-list.el")))
+
+(use-package saveplace
+  :custom
+  (save-place-file (concat hgs-emacs-state-directory "saveplace/persist.el")))
+
+(use-package gnus
+  :custom
+  (gnus-init-file (concat hgs-emacs-config-directory "gnus/init.el"))
+  (gnus-startup-file
+   (concat hgs-emacs-config-directory "gnus/newsrc")
+   "GNUS hardcodes newsrc.eld to be derived from this.")
+  (gnus-dribble-directory (concat hgs-emacs-state-directory "gnus/dribble/")))
+
+(use-package newsticker
+  :config
+  (make-directory newsticker-dir t)
+  (make-directory (file-name-directory newsticker-cache-filename) t)
+
+
+  :custom
+  (newsticker-dir (concat hgs-emacs-state-directory "newsticker/"))
+  (newsticker-cache-filename
+   (concat hgs-emacs-cache-directory "newsticker/cache.el")))
 
 (use-package dired
   :functions
@@ -667,6 +715,23 @@ recursive copies.")
   (dired-dwim-target t "Do what I mean when I have multiple Dired windows
 open."))
 
+(use-package image-dired
+  :custom
+  (image-dired-dir (concat hgs-emacs-cache-directory "image-dired/"))
+  (image-dired-gallery-dir
+   (concat hgs-emacs-state-directory "image-dired/gallery/"))
+  (image-dired-db-file (concat hgs-emacs-state-directory "image-dired/db.el"))
+  (image-dired-temp-image-file
+   (concat hgs-emacs-cache-directory "image-dired/temp-image"))
+  (image-dired-temp-rotate-image-file
+   (concat hgs-emacs-cache-directory "image-dired/temp-rotate-image")))
+
+(use-package calc
+  :custom
+  (calc-settings-file
+   (concat hgs-emacs-config-directory "calc/settings.el")
+   "Find calc settings in our configuration directory."))
+
 (use-package winner
   :diminish
   winner-mode
@@ -679,14 +744,58 @@ open."))
   :hook
   ((prog-mode text-mode special-mode) . winner-mode))
 
+(use-package filesets
+  :custom
+  (filesets-menu-cache-file
+   (concat hgs-emacs-cache-directory "filesets/menu.el")))
+
+(use-package kkc
+  :custom
+  (kkc-init-file-flag (concat hgs-emacs-config-directory "kkc/init.el")))
+
 (use-package desktop
+  :init
+  (setq desktop-dirname (concat hgs-emacs-state-directory "desktop/"))
+
   :config
-  (setq desktop-dirname (concat hgs-emacs-state-directory "desktop"))
+  (make-directory desktop-dirname t)
 
   :custom
-  (desktop-base-file-name "autosave" "Name of the desktop save file.")
-  (desktop-base-lock-name "autosave-lock" "Name of the lock for desktop
-package."))
+  (desktop-path
+   (list desktop-dirname)
+   "Search our state directory for desktop files."))
+
+(use-package calendar
+  :custom
+  (diary-file
+   (concat hgs-emacs-data-directory "diary/default")
+   "Place our default diary in our data directory."))
+
+(use-package ecomplete
+  :custom
+  (ecomplete-database-file
+   (concat hgs-emacs-state-directory "ecomplete/database.el")
+   "Place the ecomplete database file in our state directory."))
+
+(use-package ede/base
+  :custom
+  (ede-project-placeholder-cache-file
+   (concat hgs-emacs-cache-directory "ede/project-cache.el")
+   "Place the ede project placeholder cache in our cache directory."))
+
+(use-package srecode
+  :custom
+  (srecode-map-save-file (concat hgs-emacs-state-directory "srecode/map.el")))
+
+(use-package semantic
+  :custom
+  (semanticdb-default-save-directory
+   (concat hgs-emacs-cache-directory "semanticdb/cache")))
+
+(use-package shadowfile
+  :custom
+  (shadow-info-file (concat hgs-emacs-data-directory "shadow/info.el"))
+  (shadow-todo-file (concat hgs-emacs-data-directory "shadow/todo.el")))
 
 (use-package savehist
   :diminish
@@ -696,7 +805,7 @@ package."))
   (after-init . savehist-mode)
 
   :custom
-  (savehist-file (concat hgs-emacs-cache-directory "history")
+  (savehist-file (concat hgs-emacs-cache-directory "savehist/history")
                  "Cache history in cache directory."))
 
 (use-package eww
@@ -704,21 +813,29 @@ package."))
   (:map search-map
         ("M-w" . eww-search-words))
 
+  :config
+  (make-directory eww-bookmarks-directory t)
+
   :custom
   (eww-bookmarks-directory
-   (concat hgs-emacs-state-directory "eww")
+   (concat hgs-emacs-state-directory "eww/")
    "Place eww bookmarks under the state directory."))
+
+(use-package type-break
+  :custom
+  (type-break-file-name
+   (concat hgs-emacs-state-directory "type-break/state.el")))
 
 (use-package tramp
   :custom
   (tramp-auto-save-directory
-   (concat hgs-emacs-state-directory "tramp-auto-save")
+   (concat hgs-emacs-state-directory "tramp/auto-save")
    "Directory to place auto-saves when editing via Tramp.")
   (tramp-backup-directory-alist
    backup-directory-alist
    "Put Tramp backups in the same place as local backups.")
   (tramp-persistency-file-name
-   (concat hgs-emacs-cache-directory "tramp-persistency.el")
+   (concat hgs-emacs-cache-directory "tramp/persistency.el")
    "Put the Tramp persistency file in the cache directory.")
   (tramp-histfile-override
    nil "We don't want to store remote shell history locally."))
@@ -749,9 +866,15 @@ package."))
        " ")))
 
   :custom
-  (eshell-directory-name (concat hgs-emacs-state-directory "eshell")
-                         "Use state directory for storing files (e.g. aliases,
-history etc.)")
+  (eshell-directory-name
+   (concat hgs-emacs-state-directory "eshell")
+   "Use state directory for storing transient files (e.g. history etc.)")
+  (eshell-rc-script
+   (concat hgs-emacs-config-directory "eshell/rc"))
+  (eshell-login-script
+   (concat hgs-emacs-config-directory "eshell/login"))
+  (eshell-aliases-file
+   (concat hgs-emacs-config-directory "eshell/aliases"))
   (eshell-buffer-maximum-lines
    20000
    "Truncate eshell buffers to something reasonable.")
@@ -1191,6 +1314,15 @@ information.")
    nil
    "We don't want to prompt, instead we should always use an auth-source."))
 
+(use-package erc-dcc
+  :config
+  (make-directory erc-dcc-get-default-directory t)
+
+  :custom
+  (erc-dcc-get-default-directory
+   (concat hgs-emacs-data-directory "erc/dcc/")
+   "Place ERC DCC data inside our data directory."))
+
 (use-package url
   :custom
   (url-cache-directory
@@ -1198,7 +1330,13 @@ information.")
    "Put the url package's cache directory where we would expect.")
   (url-configuration-directory
    (concat hgs-emacs-data-directory "url")
-   "Put the url package's configuration directory in the data directory."))
+   "Put the url package's configuration directory in the data directory.")
+  (url-cookie-file (concat hgs-emacs-state-directory "url/cookies.el"))
+  (url-history-file (concat hgs-emacs-state-directory "url/history.el")))
+
+(use-package quickurl
+  :custom
+  (quickurl-url-file (concat hgs-emacs-state-directory "quickurl/urls")))
 
 (use-package nsm
   ;; Network Security Manager -- Manages TLS certs
@@ -1210,8 +1348,8 @@ information.")
 (use-package bookmark
   :custom
   (bookmark-default-file
-   (concat hgs-emacs-state-directory "bookmarks")
-   "Put bookmarks in the data directory."))
+   (concat hgs-emacs-state-directory "bookmark/defaults.el")
+   "Put bookmarks in the state directory."))
 
 (use-package custom
   :custom
@@ -1269,6 +1407,12 @@ information.")
   :custom
   (org-directory hgs-org-directory
                  "Base path to store org files inside by default.")
+  (org-clock-persist-file
+   (concat hgs-emacs-state-directory "org/clock-persist.el"))
+  (org-id-locations-file
+   (concat hgs-emacs-state-directory "org/id-locations.el"))
+  (org-publish-timestamp-directory
+   (concat hgs-emacs-state-directory "org/timestamps/"))
   (org-default-notes-file
    (concat hgs-org-directory "notes.org")
    "Put org notes into the appropriate file & directory by default.")
@@ -1912,7 +2056,7 @@ emacsclient (invalid argument stringp errors)."
   :init
   (require 'async-bytecomp)
   (setq async-byte-compile-log-file
-        (concat hgs-emacs-state-directory "async-bytecomp.log"))
+        (concat hgs-emacs-state-directory "async/bytecomp.log"))
 
   :hook
   ((after-init . async-bytecomp-package-mode)
@@ -1921,14 +2065,11 @@ emacsclient (invalid argument stringp errors)."
 (use-package transient
   :custom
   (transient-levels-file
-   (concat hgs-emacs-state-directory "transient/levels.el")
-   "Where to place the Transient levels file.")
+   (concat hgs-emacs-state-directory "transient/levels.el"))
   (transient-values-file
-   (concat hgs-emacs-state-directory "transient/values.el")
-   "Where to place the Transient values file.")
+   (concat hgs-emacs-state-directory "transient/values.el"))
   (transient-history-file
-   (concat hgs-emacs-state-directory "transient/history.el")
-   "Where to place the Transient history file."))
+   (concat hgs-emacs-state-directory "transient/history.el")))
 
 (use-package pdf-tools
   :magic
@@ -2470,7 +2611,7 @@ text banners, or a path to an image or text file.")
   (undo-fu-session-file-limit
    nil "Don't limit the number of persisted state files.")
   (undo-fu-session-directory
-   (concat hgs-emacs-state-directory "undo-fu-session")
+   (concat hgs-emacs-state-directory "undo-fu/session")
    "Put persisted undo state in the state directory."))
 
 (use-package vundo
@@ -2481,9 +2622,12 @@ text banners, or a path to an image or text file.")
 (use-package project
   :demand t
 
+  :config
+  (make-directory (file-name-directory project-list-file) t)
+
   :custom
   (project-list-file
-   (concat hgs-emacs-state-directory "projects")
+   (concat hgs-emacs-state-directory "project/list.el")
    "Where to cache known projects.")
   (project-switch-use-entire-map t "Use entire `project-prefix-map' as a basis
 for project switch command dispatch."))
@@ -2599,8 +2743,10 @@ switch list."))
 
   :custom
   (treemacs-persist-file
-   (concat hgs-emacs-cache-directory "treemacs-persist")
+   (concat hgs-emacs-cache-directory "treemacs/persist.org")
    "Place Treemacs persistence file in the cache.")
+  (treemacs-last-error-persist-file
+   (concat hgs-emacs-cache-directory "persist-last-error.org"))
   (treemacs-sorting 'alphabetic-asc "Sort entries by alphabetical ordering.")
   (treemacs-position 'left "Put the Treemacs window on the left.")
   (treemacs-display-in-side-window
@@ -2722,7 +2868,7 @@ switch list."))
   (message-directory
    (concat hgs-data-directory "mail") "Base directory for all core mail paths.")
   (message-auto-save-directory
-   (concat hgs-emacs-state-directory "mail-drafts")
+   (concat hgs-emacs-state-directory "message/drafts")
    "Where to place draft messages")
   (message-default-mail-headers
    "Cc: \n" "Add CC header to new mail by default."))
@@ -2745,7 +2891,7 @@ hostname after emacs 25."))
 (use-package sendmail
   :custom
   (mail-default-directory
-   (concat hgs-emacs-state-directory "mail")
+   (concat hgs-emacs-state-directory "sendmail/auto-save")
    "Put mail auto-saves in the state directory")
   (mail-specify-envelope-from t "Specify envelope from to the specified MUA.")
   (mail-envelope-from
@@ -2876,10 +3022,14 @@ structured Notmuch configuration directory."
       (setenv profile-env-var new-profile)))
 
   :custom
+  (notmuch-init-file
+   (concat hgs-emacs-config-directory "notmuch/init")
+   "The Notmuch elisp init variable must not have a suffix, but the real file
+should.")
   (notmuch-address-command
    'internal "Use `notmuch address' for address completion.")
   (notmuch-address-save-filename
-   (concat hgs-emacs-cache-directory "notmuch-addresses")
+   (concat hgs-emacs-cache-directory "notmuch/addresses")
    "Cache file for notmuch completed addresses.")
   (notmuch-crypto-process-mime
    t "Read & verify encrypted/signed mime messages.")
