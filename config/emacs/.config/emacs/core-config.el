@@ -1191,6 +1191,13 @@ information.")
    (concat hgs-emacs-data-directory "url")
    "Put the url package's configuration directory in the data directory."))
 
+(use-package nsm
+  ;; Network Security Manager -- Manages TLS certs
+  :custom
+  (nsm-settings-file
+   hgs-emacs-state-directory
+   "Put the NSM connection details in state directory."))
+
 (use-package bookmark
   :custom
   (bookmark-default-file
