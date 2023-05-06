@@ -435,7 +435,6 @@ The current load order of these scripts is as follows:
 * `$XDG_CONFIG_HOME/emacs/core-config.el`
 * `$XDG_CONFIG_HOME/emacs/custom-config.el` (If available)
 * `$XDG_CONFIG_HOME/emacs/custom-customization.el` (If available)
-* `$XDG_CONFIG_HOME/emacs/custom-abbreviation.el` (If available)
 
 #### General Configuration
 Per-install configuration overrides should be placed in

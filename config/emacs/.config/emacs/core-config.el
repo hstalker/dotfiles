@@ -608,6 +608,15 @@ file when it changes on disk.")
   (recentf-max-menu-items 25 "Maximum number of menu items to show.")
   (recentf-max-saved-items 25 "Maximum number of items to save."))
 
+(use-package abbrev
+  :custom
+  (abbrev-file-name
+   (concat hgs-emacs-config-directory "abbrev/default.el")
+   "Find abbreviation customization file in emacs configuration directory.")
+  (abbrev-suggest nil "Don't suggest using abbrevs.")
+  (abbrev-suggest-hint-threshold 3 "Threshold for abbrev suggestion.")
+  (abbrev-all-caps nil "Don't reflect upper-case abbrevs in expansion."))
+
 (use-package vc
   :bind-keymap
   ("C-x v" . vc-prefix-map)

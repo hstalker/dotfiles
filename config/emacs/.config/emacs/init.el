@@ -47,12 +47,6 @@
                                 "custom-customization.el"))
 (load-if-exists custom-file)
 
-;; Same as above for abbreviations
-(customize-set-variable 'abbrev-file-name
-                        (concat hgs-emacs-config-directory
-                                "custom-abbreviation.el"))
-(load-if-exists abbrev-file-name)
-
 (require 'hgs-post-init)
 (hgs-run-post-init)
 
