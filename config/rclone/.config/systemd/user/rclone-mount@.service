@@ -1,0 +1,43 @@
+# User service for rclone mounting
+#
+# Pass the configured remote name as the service argument, e.g.
+# systemctl --user enable --now rclone-mount@<my-remote>
+#
+# We choose to place the mounts under $XDG_STATE_HOME, as we don't *own* the
+# data, the remote provider does, i.e. it's semi-persistent data.
+#
+# Much fine-tuning can be done on the exact mount options used for caching etc.
+# We aim to provide a light document friendly configuration. It is not suitably
+# configured for media heavy workloads.
+
+[Unit]
+Description=rclone: Remote FUSE filesystem for cloud remote %i
+Documentation=man:rclone(1)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+Environment=RCLONE_REMOTE_NAME=%i
+ExecStartPre=/usr/bin/mkdir -p "${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}"
+ExecStart=/usr/bin/rclone mount \
+  --config "${XDG_CONFIG_HOME}/rclone/rclone.conf" \
+  --allow-non-empty \
+  --poll-interval 30s \
+  --dir-cache-time 72h \
+  --attr-timeout 72h \
+  --vfs-cache-mode writes \
+  --vfs-cache-max-size 512M \
+  --vfs-cache-max-age 72h \
+  --vfs-cache-poll-interval 5m \
+  --vfs-read-chunk-size 128M \
+  --vfs-read-chunk-size-limit off \
+  --log-level INFO \
+  --umask 022 \
+  "${RCLONE_REMOTE_NAME}:/" "${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}"
+ExecStop=/bin/fusermount -u ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
+ExecStopPost=/usr/bin/rmdir ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
+
+[Install]
+WantedBy=default.target
+

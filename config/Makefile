@@ -26,6 +26,7 @@ PACKAGES ?= shells \
 	terminfo \
 	wget \
 	wine \
+	rclone \
 	xorg \
 	gtk \
 	kde \

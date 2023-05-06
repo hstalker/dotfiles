@@ -95,6 +95,8 @@ Currently includes some configuration for the following pieces of software:
   * Mozc - Open Google IME-based input method
   * Weechat - Terminal IRC client
   * Zoom - Video conferencing (all the rage after the 2020-21 pandemic)
+  * Rclone - Remote filesystem mounting and syncing tool supporting many
+    providers.
 * Desktop environments (Not enabled by default)
   * None as of yet. I tend to just use Gnome because I'm lazy.
 * Language tooling
