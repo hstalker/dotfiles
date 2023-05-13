@@ -29,29 +29,32 @@ if !empty($XDG_CONFIG_HOME)
 else
   let g:config_dir=expand('$HOME/.config/vim/')
 endif
-if !empty($XDG_CACHE_HOME)
-  let g:cache_dir=expand('$XDG_CACHE_HOME/vim/')
-else
-  let g:cache_dir=expand('$HOME/.cache/vim/')
-endif
-if !empty($XDG_STATE_HOME)
-  let g:state_dir=expand('$XDG_STATE_HOME/vim/')
-else
-  let g:state_dir=expand('$HOME/.local/state/vim/')
-endif
-if !empty($XDG_DATA_HOME)
-  let g:data_dir=expand('$XDG_DATA_HOME/vim/')
-else
-  let g:data_dir=expand('$HOME/.local/share/vim/')
-endif
+let g:vim_config_dir=expand(g:config_dir . 'vim/') |
+  \ call mkdir(g:vim_config_dir, 'p')
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Check for if we're running in minimal mode (core only, no plugins)
-if empty($VIM_MINIMAL)
-  let g:minimal_mode=0
+if !empty($XDG_CACHE_HOME)
+  let g:cache_dir=expand('$XDG_CACHE_HOME/')
 else
-  let g:minimal_mode=1
+  let g:cache_dir=expand('$HOME/.cache/')
 endif
+let g:vim_cache_dir=expand(g:cache_dir . 'vim/') |
+  \ call mkdir(g:vim_cache_dir, 'p')
+
+if !empty($XDG_STATE_HOME)
+  let g:state_dir=expand('$XDG_STATE_HOME/')
+else
+  let g:state_dir=expand('$HOME/.local/state/')
+endif
+let g:vim_state_dir=expand(g:state_dir . 'vim/') |
+  \ call mkdir(g:vim_state_dir, 'p')
+
+if !empty($XDG_DATA_HOME)
+  let g:data_dir=expand('$XDG_DATA_HOME/')
+else
+  let g:data_dir=expand('$HOME/.local/share/')
+endif
+let g:vim_data_dir=expand(g:data_dir . 'vim/') |
+  \ call mkdir(g:vim_data_dir, 'p')
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -146,21 +149,32 @@ set foldlevel=0 " Default nesting to automatically open folds to.
 set foldlevelstart=99
 
 " Change netrwhist directory
-let g:netrw_home=g:cache_dir
+let g:netrw_home=g:vim_data_dir
+call mkdir(g:vim_data_dir . '/spell', 'p')
 
+" Make sure we have sub-directories for our state files
 " Set swap/backup/undo/viminfo/rtp based on our base paths
-for missing_directory in ['swap', 'backup', 'backup']
-  if !isdirectory(g:cache_dir . missing_directory)
-    call mkdir(g:cache_dir . missing_directory)
-  endif
-endfor
-execute 'set directory=' . g:cache_dir . 'swap,~/,/tmp'
-execute 'set backupdir=' . g:cache_dir . 'backup,~/,/tmp'
-execute 'set undodir=' . g:cache_dir . 'undo,~/,/tmp'
-execute 'set viminfo+=n' . g:cache_dir . 'viminfo'
-execute 'set runtimepath+=' . g:config_dir . ','
-  \ . g:config_dir . 'after,'
-  \ . '$VIM,$VIMRUNTIME'
+execute 'set runtimepath^=' . g:vim_config_dir
+execute 'set runtimepath+=' . g:vim_data_dir
+execute 'set runtimepath+=' . g:vim_config_dir . 'after,'
+
+execute 'set packpath^=' . g:vim_data_dir . ',' . g:vim_config_dir
+execute 'set packpath+=' . g:vim_config_dir . 'after,'
+  \ . g:vim_data_dir . 'after'
+
+execute 'set backupdir=' . g:vim_state_dir . 'backup' |
+  \ call mkdir(&backupdir, 'p')
+execute 'set directory=' . g:vim_state_dir . 'swap' |
+  \ call mkdir (&directory, 'p')
+execute 'set undodir=' . g:vim_state_dir . 'undo' |
+  \ call mkdir(&undodir, 'p')
+if exists('&viewdir')
+  execute 'set viewdir=' . g:vim_state_dir . 'view' |
+    \ call mkdir(&viewdir, 'p')
+endif
+if !has('nvim')
+  execute 'set viminfofile=' . g:vim_state_dir . 'viminfo'
+endif
 
 " Default updatetime of 4000ms is bad for async updates
 set updatetime=100
@@ -355,70 +369,6 @@ autocmd! BufWritePre * call core#TrimTrailingWhitespace()
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Custom delayed loading plugin handling functions
-" Allows a local install to customise package usage completely before
-" attempting to load anything.
-
-" Maintain a delayed registry of plugins to load to allow for custom overrides
-let g:plugin_registry = {}
-
-
-" Add a plugin to the delay load registry
-function! core#PluginAdd(name)
-  if !has_key(g:plugin_registry, a:name)
-    let g:plugin_registry[a:name] = {'enabled': 1, 'loaded': 0}
-  else
-    echom 'Attempted to add already known plugin: ' . a:name
-  endif
-endfunction
-
-" Disable a plugin in the delay load registry
-function! core#PluginDisable(name)
-  if has_key(g:plugin_registry, a:name)
-    let g:plugin_registry[a:name]['enabled'] = 0
-  else
-    echom 'Attempted to disable unknown plugin: ' . a:name
-  endif
-endfunction
-
-" Run an action after an update occurs (e.g. compile a module)
-function! core#PluginPostUpdateHook(name, operation)
-  " Check if plugin name exists, error if doesn't
-  if has_key(g:plugin_registry, a:name)
-    let g:plugin_registry[a:name]['do'] = a:operation
-  else
-    echom 'Attempted to add post update hook to unknown plugin: ' . a:name
-  endif
-endfunction
-
-" Queries whether a given plugin has loaded
-function! core#PluginIsLoaded(name)
-  if has_key(g:plugin_registry, a:name)
-    return g:plugin_registry[a:name]['loaded']
-  else
-    " Attempted to query whether unknown plugin is loaded. Return false
-    " anyway
-    return 0
-  endif
-endfunction
-
-" Use the delay load plugin registry to prime vim-plug
-function! core#PluginProcessRegistry()
-  for [name, extra_options] in items(g:plugin_registry)
-    if extra_options['enabled']
-      try
-        Plug name, extra_options
-        let g:plugin_registry[name]['loaded'] = 1
-      catch
-        echom "Failed to load plugin: '" . name .  "'"
-        let g:plugin_registry[name]['loaded'] = 0
-      endtry
-    endif
-  endfor
-endfunction
-
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Set extra options when running in GUI mode
 if has("gui_running")
   set guioptions-=T " Toolbar
@@ -446,16 +396,7 @@ endif
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Loading additional scripts
-" Load plugins with configurations if not specified to run in minimal mode
-if !g:minimal_mode
-  execute 'source ' . g:config_dir . 'plugin.vim'
-endif
-
 " Load all plugin filetype indent, plugin and syntax scripts now
 filetype indent plugin on
 syntax on
-
-" Load local installation customisations after everything else is done
-call core#TrySource(g:config_dir . 'custom.config.vim')
 

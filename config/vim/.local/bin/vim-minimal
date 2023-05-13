@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-# Ultra-thin wrapper around vim to let $VISUAL/$SUDO_EDIT use core-only vim
-VIM_MINIMAL=1 vim $@
-

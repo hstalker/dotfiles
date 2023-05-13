@@ -275,94 +275,25 @@ env.
 ---
 
 ### Vim
-#### Installation
-Vim should setup default plugins via git & curl, and then configure itself when
-first run.
 
-Manual steps:
+The Vim configuration deliberately eschews the use of plugins. This used to not
+be the case - in the past Vim was the primary editor of these dotfiles and was
+heavily customized. Currently Emacs is preferred, with Vim being the primary
+workhorse for small and fast edits. As a result, the aim of Vim configuration
+here is to configure sensible defaults and useful keybindings, all done with
+minimal major deviations from the default behavior or extensions in
+functionality.
 
- * Start Vim.
- * Run `:PlugUpgrade`and then `:PlugUpdate`.
- * Run `:PlugInstall`.
- * Exit Vim
-
-Alternatively, to do setup all in batch form run:
-```shell
-vim +PlugUpgrade +PlugUpdate +qall
-```
-
-#### Overview
-The Vim configuration is split into a minimal no-plugin core and a default
-medium-weight plugin using setup. Minimal vim can be started by setting the
-environment variable `$VIM_MINIMAL` prior to launch, or using the vim-minimal
-alias provided by the `shells` package.
-
-This configuration provides various customization points. The current load
-order of these scripts is as follows:
-* `$XDG_CONFIG_HOME/vim/core.vim`
-* If not minimal mode:
-  * `$XDG_CONFIG_HOME/vim/plugin.vim`
-  * `$XDG_CONFIG_HOME/vim/lock.vim`
-  * `$XDG_CONFIG_HOME/vim/custom.plugin.vim`
-  * `$XDG_CONFIG_HOME/vim/custom.lock.vim`
-* `$XDG_CONFIG_HOME/vim/custom.config.vim`
-
-#### General Configuration
-Per-install configuration overrides should be placed in
-`$XDG_CONFIG_HOME/vim/custom.config.vim`. This is where you should place all
-machine-local customizations that are *not* plugin related (think mappings,
-functions, tab settings etc.).
-
-#### Plugin Configuration
-Local machine plugin additions and overrides (not general configuration) should
-be placed in `$XDG_CONFIG_HOME/vim/custom.plugin.vim`. The allowed operations
-are:
-
-* `core#PluginAdd(name)`, where name is the `$owner/$repo` github subpath.
-* `core#PluginPostUpdateHook(name, action)`, where `action` is a string of
-  either a colon prefixed vim command, or a shell command.
-* `core#PluginDisable(name)`
-
-Local machine configuration additions (including configuration for plugins
-specified in custom.plugin.vim) should be placed in
-`$XDG_CONFIG_HOME/vim/custom.config.vim`. The provided operations are:
-
-* `core#PluginIsLoaded(name)`
-
-Typically our core vim functions for configuration are prefixed by `core#`.
-
-Package pinning and overrides are managed via vim-plug snapshots source from
-`$XDG_CONFIG_HOME/vim/lock.vim` and `$XDG_CONFIG_HOME/vim/custom.lock.vim`,
-loaded during `plugin.vim`.
-
-##### Example: Custom Per-Install Overrides
-An example `custom.plugin.vim`:
-```vimscript
-" Disable the auto-save plugin because it causes issues on our machine
-core#PluginDisable('907th/vim-auto-save')
-" Add polyglot locally
-core#PluginAdd('vim-polyglot')
-```
-
-An example `custom.config.vim`:
-```vimscript
-" Change the airline theme
-if core#PluginIsLoaded('vim-airline/vim-airline')
-  if core#PluginIsLoaded('vim-airline/vim-airline-themes')
-    let g:airline_theme='zenburn'
-  endif
-endif
-
-" We want F5 compiles like an IDE :-)
-nnoremap <F5> :make<CR>
-```
+If a specific installation decides plugins or customizations are needed, they
+can be added in the standard Vim way via native package loading (i.e. the `pack`
+directory`. See `:help packages` for upstream details.
 
 #### Theming
 This configuration has a togglable dual light/dark theme setup. The core
 functions are:
 
-* Setting dark and light themes via `let g:theme_dark='themename'` or `let
-  g:theme_light='themename'`.
+* Setting dark and light themes via `let g:theme_dark='themename'` or
+  `let g:theme_light='themename'`.
 * `core#ThemeUpdate()`, which updates the currently used theme to reflect the
   current mode (light/dark) and above set themes (`g:theme_{light,dark}`).
 * `core#ThemeToggle(target_theme)`, where `target_theme` is an optional
@@ -378,26 +309,16 @@ functions are:
 * `core#FontIncreaseSize()`, which increases the font size by one.
 * `core#FontDecreaseSize()`, which decreases the font size by one.
 
-The configuration uses an in-built pair of themes for light and dark modes when
-run in minimal mode, and uses a solarized pair of truecolor themes when plugins
-are enabled by default. It will use Vim's inferred choice for `background` in
-order to determine the default mode to launch into.
+The configuration uses an in-built pair of themes for light and dark modes. It
+will use Vim's inferred choice for `background` in order to determine the
+default mode to launch into.
 
 Note that the font altering functions will only work under gvim, as terminal
 vim is entirely reliant on the terminal font. Additionally because the Gnome
 team are geniuses and GTK uses best effort matching for font names, it will
 never fail on the first font, and therefore no alternatives will be attempted.
 
-#### Misc: Lazy Loading
-These scripts do not expose the ability to lazy load plugins despite the
-underlying vim plugin manager `vim-plug` allowing for it, as this causes issues
-with allowing fully flexible customization on a local install via the
-`custom.*.vim` customization points (Allowing for lazy-loading while retaining
-the ability to fully customize the configuration per-install likely requires a
-more powerful dependency graph mechanism, along with delayed execution hooks,
-both of which are not provided in this implementation for simplicity).
-
-#### Misc: Reconnecting to Existing Process from New X Session Clipboard Issues
+#### WARNING: Reconnecting to Existing Process from New X Session Clipboard
 Vim does not adjust to new `$DISPLAY` values, causing X clipboard support to
 break. This issue can be resolved via running `:xrestore`. Under X11, there is
 a timer running every 2 hours with this effect by default in the configuration.
@@ -486,7 +407,9 @@ inner Tmux session (e.g. `<Prefix> <Prefix> <OTHERBINDING>` will pass through
 `OTHERBINDING` to the inner session, and `<Prefix> <BINDING>` will pass the
 `BINDING` to the outer session as normal).
 
-The prefix is `<C-SPC>` by default.
+The prefix is `<C-z>` by default as this prevents the most binding conflicts in
+typical terminal workflows, and C-z's default suspension functionality in the
+shell is obviated by the introduction of Tmux itself.
 
 This configuration provides various customization points. The current load
 order of these scripts is as follows:
