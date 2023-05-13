@@ -8,6 +8,7 @@ require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
 silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
 silence_output assert_directory "${XDG_STATE_HOME:-$HOME/.local/state}/zsh"
+silence_output assert_directory "${XDG_DATA_HOME:-$HOME/.local/share}/zsh"
 
 # Load shell specific login modules
 load_per_application_modules login zsh

@@ -93,7 +93,6 @@ Currently includes some configuration for the following pieces of software:
   * Redshift - Monitor time/location-based color temperature adjustments
   * Feh - Minimal image viewer
   * Mozc - Open Google IME-based input method
-  * Zoom - Video conferencing (all the rage after the 2020-21 pandemic)
   * Rclone - Remote filesystem mounting and syncing tool supporting many
     providers.
 * Desktop environments (Not enabled by default)

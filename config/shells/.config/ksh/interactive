@@ -36,7 +36,7 @@ else
 fi
 
 # Place the history in state
-HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/ksh/history-$HOSTNAME-$USER"
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/ksh/history"
 HISTSIZE=10000
 
 reload_dotfiles() {

@@ -73,7 +73,7 @@ bindkey -a ys add-surround
 bindkey -M visual S add-surround
 
 # Place the history in state
-HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history-$(hostname)-$USER"
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 # For setting history length
 SAVEHIST=10000
 HISTSIZE=$SAVEHIST
@@ -102,7 +102,7 @@ unsetopt CORRECT_ALL
 unsetopt AUTO_CD
 
 autoload -Uz compinit
-ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$HOST-$ZSH_VERSION"
+ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
 # Only update the completions file if it's sufficiently stale by updating if
 # day has changed
 if [ -r "$ZSH_COMPDUMP" ] && \

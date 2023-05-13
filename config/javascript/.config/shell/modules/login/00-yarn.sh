@@ -5,5 +5,7 @@ silence_output \
 silence_output \
   assert_directory "${XDG_CACHE_HOME:-${HOME}/.cache}/yarn"
 silence_output \
+  assert_directory "${XDG_STATE_HOME:-${HOME}/.local/state}/yarn"
+silence_output \
   assert_directory "${XDG_DATA_HOME:-${HOME}/.local/share}/yarn"
 
