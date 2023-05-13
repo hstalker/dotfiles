@@ -6,6 +6,6 @@
 
 require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/logout"
 
-# Local installation overrides
-load_override_module bash logout
+# Load shell specific logout modules
+load_per_application_modules logout bash
 

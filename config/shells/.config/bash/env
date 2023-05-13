@@ -4,6 +4,5 @@
 # Run shell/env in order to get appropriate $BASH_ENV
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
 
-# Local installation overrides
-load_override_module bash env
-
+# Load shell specific env modules
+load_per_application_modules env bash

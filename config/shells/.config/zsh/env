@@ -6,6 +6,6 @@
 
 . "${XDG_CONFIG_HOME:-$HOME/.config}/shell/env"
 
-# Local installation overrides
-load_override_module zsh env
+# Load shell specific env modules
+load_per_application_modules env zsh
 

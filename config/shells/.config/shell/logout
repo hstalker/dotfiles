@@ -5,9 +5,6 @@
 
 ###############################################################################
 
-# Load application specific logout files
-load_per_application_modules logout
-
-# Local installation overrides
-load_override_module shell logout
+# Load shared shell specific login modules
+load_per_application_modules login shell
 

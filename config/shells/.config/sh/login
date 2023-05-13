@@ -18,6 +18,6 @@ fi
 
 require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/login"
 
-# Local installation overrides
-load_override_module sh login
+# Load shell specific login modules
+load_per_application_modules login sh
 

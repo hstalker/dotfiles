@@ -20,9 +20,6 @@ fi
 path_remove . PATH
 path_remove "" PATH
 
-# Load application specific login files
-load_per_application_modules login
-
-# Local installation overrides
-load_override_module shell login
+# Load shared shell specific login modules
+load_per_application_modules login shell
 

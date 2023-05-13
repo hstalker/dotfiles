@@ -14,6 +14,6 @@ try_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash-completion/bash_completion"
 silence_output assert_directory "${XDG_CACHE_HOME:-$HOME/.cache}/bash"
 silence_output assert_directory "${XDG_STATE_HOME:-$HOME/.local/state}/bash"
 
-# Local installation overrides
-load_override_module bash login
+# Load shell specific login modules
+load_per_application_modules login bash
 

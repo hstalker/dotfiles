@@ -214,10 +214,10 @@ See the makefile for more targets and customization points.
 The `shells/` package is designed in order to allow for sharing as much posix
 compatible configuration as possible (e.g. aliases and environment variables).
 This shared configuration goes in
-`$XDG_CONFIG_HOME/shell/{env,interactive,login,logout}`.
-As one may expect from the naming convention, all shells load `env`, login
-shells load `login`, interactive shells run `interactive`, and login shells run
-`logout` on termination/logout.
+`$XDG_CONFIG_HOME/shell/{env,interactive,login,logout}`.  As one may expect
+from the naming convention, all shells load `env`, login shells load `login`,
+interactive shells run `interactive`, and login shells run `logout` on
+termination/logout.
 
 Generally the following rules of thumb apply:
 It should go in `login` if:
@@ -226,8 +226,8 @@ It should go in `login` if:
   `${XDG_CONFIG_HOME}/environment.d` so that they are correctly available to
   both systemd services and GUI applications even under Wayland sessions.
   However, if the environment variable is only meant to be used interactively
-  within a terminal, you should prefer the `.interactive` mechanism for
-  setting that variable (as a non-export).
+  within a terminal, you should prefer the `.interactive` mechanism for setting
+  that variable (as a non-export).
 * It needs to occur on initial login (e.g. display machine information).
 
 It should go in `logout` if:
@@ -240,45 +240,37 @@ It should go in `interactive` if:
 * It's an alias.
 * It's a shell session specific environment variable (not exported).
 
-Per-application shell modules should be placed under
-`XDG_CONFIG_HOME/shell/modules/{env,login,logout,interactive}/` as a `*.sh`
-file, where they will be loaded by the shell at appropriate times by the shell
-in alphanumeric order. This is in order to allow application specific shell
-configuration for more fine grained installation of these dotfiles (for example:
-tmux aliases could be placed in `$XDG_CONFIG_HOME/tmux/.interactive`, which then
-will only be installed/linked and loaded by the shell if the tmux configuration
-is installed). Per-application shell modules should not assume the presence of
-other per-application shell modules (but can have shifted load order or
-workarounds to work in the presence of other per-application modules).
+Shells follows a standard `conf.d/`-style alphanumerically ordered module
+auto-loading system. The following load order is respected for the relevant :
+* `$XDG_CONFIG_HOME/shell/modules/{env,login,interactive,logout}/*.sh`
+* One of the following dependent on which shell is being configured:
+  * `$XDG_CONFIG_HOME/sh/modules/{env,login,interactive,logout}/*.sh`
+  * `$XDG_CONFIG_HOME/bash/modules/{env,login,interactive,logout}/*.sh`
+  * `$XDG_CONFIG_HOME/ksh/modules/{env,login,interactive,logout}/*.sh`
+  * `$XDG_CONFIG_HOME/zsh/modules/{env,login,interactive,logout}/*.sh`
 
-Shells will load per-install per-shell override scripts as per the prior
-mentioned rules. These customization points can be found at:
-`$XDG_CONFIG_HOME/{shell,sh,bash,zsh,ksh}/custom.{env,interactive,login,logout}`.
+This mechanism application-specific shell configuration allows for more modular
+shell configuration. For example:
+ * Tmux aliases could be placed in
+   `$XDG_CONFIG_HOME/shell/modules/interactive/50-tmux.sh`.
+ * These aliases will only be installed/linked and loaded by the shell if the
+   tmux configuration is also copied/linked into that directory.
+ * If the user does not choose to install tmux configuration, it will not be
+   loaded at all.
 
-Due to the complexity of working around various shells' idiosyncrasies.
-Top-level shell scripts (i.e. in `$HOME`) should not need to be modified.
+Shell modules should assume as little knowledge of other shell modules as
+possible in order to maximize isolation.
 
-#### Misc: Different Behavior of Non-Login Non-Interactive Shells
+Due to the complexity of working around various shells' idiosyncrasies in order
+to create a normalized set of customization points (env, login, interactive,
+logout), top-level shell scripts (i.e. in `$HOME`) should be modified as little
+as possible.
+
+#### WARNING: Different Behavior of Non-Login Non-Interactive Shells
 Running non-interactive non-login shells with sh/ksh will not load any
 configuration. Bash/zsh will always load their respective `env` at a minimum in
 all shell types, however sh/ksh must be at least an interactive shell to load
 env.
-
-#### Warnings: Linux Distributions May Break the Setup
-It is possible that certain Linux distributions may source shell configuration
-files in their base scripts despite that altering the standard loading
-behavior. This would break our design. As far as we are aware, all the most
-common distros don't do this however.
-
-#### Warnings: This Design is Brittle and Subject to Change
-This setup works under the assumption that all shells are bourne shells
-(doesn't take into account sharing configuration to cshell derivatives or
-eshell for instance), and is only useful in a scenario where one changes shells
-often. This makes it both limited in scope, and unlikely to really be useful,
-especially if one writes their shell configuration in as sh compatible style as
-possible. Additionally the way this setup works in convoluted and brittle. As
-such it is a valid concern that this setup may be jettisoned entirely to focus
-on supporting a single shell type, vastly reducing the overhead.
 
 ---
 

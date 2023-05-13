@@ -596,19 +596,26 @@ is_directory_empty() {
   fi
 }
 
-# Load every file matching in "$XDG_CONFIG_HOME/shell/modules/$TYPE/*.sh".
+# Load every file matching in
+# "$XDG_CONFIG_HOME/$SHELL_TYPE/modules/$MODULE_TYPE/*.sh".
 # Primarily used to load modularized per-application
 # login/logout/interactive/env configuration.
 load_per_application_modules() {
   _ALLOWED_MODULE_TYPES="env login logout interactive"
-  if [ $# -ne 1 ] || ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$1"; then
-    report_error "USAGE: load_all_per_application MODULE-NAME where \
-MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
+  _ALLOWED_SHELL_TYPES="shell sh ksh zsh bash"
+  if [ $# -ne 2 ] || \
+      ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$1" ||
+      ! echo "${_ALLOWED_SHELL_TYPES}" | grep -wq "$2"; then
+    report_error "USAGE: load_per_application_modules MODULE_TYPE [SHELL-TYPE] where \
+SHELL-TYPE is one of '${_ALLOWED_SHELL_TYPES}', \
+and MODULE-TYPE is one of '${_ALLOWED_MODULE_TYPES}' \
+SHELL-TYPE defaults to 'shell'."
     return 255
   fi
   MODULE_TYPE="$1"
+  SHELL_TYPE="$2"
 
-  MODULE_BASE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/shell/modules/${MODULE_TYPE}"
+  MODULE_BASE_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/${SHELL_TYPE}/modules/${MODULE_TYPE}"
   if [ -d "${MODULE_BASE_DIR}" ] && \
      [ -r "${MODULE_BASE_DIR}" ] && \
      ! is_directory_empty "${MODULE_BASE_DIR}" '*.sh'; then
@@ -618,27 +625,6 @@ MODULE-NAME is one of '${_ALLOWED_MODULE_TYPES}'"
       try_source "${MODULE}"
     done
   fi
-
-  return 0
-}
-
-# Try to load the $XDG_CONFIG_HOME/$1/custom.$2 override module specified.
-load_override_module() {
-  _ALLOWED_SHELL_TYPES="shell sh ksh zsh bash"
-  _ALLOWED_MODULE_TYPES="env login logout interactive"
-  if [ $# -ne 2 ] || \
-      ! echo "${_ALLOWED_SHELL_TYPES}" | grep -wq "$1" ||
-      ! echo "${_ALLOWED_MODULE_TYPES}" | grep -wq "$2"; then
-    report_error "USAGE: load_override_module SHELL-TYPE MODULE-TYPE where \
-SHELL-TYPE is one of '${_ALLOWED_SHELL_TYPES}', \
-and MODULE-TYPE is one of '${_ALLOWED_MODULE_TYPES}'"
-    return 255
-  fi
-  SHELL_NAME="$1"
-  MODULE_TYPE="$2"
-
-  try_source \
-    "${XDG_CONFIG_HOME:-$HOME/.config}/${SHELL_NAME}/custom.${MODULE_TYPE}"
 
   return 0
 }
@@ -655,9 +641,6 @@ assign_export ENV "$HOME/.shrc"
 # The path at $BASH_ENV is run when the bash shell is non-interactive
 assign_export BASH_ENV "$HOME/.bashrc"
 
-# Load application specific env files
-load_per_application_modules env
-
-# Local installation overrides
-load_override_module shell env
+# Load shared application specific env modules
+load_per_application_modules env shell
 

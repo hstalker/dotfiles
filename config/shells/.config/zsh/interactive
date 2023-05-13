@@ -120,6 +120,6 @@ reload_dotfiles() {
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/zsh/interactive"
 }
 
-# Local installation overrides
-load_override_module zsh interactive
+# Load shell specific interactive modules
+load_per_application_modules interactive zsh
 

@@ -93,9 +93,6 @@ get_vcs_branch() {
   fi
 }
 
-# Load application specific interactive files
-load_per_application_modules interactive
-
-# Local installation overrides
-load_override_module shell interactive
+# Load shared shell specific interactive modules
+load_per_application_modules interactive shell
 

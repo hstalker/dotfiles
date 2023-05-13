@@ -68,6 +68,6 @@ reload_dotfiles() {
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/interactive"
 }
 
-# Local installation overrides
-load_override_module bash interactive
+# Load shell specific interactive modules
+load_per_application_modules interactive bash
 
