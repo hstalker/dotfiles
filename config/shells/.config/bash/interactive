@@ -62,6 +62,9 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Default to Emacs keybindings
+set -o emacs
+
 reload_dotfiles() {
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/env"
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/bash/login"

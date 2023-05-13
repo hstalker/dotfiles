@@ -39,6 +39,9 @@ fi
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/ksh/history"
 HISTSIZE=10000
 
+# Default to Emacs keybindings
+set -o emacs
+
 reload_dotfiles() {
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/env"
   require_source "${XDG_CONFIG_HOME:-$HOME/.config}/ksh/login"

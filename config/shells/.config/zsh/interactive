@@ -72,6 +72,9 @@ bindkey -a ds delete-surround
 bindkey -a ys add-surround
 bindkey -M visual S add-surround
 
+# Restore Emacs keybindings as our default binding set
+bindkey -e
+
 # Place the history in state
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 # For setting history length
