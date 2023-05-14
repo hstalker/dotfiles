@@ -37,6 +37,8 @@ ExecStart=/usr/bin/rclone mount \
   "${RCLONE_REMOTE_NAME}:/" "${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}"
 ExecStop=/bin/fusermount -u ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
 ExecStopPost=/usr/bin/rmdir ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
+Restart=on-failure
+RestartSec=180s
 
 [Install]
 WantedBy=default.target
