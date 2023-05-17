@@ -3,8 +3,10 @@
 # Pass the configured remote name as the service argument, e.g.
 # systemctl --user enable --now rclone-mount@<my-remote>
 #
-# We choose to place the mounts under $XDG_STATE_HOME, as we don't *own* the
-# data, the remote provider does, i.e. it's semi-persistent data.
+# We choose to place the mounts under $XDG_RUNTIME_DIR, as the mount-point
+# itself is transient, even if the data is persistent. This makes even more
+# sense if you consider that our system does not exhibit sole ownership over the
+# referenced data set.
 #
 # Much fine-tuning can be done on the exact mount options used for caching etc.
 # We aim to provide a light document friendly configuration. It is not suitably
@@ -15,13 +17,22 @@ Description=rclone: Remote FUSE filesystem for cloud remote %i
 Documentation=man:rclone(1)
 After=network-online.target
 Wants=network-online.target
+# Sanity checks over input/output paths
+AssertPathExists=${XDG_RUNTIME_DIR}
+AssertPathExists=${XDG_CONFIG_HOME}/rclone/rclone.conf
 
 [Service]
 Type=notify
+# We want to guarantee any paths we create or files we mirror are only
+# user-accessible
+UMask=0077
 Environment=RCLONE_REMOTE_NAME=%i
-ExecStartPre=/usr/bin/mkdir -p "${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}"
+ExecStartPre=/usr/bin/mkdir -p "${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}"
 ExecStart=/usr/bin/rclone mount \
   --config "${XDG_CONFIG_HOME}/rclone/rclone.conf" \
+  --umask 077 \
+  --dir-perms 0700 \
+  --file-perms 0600 \
   --allow-non-empty \
   --poll-interval 30s \
   --dir-cache-time 72h \
@@ -33,10 +44,9 @@ ExecStart=/usr/bin/rclone mount \
   --vfs-read-chunk-size 128M \
   --vfs-read-chunk-size-limit off \
   --log-level INFO \
-  --umask 022 \
-  "${RCLONE_REMOTE_NAME}:/" "${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}"
-ExecStop=/bin/fusermount -u ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
-ExecStopPost=/usr/bin/rmdir ${XDG_STATE_HOME}/rclone/${RCLONE_REMOTE_NAME}
+  "${RCLONE_REMOTE_NAME}:/" "${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}"
+ExecStop=/bin/fusermount -u ${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}
+ExecStopPost=/usr/bin/rmdir ${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}
 Restart=on-failure
 RestartSec=180s
 
