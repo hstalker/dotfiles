@@ -99,14 +99,10 @@ This won't work as expected under daemon mode."
 ;; global scope.
 (use-package emacs
   :no-require t ; Don't load `emacs.el' (obviously - it won't work)
+  :ensure nil
+  :demand t
 
-  :functions
-  hgs--setup-default-fonts
-  hgs--setup-default-tui
-  hgs--setup-default-gui
-  hgs--suspend-frame
-
-  :init
+  :preface
   (defun hgs--setup-default-fonts (frame)
     "Setup default fonts for the given frame."
     (cl-flet* ((get-font-family (lambda (font) (car font)))
@@ -190,16 +186,29 @@ nil, 'prepend or 'append."
     "Set default terminal UI for the given frame."
     (menu-bar-mode -1))
 
-  (add-hook 'hgs-frame-customization-hook #'hgs--setup-default-fonts -50)
-  (add-hook 'hgs-frame-customization-gui-hook #'hgs--setup-default-gui -50)
-  (add-hook 'hgs-frame-customization-tui-hook #'hgs--setup-default-tui -50)
-
   (defun hgs--suspend-frame ()
     "In a GUI environment, do nothing; otherwise `suspend-frame'."
     (interactive)
     (if (display-graphic-p)
         (message "suspend-frame disabled for graphical displays.")
       (suspend-frame)))
+
+  :bind
+  (:map global-map
+        ;; Prevent us from accidentally suspending frame in non-graphical
+        ;; displays.
+        ([remap suspend-frame] ("No-op" . hgs--suspend-frame))
+
+        ;; Replace the case altering bindings with their dwim variants to make
+        ;; life easier for free!
+        ([remap upcase-word] ("Upcase" . upcase-dwim))
+        ([remap downcase-word] ("Downcase" . downcase-dwim))
+        ([remap capitalize-word] ("Capitalize" . capitalize-dwim)))
+
+  :init
+  (add-hook 'hgs-frame-customization-hook #'hgs--setup-default-fonts -50)
+  (add-hook 'hgs-frame-customization-gui-hook #'hgs--setup-default-gui -50)
+  (add-hook 'hgs-frame-customization-tui-hook #'hgs--setup-default-tui -50)
 
   :config
   ;; Set standard encodings
@@ -239,56 +248,34 @@ nil, 'prepend or 'append."
   (put 'narrow-to-defun 'disabled nil)
   (put 'narrow-to-page 'disabled nil)
 
-  (bind-keys :map global-map
-             ;; Prevent us from accidentally suspending frame in non-graphical
-             ;; displays.
-             ([remap suspend-frame] . hgs--suspend-frame)
-
-             ;; Replace the case altering bindings with their dwim variants to
-             ;; make life easier for free!
-             ([remap upcase-word] . upcase-dwim)
-             ([remap downcase-word] . downcase-dwim)
-             ([remap capitalize-word] . capitalize-dwim))
-
   ;; Indicate the depth of recursion of the mini-buffer in the mode-line
   (minibuffer-depth-indicate-mode +1)
 
   :custom
-  (require-final-newline t "We should always require a final newline.")
-  (completion-ignore-case t "Ignore case for built-in completion matching in
-general.")
-  (read-file-name-completion-ignore-case t "Ignore case for file name completion
-matching.")
-  (read-buffer-completion-ignore-case t "Ignore case for buffer name completion
-matching.")
-  (case-fold-search t "Should have non-case-sensitive search by default.")
-  (use-dialog-box nil "All dialog boxes should instead be mini-buffer prompts.")
-  (kill-whole-line nil "C-k shouldn't kill entire line.")
-  (cursor-type 'bar "User a bar cursor rather than a box, as bar better suits
-Emacs marking.")
-  (enable-recursive-minibuffers t "Allow for minibuffer usage inside
-minibuffers.")
-  (visible-bell nil "Don't show visual bell.")
-  (fill-column 80 "Set the fill column to a general standard of 80.")
-  (indent-tabs-mode nil "We don't want to use tabs for indentation.")
-  (tab-width 2 "Set the default tab width to 2")
-  (inhibit-startup-message t "Don't show a startup message.")
-  (inhibit-startup-echo-area-message nil "Don't show a startup message in the
-echo area.")
-  (inhibit-default-init t "Don't load the default library.")
-  (initial-scratch-message nil "Don't show an initial message in the scratch
-buffer.")
+  (require-final-newline t)
+  (completion-ignore-case t)
+  (read-file-name-completion-ignore-case t)
+  (read-buffer-completion-ignore-case t)
+  (case-fold-search t)
+  (use-dialog-box nil)
+  (kill-whole-line nil)
+  (cursor-type 'bar)
+  (enable-recursive-minibuffers t)
+  (visible-bell nil)
+  (fill-column 80)
+  (indent-tabs-mode nil)
+  (tab-width 2)
+  (inhibit-startup-message t)
+  (inhibit-startup-echo-area-message nil)
+  (inhibit-default-init t)
+  (initial-scratch-message nil)
   (auto-save-list-file-prefix
-   (concat hgs-emacs-state-directory "auto-save/sessions/")
-   "Put autosaves in our state directory.")
-  (sentence-end-double-space nil "Tell Emacs that we don't use double spacing
-for sentences.")
-  (bidi-paragraph-direction 'left-to-right "We don't use Emacs for
-non-left-to-right text, so this gives a nice performance boost.")
-  (ring-bell-function #'ignore "We don't want bell audio.")
-  (history-delete-duplicates
-   t
-   "Make sure we don't have duplicates in the command history.")
+   (concat hgs-emacs-state-directory "auto-save/sessions/"))
+  (sentence-end-double-space nil)
+  ;; Tell Emacs that we primarily use left-to-right languages
+  (bidi-paragraph-direction 'left-to-right)
+  (ring-bell-function #'ignore)
+  (history-delete-duplicates t)
   (display-buffer-alist
    ;; Don't bother truly attempting to tame Emacs windowing. True freedom is
    ;; learning to not care where things are as long as *Help* doesn't replace
@@ -329,33 +316,45 @@ non-left-to-right text, so this gives a nice performance boost.")
 predictable."))
 
 (use-package minibuffer
+  :ensure nil
+  :defer t
+
   :bind
   ;; Allows us to use a narrowing framework for capf completions, which in my
   ;; opinion is better UX than company-mode.
-  ("C-c ;" . completion-at-point))
+  (:map global-map
+        ("C-c ;" ("Completion-at-point" . completion-at-point))))
 
-;; Only needed for stopping some Emacs games from littering configuration
-;; directory
 (use-package gamegrid
+  :ensure nil
+  :defer t
+
   :config
   (setq gamegrid-user-score-file-directory
         (concat hgs-emacs-state-directory "games/gamegrid")))
 
 (use-package timeclock
+  :ensure nil
+  :defer t
+
   :custom
   (timeclock-file (concat hgs-emacs-data-directory "timeclock/log")))
 
 (use-package help
-  :config
-  (turn-on-visual-line-mode)
+  :ensure nil
+  :defer t
+
+  :hook
+  (help-mode . turn-on-visual-line-mode)
 
   :custom
-  (help-window-select
-   'always
-   "We always want to focus the help window once we open it."))
+  (help-window-select 'always))
 
 (use-package compile
-  :config
+  :ensure nil
+  :defer t
+
+  :preface
   ;; Hopefully fixes the compilation colorization
   (defun hgs--filter-compilation-buffer ()
     "Allows color escape codes to work better inside the compilation buffer for
@@ -371,25 +370,26 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
                 nil 'noerror))
         (replace-match "\\1\n\\2")))
     (read-only-mode))
-  (add-hook 'compilation-filter-hook #'hgs--filter-compilation-buffer)
 
+  :config
+  (add-hook 'compilation-filter-hook #'hgs--filter-compilation-buffer)
   ;; Make setting compile command safe via local variables
   (put 'compile-command 'safe-local-variable #'stringp)
 
   :custom
-  (compilation-scroll-output
-   'first-error
-   "Follow compilation buffer output until first error.")
-  (compilation-skip-threshold
-   2
-   "Don't stop scrolling on anything less than an error.")
-  (compilation-ask-about-save t "Ask which buffers to save before compiling."))
+  (compilation-scroll-output 'first-error)
+  (compilation-skip-threshold 2 "Don't stop scrolling unless hit an error.")
+  (compilation-ask-about-save t))
 
-(use-package gud)
+(use-package gud
+  :ensure nil
+  :defer t)
 
 (use-package pulse
-  :init
-  ;; Note this currently is effectively constant
+  :ensure nil
+  :defer t
+
+  :preface
   (defcustom hgs--line-pulse-commands
     '(scroll-up-command
       scroll-down-command
@@ -413,6 +413,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
     (dolist (command hgs--line-pulse-commands)
       (advice-remove command :after #'hgs--pulse-current-line)))
 
+  :init
   (hgs--add-pulse-advice)
 
   :custom
@@ -420,16 +421,20 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   (pulse-iterations 10 "Number of iterations per pulse."))
 
 (use-package find-file
+  :ensure nil
+  :defer t
+
   :custom
-  (ff-case-fold-search t "Ignore case in matching.")
-  (ff-always-in-other-window nil "Don't open other file in other window always")
-  (ff-ignore-include
-   nil "Use special automation for jumping to include under cursor.")
-  (ff-always-try-to-create
-   nil "Don't try to create the other file if it doesn't exist.")
+  (ff-case-fold-search t)
+  (ff-always-in-other-window nil)
+  (ff-ignore-include nil)
+  (ff-always-try-to-create nil)
   (ff-quiet-mode t "Don't trace searched directories."))
 
 (use-package ediff
+  :ensure nil
+  :defer t
+
   :config
   ;; Attempt to undo the window configuration change when exiting an Ediff
   ;; session.
@@ -439,125 +444,134 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   (ediff-keep-variants nil "Kill Ediff buffers on exit by default.")
   (ediff-window-setup-function
    #'ediff-setup-windows-plain
-   "User a single frame for ediff rather than multiple.")
-  (ediff-split-window-function
-   #'split-window-vertically
-   "Use vertical splits for ediff."))
+   "Use a single frame for ediff.")
+  (ediff-split-window-function #'split-window-vertically))
 
-;; Enable xterm mouse mode by default if running in the terminal
 (use-package xt-mouse
-  :if (not (display-graphic-p))
+  :ensure nil
+  :defer t
+  :unless (display-graphic-p)
+
+  :diminish xterm-mouse-mode
 
   :hook
-  ((prog-mode text-mode) . xterm-mouse-mode))
+  ;; Enable xterm mouse mode by default if running in the terminal
+  ((prog-mode text-mode special-mode) . xterm-mouse-mode))
 
-;; Active regions should be deleted by normal deletion commands like expected
 (use-package delsel
-  :demand t
+  :ensure nil
+  :defer t
 
-  :config
-  (delete-selection-mode))
+  :diminish delete-selection-mode
 
-;; Enable highlighting of current line if we have more recent fast line
-;; highlighting (>=27).
-(unless (version< emacs-version "27")
-  (use-package hl-line
-    :hook
-    ((prog-mode text-mode) . hl-line-mode)))
+  :hook
+  ;; Active regions should be deleted by normal deletion commands like expected
+  ;; in all modes
+  ((prog-mode text-mode) . delete-selection-mode))
 
-(unless (version<= emacs-version "27.1.0")
-  (use-package tab-bar
-    :diminish
-    tab-bar-mode
+(use-package hl-line
+  :ensure nil
+  :defer t
+  ;; >27 is required for fast line highlight
+  :unless (version< emacs-version "27")
 
-    :hook
-    (after-init . tab-bar-mode)
+  :diminish hl-line-mode
 
-    :custom
-    (tab-bar-show nil "Don't show the tab bar. Rely on the mode-line to display
-current tab, and using `tab-switch' for searching tabs.")
-    (tab-bar-new-tab-choice t "Start new tab on current buffer.")))
+  :hook
+  ((prog-mode text-mode) . hl-line-mode))
+
+(use-package tab-bar
+  :ensure nil
+  :defer t
+  :unless (version<= emacs-version "27.1.0")
+
+  :diminish tab-bar-mode
+
+  :hook
+  ((prog-mode text-mode special-mode) . tab-bar-mode)
+
+  :custom
+  (tab-bar-show nil "Rely on `tab-switch' for searching tabs.")
+  (tab-bar-new-tab-choice t "Start new tab on current buffer."))
 
 (use-package simple
+  :ensure nil
+  :defer t
+
   :diminish
   line-number-mode
   column-number-mode
   auto-fill-mode
 
   :hook
-  (((prog-mode text-mode) . line-number-mode)
-   ((prog-mode text-mode) . column-number-mode)
-   ((text-mode) . turn-on-auto-fill)))
+  ((prog-mode text-mode) . line-number-mode)
+  ((prog-mode text-mode) . column-number-mode)
+  ((text-mode) . turn-on-auto-fill))
 
-(if (version<= emacs-version "26.0.50")
-    (use-package linum
-      :diminish
-      global-linum-mode
-      linum-mode
+;; Slow & old
+(use-package linum
+  :ensure nil
+  :defer t
+  :when (version< emacs-version "26.0.50")
 
-      :hook
-      ((prog-mode text-mode) . linum-mode)) ; Slow & old
-  ;; Fast & shiny
-  (use-package display-line-numbers
-    :diminish
-    global-display-line-numbers-mode
-    display-line-numbers-mode
+  :diminish
+  global-linum-mode
+  linum-mode
 
-    :hook
-    ((prog-mode text-mode) . display-line-numbers-mode)))
+  :hook
+  ((prog-mode text-mode) . linum-mode))
 
-(when (version<= "27.1" emacs-version)
-  (use-package so-long
-    :demand t
+;; Fast & shiny
+(use-package display-line-numbers
+  :ensure nil
+  :defer t
 
-    :config
-    ;; so-long will automatically figure out when to activate with the global
-    ;; mode on.
-    (global-so-long-mode +1)
+  :unless (version<= emacs-version "26.0.50")
 
-    :custom
-    (so-long-action #'so-long-minor-mode "Action to perform when
-long lines are detected.")
-    (so-long-threshold 1000 "Threshold for what length is considered long.")
-    (so-long-max-lines 100 "Number of non-blank lines to test for length.")))
+  :diminish
+  global-display-line-numbers-mode
+  display-line-numbers-mode
 
-;; Displays the whitespace
+  :hook
+  ((prog-mode text-mode) . display-line-numbers-mode))
+
+(use-package so-long
+  :ensure nil
+  :defer t
+  :unless (version< emacs-version "27.1")
+
+  :diminish
+  global-so-long-mode
+  so-long-mode
+
+  :hook
+  ;; so-long will automatically figure out when to activate the workhorse minor
+  ;; mode with the global mode active.
+  ((prog-mode text-mode) . global-so-long-mode)
+
+  :custom
+  (so-long-action #'so-long-minor-mode)
+  (so-long-threshold 1000 "Threshold for what length is considered long.")
+  (so-long-max-lines 100 "Number of non-blank lines to test for length."))
+
 (use-package whitespace
+  :ensure nil
+  :defer t
+
   :diminish
   global-whitespace-mode
   whitespace-mode
 
-  :commands
-  global-whitespace-mode
-  whitespace-mode
-
-  :functions
-  hgs--reset-whitespace-mode
-  hgs--reset-whitespace-mode-local-hack
-
   :hook
-  ((prog-mode text-mode) . hgs--reset-whitespace-mode-local-hack)
+  ((prog-mode text-mode) . whitespace-mode)
 
   :config
   (put 'whitespace-line-column 'safe-local-variable #'integerp)
 
-  :init
-  (defun hgs--reset-whitespace-mode ()
-    "Turns `WHITESPACE-MODE' off and then on to allow changes in variables
-to propagate."
-    (whitespace-mode -1)
-    (whitespace-mode +1))
-
-  (defun hgs--reset-whitespace-mode-local-hack ()
-    "Reset `WHITESPACE-MODE' after local variables are set to allows for them
-to be taken into account inside `WHITESPACE-MODE'."
-    (add-hook 'hack-local-variables-hook
-              #'hgs--reset-whitespace-mode
-              nil 'local))
-
   :custom
-  (whitespace-line-column nil "Max line length for whitespace mode. Uses
-`fill-column' when set to nil.")
+  (whitespace-line-column
+   nil
+   "Max line length for whitespace mode. Uses `fill-column' when set to nil.")
   (whitespace-style
    '(face
      trailing
@@ -567,67 +581,76 @@ to be taken into account inside `WHITESPACE-MODE'."
    "What whitespace should we visualize?"))
 
 (use-package apropos
+  :ensure nil
+  :defer t
+
   :custom
-  (apropos-do-all t "Make apropos commands search more extensively (as if
-given a prefix argument by default."))
+  (apropos-do-all t "Activate extensive search by default."))
 
 (use-package files
-  :custom
-  (tags-revert-without-query t "Don't prompt me to reload the current TAGS
-file when it changes on disk.")
-  (large-file-warning-threshold
-   (* 1024 1024 200)
-   "Increase the default large file warning threshold to 200MB.")
+  :ensure nil
+  :defer t
 
+  :custom
+  (tags-revert-without-query t)
+  (large-file-warning-threshold (* 1024 1024 200))
   (auto-save-file-name-transforms
    `((".*" ,(concat hgs-emacs-state-directory) "backup")
-     t)
-   "Put autosaves in the state directory.")
+     t))
   (backup-directory-alist
-   `((".*" . ,(concat hgs-emacs-state-directory "backup")))
-   "Put backups in the state directory.")
+   `((".*" . ,(concat hgs-emacs-state-directory "backup"))))
   (backup-by-copying t "Always copy rather than symlink for backups."))
 
 (use-package subword
+  :ensure nil
+  :defer t
+
   :diminish
   global-subword-mode
   subword-mode
-
-  :commands
-  global-subword-mode
 
   :hook
   ((prog-mode text-mode special-mode minibuffer-setup) . subword-mode))
 
 (use-package recentf
+  :ensure nil
+  :defer t
+
   :diminish
-  recentf
+  recentf-mode
 
   :hook
   ((prog-mode text-mode special-mode) . recentf-mode)
 
   :custom
-  (recentf-save-file (concat hgs-emacs-state-directory "recentf/save.el")
-                     "Place the recentf cache into our state directory.")
-  (recentf-max-menu-items 25 "Maximum number of menu items to show.")
-  (recentf-max-saved-items 25 "Maximum number of items to save."))
+  (recentf-save-file (concat hgs-emacs-state-directory "recentf/save.el"))
+  (recentf-max-menu-items 25)
+  (recentf-max-saved-items 25))
 
 (use-package abbrev
+  :ensure nil
+  :defer t
+
+  :diminish
+  abbrev-mode
+
   :custom
-  (abbrev-file-name
-   (concat hgs-emacs-config-directory "abbrev/default.el")
-   "Find abbreviation customization file in emacs configuration directory.")
-  (abbrev-suggest nil "Don't suggest using abbrevs.")
-  (abbrev-suggest-hint-threshold 3 "Threshold for abbrev suggestion.")
+  (abbrev-file-name (concat hgs-emacs-config-directory "abbrev/default.el"))
+  (abbrev-suggest nil)
+  (abbrev-suggest-hint-threshold 3)
   (abbrev-all-caps nil "Don't reflect upper-case abbrevs in expansion."))
 
 (use-package autoinsert
+  :ensure nil
+  :defer t
+
   :custom
-  (auto-insert-directory
-   (concat hgs-emacs-config-directory "autoinsert/")
-   "Home for autoinsert files."))
+  (auto-insert-directory (concat hgs-emacs-config-directory "autoinsert/")))
 
 (use-package vc
+  :ensure nil
+  :defer t
+
   :bind-keymap
   ("C-x v" . vc-prefix-map)
 
@@ -636,29 +659,48 @@ file when it changes on disk.")
         ("=" . ediff-revision))
 
   :custom
-  (vc-follow-symlinks t "Make the version control functionality automatically
-follow symlinks to files potentially outside of the VCS (or inside another)."))
+  (vc-follow-symlinks t))
 
 (use-package eudc-vars
+  :ensure nil
+  :defer t
+
   :custom
-  (eudc-options-file
-   (concat hgs-emacs-config-directory "eudc/options.el")))
+  (eudc-options-file (concat hgs-emacs-config-directory "eudc/options.el")))
 
 (use-package remember
+  :ensure nil
+  :defer t
+
   :custom
   (remember-data-file (concat hgs-emacs-data-directory "remember/notes"))
   (remember-data-directory (concat hgs-emacs-data-directory "remember/")))
 
 (use-package ido
+  :ensure nil
+  :defer t
+
+  :diminish
+  ido-mode
+
   :custom
   (ido-save-directory-list-file
    (concat hgs-emacs-state-directory "ido/save-directory-list.el")))
 
 (use-package saveplace
+  :ensure nil
+  :defer t
+
+  :diminish
+  save-place-mode
+
   :custom
   (save-place-file (concat hgs-emacs-state-directory "saveplace/persist.el")))
 
 (use-package gnus
+  :ensure nil
+  :defer t
+
   :custom
   (gnus-init-file (concat hgs-emacs-config-directory "gnus/init.el"))
   (gnus-startup-file
@@ -667,10 +709,12 @@ follow symlinks to files potentially outside of the VCS (or inside another)."))
   (gnus-dribble-directory (concat hgs-emacs-state-directory "gnus/dribble/")))
 
 (use-package newsticker
+  :ensure nil
+  :defer t
+
   :config
   (make-directory newsticker-dir t)
   (make-directory (file-name-directory newsticker-cache-filename) t)
-
 
   :custom
   (newsticker-dir (concat hgs-emacs-state-directory "newsticker/"))
@@ -678,17 +722,10 @@ follow symlinks to files potentially outside of the VCS (or inside another)."))
    (concat hgs-emacs-cache-directory "newsticker/cache.el")))
 
 (use-package dired
-  :functions
-  hgs-kill-dired-buffers
-  hgs--dired-up-directory-clean
+  :ensure nil
+  :defer t
 
-  :bind
-  ((:map global-map
-         ("C-x d" . dired))
-   (:map dired-mode-map
-         ("^" . hgs--dired-up-directory-clean)))
-
-  :init
+  :preface
   ;; Dired tends to clutter the buffer list quite heavily.
   (defun hgs-kill-dired-buffers ()
     "Kill all open Dired buffers."
@@ -703,19 +740,29 @@ follow symlinks to files potentially outside of the VCS (or inside another)."))
     (interactive)
     (find-alternate-file ".."))
 
+  :bind
+  (:map global-map
+        ("C-x d" . dired))
+  (:map dired-mode-map
+        ("^" . hgs--dired-up-directory-clean))
+
   :config
   ;; Emacs disables this by default, but it's the only real way to use dired w/o
   ;; buffer spam.
   (put 'dired-find-alternate-file 'disabled nil)
 
   :custom
-  (dired-listing-switches "-alh" "Tell Dired to use human-readable units.")
-  (dired-recursive-copies 'always "Tell Dired to default to performing
-recursive copies.")
-  (dired-dwim-target t "Do what I mean when I have multiple Dired windows
-open."))
+  (dired-listing-switches "-alh1v --group-directories-first")
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'top)
+  (dired-dwim-target t "Auto infer cross-window operations."))
 
 (use-package image-dired
+  :ensure nil
+  :defer t
+  :after
+  (:all dired)
+
   :custom
   (image-dired-dir (concat hgs-emacs-cache-directory "image-dired/"))
   (image-dired-gallery-dir
@@ -727,77 +774,106 @@ open."))
    (concat hgs-emacs-cache-directory "image-dired/temp-rotate-image")))
 
 (use-package calc
+  :ensure nil
+  :defer t
+
   :custom
-  (calc-settings-file
-   (concat hgs-emacs-config-directory "calc/settings.el")
-   "Find calc settings in our configuration directory."))
+  (calc-settings-file (concat hgs-emacs-config-directory "calc/settings.el")))
 
 (use-package winner
+  :ensure nil
+  :defer t
+
   :diminish
   winner-mode
 
   :bind
   (:map winner-mode-map
-        ("C-c <left>" . winner-undo)
-        ("C-c <right>" . winner-redo))
+        ("C-c <left>" ("Window undo" . winner-undo))
+        ("C-c <right>" ("Window redo" . winner-redo)))
 
   :hook
   ((prog-mode text-mode special-mode) . winner-mode))
 
 (use-package filesets
+  :ensure nil
+  :defer t
+
   :custom
   (filesets-menu-cache-file
    (concat hgs-emacs-cache-directory "filesets/menu.el")))
 
 (use-package kkc
+  :ensure nil
+  :defer t
+
   :custom
   (kkc-init-file-flag (concat hgs-emacs-config-directory "kkc/init.el")))
 
 (use-package desktop
+  :ensure nil
+  :defer t
+
   :init
   (setq desktop-dirname (concat hgs-emacs-state-directory "desktop/"))
 
   :config
-  (make-directory desktop-dirname t)
+  (cl-dolist (path desktop-path)
+    (make-directory path t))
 
   :custom
-  (desktop-path
-   (list desktop-dirname)
-   "Search our state directory for desktop files."))
+  (desktop-path (list desktop-dirname)))
 
 (use-package calendar
+  :ensure nil
+  :defer t
+
   :custom
-  (diary-file
-   (concat hgs-emacs-data-directory "diary/default")
-   "Place our default diary in our data directory."))
+  (diary-file (concat hgs-emacs-data-directory "diary/default")))
 
 (use-package ecomplete
+  :ensure nil
+  :defer t
+
   :custom
   (ecomplete-database-file
-   (concat hgs-emacs-state-directory "ecomplete/database.el")
-   "Place the ecomplete database file in our state directory."))
+   (concat hgs-emacs-state-directory "ecomplete/database.el")))
 
 (use-package ede/base
+  :ensure nil
+  :defer t
+
   :custom
   (ede-project-placeholder-cache-file
-   (concat hgs-emacs-cache-directory "ede/project-cache.el")
-   "Place the ede project placeholder cache in our cache directory."))
+   (concat hgs-emacs-cache-directory "ede/project-cache.el")))
 
 (use-package srecode
+  :ensure nil
+  :defer t
+
   :custom
   (srecode-map-save-file (concat hgs-emacs-state-directory "srecode/map.el")))
 
 (use-package semantic
+  :ensure nil
+  :defer t
+
   :custom
   (semanticdb-default-save-directory
    (concat hgs-emacs-cache-directory "semanticdb/cache")))
 
 (use-package shadowfile
+  :ensure nil
+  :defer t
+
   :custom
   (shadow-info-file (concat hgs-emacs-data-directory "shadow/info.el"))
   (shadow-todo-file (concat hgs-emacs-data-directory "shadow/todo.el")))
 
 (use-package savehist
+  :ensure nil
+  :defer t
+
   :diminish
   savehist-mode
 
@@ -805,10 +881,12 @@ open."))
   (after-init . savehist-mode)
 
   :custom
-  (savehist-file (concat hgs-emacs-cache-directory "savehist/history")
-                 "Cache history in cache directory."))
+  (savehist-file (concat hgs-emacs-cache-directory "savehist/history")))
 
 (use-package eww
+  :ensure nil
+  :defer t
+
   :bind
   (:map search-map
         ("M-w" . eww-search-words))
@@ -817,35 +895,40 @@ open."))
   (make-directory eww-bookmarks-directory t)
 
   :custom
-  (eww-bookmarks-directory
-   (concat hgs-emacs-state-directory "eww/")
-   "Place eww bookmarks under the state directory."))
+  (eww-bookmarks-directory (concat hgs-emacs-state-directory "eww/")))
 
 (use-package type-break
+  :ensure nil
+  :defer t
+
   :custom
   (type-break-file-name
    (concat hgs-emacs-state-directory "type-break/state.el")))
 
 (use-package tramp
+  :ensure nil
+  :defer t
+
   :custom
   (tramp-auto-save-directory
-   (concat hgs-emacs-state-directory "tramp/auto-save")
-   "Directory to place auto-saves when editing via Tramp.")
+   (concat hgs-emacs-state-directory "tramp/auto-save"))
   (tramp-backup-directory-alist
    backup-directory-alist
    "Put Tramp backups in the same place as local backups.")
   (tramp-persistency-file-name
-   (concat hgs-emacs-cache-directory "tramp/persistency.el")
-   "Put the Tramp persistency file in the cache directory.")
+   (concat hgs-emacs-cache-directory "tramp/persistency.el"))
   (tramp-histfile-override
-   nil "We don't want to store remote shell history locally."))
+   nil
+   "We don't want to store remote shell history locally."))
 
 (use-package eshell
-  :functions
-  eshell/pwd
-  vc-git-branches
+  :ensure t
+  :defer t
 
-  :init
+  :autoload
+  eshell/pwd
+
+  :preface
   (defun hgs--eshell-prompt-function ()
     "Function that determines the eshell prompt to display.
 `eshell-prompt-function' must be set to this to be activated."
@@ -869,49 +952,42 @@ open."))
   (eshell-directory-name
    (concat hgs-emacs-state-directory "eshell")
    "Use state directory for storing transient files (e.g. history etc.)")
-  (eshell-rc-script
-   (concat hgs-emacs-config-directory "eshell/rc"))
-  (eshell-login-script
-   (concat hgs-emacs-config-directory "eshell/login"))
-  (eshell-aliases-file
-   (concat hgs-emacs-config-directory "eshell/aliases"))
-  (eshell-buffer-maximum-lines
-   20000
-   "Truncate eshell buffers to something reasonable.")
-  (eshell-highlight-prompt nil "We don't need prompt highlighting.")
-  (eshell-hist-ignoredups t "No duplicates in shell history.")
-  (eshell-history-size 2048 "Cap our history size to something reasonable.")
+  (eshell-rc-script (concat hgs-emacs-config-directory "eshell/rc"))
+  (eshell-login-script (concat hgs-emacs-config-directory "eshell/login"))
+  (eshell-aliases-file (concat hgs-emacs-config-directory "eshell/aliases"))
+  (eshell-buffer-maximum-lines 20000)
+  (eshell-highlight-prompt t)
+  (eshell-hist-ignoredups t)
+  (eshell-history-size 5000)
   (eshell-plain-echo-behavior t "Make `echo' imitate shell echo.")
-  (eshell-prompt-function
-   #'hgs--eshell-prompt-function
-   "Setup my prompt to something useful.")
+  (eshell-prompt-function #'hgs--eshell-prompt-function)
   (eshell-prompt-regexp ".+^λ " "Tell Emacs how to find prompts in the buffer.")
-  (eshell-scroll-to-bottom-on-input
-   'this
-   "We want to scroll to the bottom on input.")
-  (eshell-scroll-to-bottom-on-output
-   nil
-   "We don't want to scroll to bottom on output."))
+  (eshell-scroll-to-bottom-on-input 'this)
+  (eshell-scroll-to-bottom-on-output nil))
 
 (use-package flyspell
-  :if (executable-find "aspell")
+  :ensure nil
+  :defer t
+  :when (executable-find "aspell")
+
+  :diminish
+  flyspell-mode
+  flyspell-prog-mode
 
   :hook
-  (((text-mode) . flyspell-mode)
-   ((prog-mode) . flyspell-prog-mode))
+  (text-mode . flyspell-mode)
+  (prog-mode . flyspell-prog-mode)
 
   :custom
-  (ispell-program-name "aspell" "Spellcheck program to use.")
+  (ispell-program-name "aspell")
   (ispell-extra-args
-   '("--sug-mode=ultra" "--lang=en_US")
-   "Change the default lookup mode for performance, and force language to
-American English."))
+   '("--sug-mode=ultra" "--lang=en_US")))
 
 (use-package epa
-  :hook
-  (((find-file) . hgs--epa-inhibit-backups))
+  :ensure nil
+  :defer t
 
-  :init
+  :preface
   (defun hgs--epa-inhibit-backups ()
     "Inhibit backups when operating on encrypted files."
     (when (and buffer-file-name
@@ -919,33 +995,23 @@ American English."))
         (message "Backup inhibited for this file `%s'." buffer-file-name)
         (setq-local backup-inhibited t)))
 
+  :hook
+  (find-file . hgs--epa-inhibit-backups)
+
   :custom
-  (epa-file-inhibit-auto-save
-   t
-   "Don't autosave when operating on encrypted files."))
+  (epa-file-inhibit-auto-save t))
 
 (use-package erc
-  :defines
-  hgs-erc-freenode-server-regexp
-  hgs-erc-rizon-server-regexp
-  hgs-erc-libera-server-regexp
-  hgs-erc-oftc-server-regexp
+  :ensure nil
+  :defer t
+
+  :autoload
+  hgs--erc-save-buffers-to-logs
 
   :functions
-  erc
-  erc-tls
-  hgs--erc-save-buffers-to-logs
-  hgs--erc-disable-whitespace-mode
   hgs-erc-current-network-name
 
-  :hook
-  (erc-mode . hgs--erc-disable-whitespace-mode)
-  ;; Default to readonly when joining a channel to prevent fat fingering by
-  ;; default
-  (erc-join . read-only-mode)
-
-  :init
-  (require 'rx)
+  :preface
   (defcustom hgs-erc-freenode-server-regexp
     (rx "freenode")
     "Regular expression for matching Freenode IRC server name."
@@ -982,17 +1048,28 @@ American English."))
     "Disables whitespace mode in erc buffers, as it causes issues."
     (whitespace-mode -1))
 
+  :hook
+  (erc-mode . hgs--erc-disable-whitespace-mode)
+  ;; Default to readonly when joining a channel to prevent fat fingering by
+  ;; default
+  (erc-join . read-only-mode)
+
+  :config
+  (add-to-list 'erc-modules 'notifications) ;; Enable notifications
+  (add-to-list 'erc-modules 'spelling) ;; Enable spelling corrections
+  (erc-update-modules)
+
   (defun hgs--erc-save-buffers-to-logs (&optional _)
     "Auto saves erc buffers to their log files when exiting emacs."
     (save-some-buffers t (lambda (&optional _)
                            (when (eq major-mode 'erc-mode)
                              t))))
+  (advice-add #'save-buffers-kill-emacs :before #'hgs--erc-save-buffers-to-logs)
 
   (defun hgs-erc-current-network-name (&optional buffer-to-check)
     "Returns network name (not necessarily server).
 Will use the current buffer unless `BUFFER-TO-CHECK' is non-nil,
 in which case it will be used."
-    (require 'erc)
     (let ((channel-buffer (or buffer-to-check (current-buffer))))
       (with-current-buffer channel-buffer
         (or (and (fboundp 'erc-network-name) (erc-network-name))
@@ -1000,40 +1077,24 @@ in which case it will be used."
              (or erc-server-announced-name
                  erc-session-server))))))
 
-  :config
-  (add-to-list 'erc-modules 'notifications) ;; Enable notifications
-  (add-to-list 'erc-modules 'spelling) ;; Enable spelling corrections
-  (erc-update-modules)
-
-  (advice-add #'save-buffers-kill-emacs :before #'hgs--erc-save-buffers-to-logs)
-
   :custom
-  (erc-nick user-login-name "Default nick.")
-  (erc-user-full-name erc-nick "Full real name of the user.")
-  (erc-email-userid erc-nick "Email of the user.")
-  (erc-nick-uniquifier
-   "_"
-   "Use trailing underscores for nicks that are already taken.")
+  (erc-nick user-login-name)
+  (erc-user-full-name erc-nick)
+  (erc-email-userid erc-nick)
+  (erc-nick-uniquifier "_")
   (erc-join-buffer
    'bury
    "Don't bring channel buffers to the forefront when they appear.")
-  (erc-hide-list
-   '()
-   "Don't hide anything by default.")
+  (erc-hide-list '())
   (erc-lurker-hide-list
    '("JOIN"
      "PART"
-     "QUIT")
-   "Hide status changes for lurkers.")
+     "QUIT"))
   (erc-lurker-threshold-time
    (* 60 (* 60 (* 24)))
    "Class anyone inactive for 24 hours as a lurker.")
-  (erc-debug-log-file
-   (concat hgs-emacs-state-directory "erc/debug.log")
-   "Relocate the erc debug log file somewhere more sensible.")
-  (erc-send-whitespace-lines
-   nil
-   "Don't send lines only consisting of whitespace.")
+  (erc-debug-log-file (concat hgs-emacs-state-directory "erc/debug.log"))
+  (erc-send-whitespace-lines nil)
   (erc-rename-buffers
    t
    "Rename server buffers with network name instead of
@@ -1043,42 +1104,34 @@ networks, but they'll appear as the same server to the client."))
 
 ;; Manages joining channels (both manually and automatically)
 (use-package erc-join
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-autojoin-mode
-  erc-autojoin-enable
-  erc-autojoin-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-autojoin-enable)
 
   :custom
-  (erc-autojoin-channels-alist
-   '()
-   "AList of server -> channel list to auto-join on connection.")
+  (erc-autojoin-channels-alist '())
   (erc-autojoin-timing
    'ident
    "Auto-join after successful identification with NickServ."))
 
 (use-package erc-fill
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-fill-mode
-  erc-fill-enable
-  erc-fill-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-fill-enable)
 
   :custom
-  (erc-fill-column
-   fill-column
-   "Set ERC fill column to be the same as everywhere else.")
-  (erc-fill-function 'erc-fill-variable "Use variable filling")
+  (erc-fill-column fill-column)
+  (erc-fill-function 'erc-fill-variable)
   (erc-fill-prefix
    (make-string (erc-timestamp-offset) ? )
    "Prefix wrapping with enough spaces to be just past the timestamp
@@ -1086,13 +1139,11 @@ networks, but they'll appear as the same server to the client."))
 
 ;; Highlights or hides messages matching certain patterns
 (use-package erc-match
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-match-mode
-  erc-match-enable
-  erc-match-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-match-enable)
@@ -1104,13 +1155,11 @@ networks, but they'll appear as the same server to the client."))
 
 ;; Tracks active erc buffers
 (use-package erc-track
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-track-mode
-  erc-track-enable
-  erc-track-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-track-enable)
@@ -1123,60 +1172,46 @@ buffers).")
   (erc-track-visibility
    'visible
    "Consider all actually visible frames as containing visible buffers.")
-  (erc-track-exclude
-   '()
-   "Channels to exclude from tracking.")
+  (erc-track-exclude '())
   (erc-track-exclude-types
    '("JOIN"
      "NICK"
      "QUIT"
      "MODE"
-     "AWAY")
-   "Types of messages to exclude")
-  (erc-track-exclude-server-buffer
-   t
-   "Don't track anything in the server buffer."))
+     "AWAY"))
+  (erc-track-exclude-server-buffer t))
 
 ;; Stores previous commands/text in a ring available for recall via M-p/M-n
 (use-package erc-ring
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-ring-mode
-  erc-ring-enable
-  erc-ring-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-ring-enable))
 
 ;; Hides mode changes from the servers
 (use-package erc-netsplit
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-netsplit-mode
-  erc-netsplit-enable
-  erc-netsplit-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-netsplit-enable))
 
 ;; Performs logging of channels
 (use-package erc-log
+  :ensure nil
+  :defer t
+
   :after
-  erc
+  (:all erc)
 
-  :functions
-  erc-log-mode
-  erc-log-enable
-  erc-log-disable
-
-  :hook
-  (((erc-mode) . erc-log-enable))
-
-  :init
+  :preface
   (defcustom hgs-erc-log-channels-directory
     (file-name-as-directory (concat hgs-emacs-state-directory "erc/logs"))
     "Base directory path for placing erc logs."
@@ -1228,6 +1263,9 @@ The name of the log file is composed of nick current date."
     (convert-standard-filename
      (concat (format-time-string "%Y-%m-%d") ".log")))
 
+  :hook
+  (erc-mode . erc-log-enable)
+
   :custom
   (erc-log-channels-directory
    #'hgs--erc-compute-log-channels-directory
@@ -1248,131 +1286,139 @@ information.")
 
 ;; Manages timestamps
 (use-package erc-stamp
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-stamp-mode
-  erc-stamp-enable
-  erc-stamp-disable
+  :after
+  (:all erc)
 
   :hook
-  (((erc-mode) . erc-stamp-enable))
+  (erc-mode . erc-stamp-enable)
 
   :custom
-  (erc-hide-timestamps nil "Timestamps should be visible.")
-  (erc-timestamp-only-if-changed-flag nil "Always insert timestamp")
-  (erc-insert-timestamp-function
-   #'erc-insert-timestamp-left
-   "Put timestamps on the left.")
-  (erc-timestamp-format "[%H:%M:%S]" "How to present timestamps."))
+  (erc-hide-timestamps nil)
+  (erc-timestamp-only-if-changed-flag nil)
+  (erc-insert-timestamp-function #'erc-insert-timestamp-left)
+  (erc-timestamp-format "[%H:%M:%S]"))
 
 ;; Keeps the erc buffers to a manageable size
 (use-package erc-truncate
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-truncate-mode
-  erc-truncate-enable
-  erc-truncate-disable
+  :after
+  (:all erc)
 
   :hook
-  (((erc-mode) . erc-truncate-enable))
+  (erc-mode . erc-truncate-enable)
 
   :custom
-  (erc-max-buffer-size 30000 "Truncate buffers so they don't hog core.")
-  (erc-truncate-buffer-on-save
-   nil
-   "Don't truncate the erc buffer after saving to log file."))
+  (erc-max-buffer-size 30000)
+  (erc-truncate-buffer-on-save nil))
 
 (use-package erc-backend
+  :ensure nil
+  :defer t
+
   :after
-  erc
+  (:all erc)
 
   :custom
-  (erc-server-reconnect-attempts 5 "Try up to 5 times to reconnect.")
-  (erc-server-reconnect-timeout 3 "Timeout after 3 minutes."))
+  (erc-server-reconnect-attempts 5)
+  (erc-server-reconnect-timeout 3))
 
 (use-package erc-services
-  :after
-  erc
+  :ensure nil
+  :defer t
 
-  :functions
-  erc-services-mode
-  erc-services-enable
-  erc-services-disable
+  :after
+  (:all erc)
 
   :hook
   (erc-mode . erc-services-enable)
 
   :custom
-  (erc-prompt-for-password
-   nil
-   "We don't want to prompt, instead we should use an auth-source.")
-  (erc-prompt-for-nickserv-password
-   nil
-   "We don't want to prompt, instead we should always use an auth-source."))
+  (erc-prompt-for-password nil)
+  (erc-prompt-for-nickserv-password nil))
 
 (use-package erc-dcc
+  :ensure nil
+  :defer t
+
+  :after
+  (:all erc)
+
   :config
   (make-directory erc-dcc-get-default-directory t)
 
   :custom
   (erc-dcc-get-default-directory
-   (concat hgs-emacs-data-directory "erc/dcc/")
-   "Place ERC DCC data inside our data directory."))
+   (concat hgs-emacs-data-directory "erc/dcc/")))
+
+(use-package erc-hl-nicks
+  :ensure nil
+  :defer t
+
+  :after
+  (:all erc))
 
 (use-package url
+  :ensure nil
+  :defer t
+
   :custom
-  (url-cache-directory
-   (concat hgs-emacs-cache-directory "url")
-   "Put the url package's cache directory where we would expect.")
-  (url-configuration-directory
-   (concat hgs-emacs-data-directory "url")
-   "Put the url package's configuration directory in the data directory.")
+  (url-cache-directory (concat hgs-emacs-cache-directory "url"))
+  (url-configuration-directory (concat hgs-emacs-data-directory "url"))
   (url-cookie-file (concat hgs-emacs-state-directory "url/cookies.el"))
   (url-history-file (concat hgs-emacs-state-directory "url/history.el")))
 
 (use-package quickurl
+  :ensure nil
+  :defer t
+
   :custom
   (quickurl-url-file (concat hgs-emacs-state-directory "quickurl/urls")))
 
+;; Network Security Manager -- Manages TLS certs
 (use-package nsm
-  ;; Network Security Manager -- Manages TLS certs
+  :ensure nil
+  :defer t
+
   :custom
-  (nsm-settings-file
-   hgs-emacs-state-directory
-   "Put the NSM connection details in state directory."))
+  (nsm-settings-file (concat hgs-emacs-state-directory "network-security/data")))
 
 (use-package bookmark
+  :ensure nil
+  :defer t
+
   :custom
   (bookmark-default-file
-   (concat hgs-emacs-state-directory "bookmark/defaults.el")
-   "Put bookmarks in the state directory."))
+   (concat hgs-emacs-state-directory "bookmark/defaults.el")))
 
 (use-package custom
+  :ensure nil
+  :defer t
+
   :custom
-  (custom-theme-directory
-   (concat hgs-emacs-config-directory "themes")
-   "Expect custom themes from our configuration directory."))
+  (custom-theme-directory (concat hgs-emacs-config-directory "themes")))
 
 (use-package python
+  :ensure nil
+  :defer t
+
   :defines
   python-indent-guess-indent-offset
 
-  :mode
-  (("\\.py\\'" . python-mode))
-
   :custom
-  (python-indent-offset 2 "We prefer to default indent in python to 2 space.")
-  (python-indent-guess-indent-offset
-   t
-   "Guess indent offset and set it appropriately."))
+  (python-indent-offset 2)
+  (python-indent-guess-indent-offset t))
 
 ;; C/C++
 (use-package cc-mode
-  :init
+  :ensure nil
+  :defer t
+
+  :preface
   (defcustom hgs-clang-format-command
     ;; (PROGRAM ARGS...)
     '("clang-format")
@@ -1388,37 +1434,32 @@ information.")
     :lighter " CF"))
 
 (use-package org
-  :mode
-  ("\\.org\\'" . org-mode)
+  :ensure nil
+  :defer t
 
   :bind
   (:prefix "C-c o"
            :prefix-map hgs--org-prefix-map
            :prefix-docstring "Org commands"
-           ("l" . org-store-link)
-           ("c" . org-capture)
-           ("a" . org-agenda)
-           ("j" . org-clock-goto))
+           ("l" ("Store link" . org-store-link))
+           ("c" ("Capture" . org-capture))
+           ("a" ("Agenda" . org-agenda))
+           ("j" ("Go to clock" . org-clock-goto)))
 
   :init
   (which-key-add-key-based-replacements
     "C-c o" "Org")
 
   :custom
-  (org-directory hgs-org-directory
-                 "Base path to store org files inside by default.")
+  (org-directory hgs-org-directory)
   (org-clock-persist-file
    (concat hgs-emacs-state-directory "org/clock-persist.el"))
   (org-id-locations-file
    (concat hgs-emacs-state-directory "org/id-locations.el"))
   (org-publish-timestamp-directory
    (concat hgs-emacs-state-directory "org/timestamps/"))
-  (org-default-notes-file
-   (concat hgs-org-directory "notes.org")
-   "Put org notes into the appropriate file & directory by default.")
-  (org-agenda-files
-   `(,hgs-org-directory)
-   "Directory to search for matching org files for agenda.")
+  (org-default-notes-file (concat hgs-org-directory "notes.org"))
+  (org-agenda-files `(,hgs-org-directory))
   (org-archive-location
    (concat hgs-org-directory "archive/%s::datetree/")
    "Place archivals into an organized datetree in an archive sub-directory.")
@@ -1427,12 +1468,15 @@ information.")
      (org-agenda-files :maxlevel . 9))
    "Allow us to refile to all Org files in the agenda and current buffer to an
 arbitrary depth.")
-  (org-refile-use-outline-path 'file "Show the file name as part of the outline
-path when refiling.")
-  (org-refile-allow-creating-parent-nodes 'confirm "Prompt when wanting to
-create new nodes during a refile.")
-  (org-outline-path-complete-in-steps nil "Allow us to complete the path using a
-narrowing framework.")
+  (org-refile-use-outline-path
+   'file
+   "Show the file name as part of the outline path when refiling.")
+  (org-refile-allow-creating-parent-nodes
+   'confirm
+   "Prompt when wanting to create new nodes during a refile.")
+  (org-outline-path-complete-in-steps
+   nil
+   "Allow us to complete the path using a narrowing framework.")
   (org-log-into-drawer t "Place automatic log lines into a drawer.")
   (org-todo-keywords
    '((sequence
@@ -1515,15 +1559,17 @@ narrowing framework.")
   (org-ellipsis "▼" "The ellipsis symbol to show for folds and the like."))
 
 (use-package org-indent
-  :after org
+  :ensure nil
+  :defer t
+
+  :after
+  (:all org)
 
   :diminish
   org-indent-mode
 
   :custom
-  (org-indent-indentation-per-level
-   2
-   "Reduce indentation in `org-indent' mode."))
+  (org-indent-indentation-per-level 2))
 
 ;; Personal lisp packages
 
@@ -1532,77 +1578,70 @@ narrowing framework.")
 ;; Third-party package configuration
 
 (use-package go-mode
-  :mode
-  (("\\.go\\'" . go-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package rustic-mode
-  :mode
-  (("\\.rs\\'" . rustic-mode))
+  :ensure nil
+  :defer t
 
   :custom
   (rustic-lsp-setup-p nil "Don't automatically try to setup lsp-mode")
   (rustic-format-trigger 'on-save "Format Rust code on save."))
 
 (use-package vimrc-mode
-  :mode
-  (("\\.vim\\'" . vimrc-mode)
-   ("[._]?g?vimrc\\'" . vimrc-mode)
-   ("\\.exrc\\'" . vimrc-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package dockerfile-mode
-  :mode
-  (("Dockerfile\\'" . dockerfile-mode))
+  :ensure nil
+  :defer t
 
   :config
   ;; Allow the use to put a file-local variable specifying the image name.
   (put 'docker-image-name 'safe-local-variable #'stringp))
 
 (use-package protobuf-mode
+  :ensure nil
+  :defer t
+
   :mode
-  (("\\.\\(pb\\|proto\\)\\'" . protobuf-mode)))
+  ;; Built-in mode autoload only deals with *.proto
+  ("\\.pb\\'" . protobuf-mode))
 
 (use-package bazel
-  :mode
-  (("/BUILD\\(\\..*\\)?\\'" . bazel-build-mode)
-   ("/WORKSPACE\\'" . bazel-workspace-mode)
-   ("\\.bzl\\'" . bazel-starlark-mode)
-   ("\\.bazelrc\\'" . bazelrc-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package meson-mode
-  :mode
-  (("\\.meson\\'" . meson-mode)
-   ("/meson\\.build\\'" . meson-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package jq-mode
+  :ensure nil
+  :defer t
+
   :after
-  json-mode
-
-  :defines
-  json-mode-map
-
-  :mode
-  ("\\.jq\\'" . jq-mode)
+  (:all json-mode)
 
   :bind
   (:map json-mode-map
-        ("C-c C-j" . jq-interactively)))
+        ("C-c C-j" ("JQ (Interactive)" . jq-interactively))))
 
 (use-package toml-mode
-  :mode
-  (("\\.toml\\'" . toml-mode)))
+  :ensure nil
+  :defer t)
 
 ;; Dim non-focused windows for clarity. This seems to cause massive terminal
 ;; slow-down when changing active window, so I might eventually remove it.
 (use-package dimmer
+  :ensure nil
   :demand t
 
   :diminish
   dimmer-mode
 
-  :functions
-  hgs--apply-dimmer-fix
-
-  :init
+  :preface
   ;; Apply some fixes when/if these packages load to prevent dimmer from
   ;; interfering with their visibility.
   (defmacro hgs--apply-dimmer-fix (package-name)
@@ -1617,23 +1656,16 @@ narrowing framework.")
   (dimmer-mode +1)
 
   :custom
-  (dimmer-adjustment-mode :both "Dim the other windows' fore/backgrounds.")
+  (dimmer-adjustment-mode :both)
   (dimmer-fraction 0.15 "Higher means greater dimming.")
   (dimmer-watch-frame-focus-events
    nil
-   "Don't react to frame-wide focusing changes. Needed to avoid flashing on
-mouse navigation."))
+   "Don't react to frame-wide focusing changes. Needed to avoid
+flashing on mouse navigation."))
 
 (use-package avy
-  :defines
-  avy-order-closest
-
-  :commands
-  avy-goto-char
-  avy-goto-char-2
-  avy-goto-char-timer
-  avy-goto-word
-  avy-goto-line
+  :ensure nil
+  :defer t
 
   :bind
   (:map global-map
@@ -1656,17 +1688,21 @@ mouse navigation."))
 
   :custom
   (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
-  (avy-keys-alist '() "Alist of Avy commands to keys to use for prompts. Falls
-back to `avy-keys'")
+  (avy-keys-alist
+   '()
+   "Alist of Avy commands to keys to use for prompts. Falls back to `avy-keys'")
   (avy-style 'at "Overlay display style.")
   (avy-styles-alist '() "Alist of Avy commands to overlay display styles.")
   (avy-background nil "Use a gray background during selection.")
   (avy-all-windows t "Scan all windows on the selected for selection.")
   (avy-case-fold-search t "Ignore case for search.")
-  (avy-single-candidate-jump nil "Don't auto-jump on single candidates to allow applying
-actions.")
-  (avy-highlight-first nil "Don't highlight the first decision character, only
-first non-terminating decision characters.")
+  (avy-single-candidate-jump
+  nil
+  "Don't auto-jump on single candidates to allow applying actions.")
+  (avy-highlight-first
+   nil
+   "Don't highlight the first decision character, only first non-terminating
+decision characters.")
   (avy-timeout-seconds 0.5 "How long `*-timer' commands should wait.")
   (avy-orders-alist
    '((avy-goto-char . avy-order-closest))
@@ -1674,31 +1710,39 @@ first non-terminating decision characters.")
 to point."))
 
 (use-package page-break-lines
-  :diminish
-  page-break-lines-mode
+  :ensure nil
+  :defer t
 
-  :commands
+  :diminish
   page-break-lines-mode)
 
 (use-package all-the-icons
-  :after
-  memoize
+  :ensure nil
+  :demand t
+
+  :preface
+  (defun hgs--setup-all-the-icons ()
+    "Try to automatically install the fonts if they appear missing."
+    (when (and (not (member "all-the-icons" (font-family-list)))
+               (not (daemonp))
+               (window-system))
+      (all-the-icons-install-fonts t)))
 
   :config
-  ;; Try to automatically install the fonts if they appear missing
-  (when (and (not (member "all-the-icons" (font-family-list)))
-             (not (daemonp))
-             (window-system))
-    (all-the-icons-install-fonts t)))
+  (hgs--setup-all-the-icons))
 
 (use-package org-bullets
-  :after org
+  :ensure nil
+  :defer t
+
+  :after
+  (:all org)
 
   :diminish
   org-bullets-mode
 
   :hook
-  ((org-mode) . org-bullets-mode)
+  (org-mode . org-bullets-mode)
 
   :custom
   (org-bullets-bullet-list
@@ -1714,18 +1758,29 @@ to point."))
    "Unicode bullets to use."))
 
 (use-package org-mime
+  :ensure nil
+  :defer t
+
+  :after
+  (:all org)
+
   :custom
-  (org-mime-library 'mml "Use mml."))
+  (org-mime-library 'mml))
 
 (use-package exec-path-from-shell
-  :commands
-  exec-path-from-shell-initialize
+  :ensure nil
+  :demand t
+
+  :preface
+  (defun hgs--initialize-exec-path-from-shell ()
+    "Perform an initial synchronization under some platforms."
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize))
+    (when (daemonp)
+      (exec-path-from-shell-initialize)))
 
   :config
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize))
-  (when (daemonp)
-    (exec-path-from-shell-initialize))
+  (hgs--initialize-exec-path-from-shell)
 
   :custom
   (exec-path-from-shell-variables
@@ -1758,7 +1813,8 @@ to point."))
    "All the shell variables Emacs should be attempting to source."))
 
 (use-package auth-source
-  :demand t
+  :ensure nil
+  :defer t
 
   :custom
   (auth-sources
@@ -1767,13 +1823,16 @@ to point."))
    "Setup my ordered list of preferred authentication sources for Emacs."))
 
 (use-package auth-source-pass
-  :if (or (executable-find "pass")
-          (executable-find "gopass"))
+  :ensure nil
+  :defer t
+
+  :when (or (executable-find "pass")
+            (executable-find "gopass"))
 
   :after
-  auth-source
+  (:all auth-source)
 
-  :functions
+  :autoload
   hgs-pass-refresh-store-directory
 
   :config
@@ -1792,13 +1851,15 @@ to point."))
    ":"
    "Separator between host name and port in an entry."))
 
-
 (use-package password-store
-  :if (or (executable-find "pass")
-          (executable-find "gopass"))
+  :ensure nil
+  :defer t
+
+  :when (or (executable-find "pass")
+            (executable-find "gopass"))
 
   :after
-  auth-source-pass
+  (:all auth-source-pass)
 
   :custom
   (password-store-executable
@@ -1808,25 +1869,22 @@ to point."))
    "Prefer gopass if it is available."))
 
 (use-package pass
-  :if (or (executable-find "pass")
-          (executable-find "gopass"))
+  :ensure nil
+  :defer t
+  :when (or (executable-find "pass")
+            (executable-find "gopass"))
 
   :after
-  password-store
-
-  :commands
-  pass)
+  (:all password-store))
 
 (use-package vertico
+  :ensure nil
   :demand t
 
   :diminish
   vertico-mode
 
-  :hook
-  (after-init . vertico-mode)
-
-  :init
+  :preface
   (defun hgs--vertico-completion-in-region (&rest args)
     "Use `consult-completion-in-region' if Vertico and Consult are available.
 Otherwise use the default `completion--in-region' function."
@@ -1835,15 +1893,18 @@ Otherwise use the default `completion--in-region' function."
              #'completion--in-region)
            args))
 
+  :config
+  (vertico-mode +1)
+
   :custom
-  (completion-in-region-function #'hgs--vertico-completion-in-region
-                                 "Use custom `completion-in-region' function.")
-  (vertico-scroll-margin 0 "Show no scroll margin.")
+  (completion-in-region-function #'hgs--vertico-completion-in-region)
+  (vertico-scroll-margin 0)
   (vertico-resize t "Dynamically resize minibuffer.")
-  (vertico-count 15 "Show more candidates.")
-  (vertico-cycle t "Enable cycling through candidate list."))
+  (vertico-count 15)
+  (vertico-cycle t))
 
 (use-package orderless
+  :ensure nil
   :demand t
 
   :custom
@@ -1859,57 +1920,57 @@ order to ensure dynamic completion tables work correctly.")
    "Enable partial completion for files for wildcard & partial path matching
 support.")
   (orderless-matching-styles
-   '(orderless-initialism orderless-literal orderless-regexp)
-   "List of matching styles to use for orderless completion"))
+   '(orderless-initialism orderless-literal orderless-regexp)))
 
 (use-package consult
+  :ensure nil
   :demand t
-
-  :functions
-  consult-register-window
 
   :bind
   (:map global-map
-        ([remap yank-pop] . consult-yank-pop)
-        ("C-h M" . consult-man)
-        ("C-c H" . consult-history)
-        ("M-s e" . consult-isearch-history)
-        ("C-x K" . consult-kmacro)
-        ("C-M-#" . consult-register)
-        ("C-x r M-\"" . consult-register-load)
-        ("C-x r M-'" . consult-register-store)
-        ([remap bookmark-jump] . consult-bookmark)
-        ("C-x M-:" . consult-complex-command)
-        ("C-x b" . consult-buffer)
-        ("C-x 4 b" . consult-buffer-other-window)
-        ("C-x 5 b" . consult-buffer-other-frame))
+        ([remap yank-pop] ("Yank pop" . consult-yank-pop))
+        ("C-h M" ("Man" . consult-man))
+        ("C-c H" ("History" . consult-history))
+        ("M-s e" ("Isearch history" . consult-isearch-history))
+        ("C-x K" ("Kmacro" . consult-kmacro))
+        ("C-M-#" ("Register" . consult-register))
+        ("C-x r M-\"" ("Register load" . consult-register-load))
+        ("C-x r M-'" ("Register store" . consult-register-store))
+        ([remap bookmark-jump] ("Bookmark jump" . consult-bookmark))
+        ("C-x M-:" ("Complex command" . consult-complex-command))
+        ("C-x b" ("Switch buffer" . consult-buffer))
+        ("C-x 4 b" ("Switch buffer (other window)"
+                    . consult-buffer-other-window))
+        ("C-x 5 b" ("Switch buffer (other frame)"
+                    . consult-buffer-other-frame)))
   (:map goto-map
-        ("g" . consult-goto-line)
-        ("M-g" . consult-goto-line)
-        ("e" . consult-compile-error)
-        ("f" . consult-flycheck)
-        ("F" . consult-flymake)
-        ("o" . consult-outline)
-        ("m" . consult-mark)
-        ("k" . consult-global-mark)
-        ("i" . consult-imenu)
-        ("I" . consult-imenu-multi))
+        ("g" ("Goto line" . consult-goto-line))
+        ("M-g" ("Goto line" . consult-goto-line))
+        ("e" ("Compile error" . consult-compile-error))
+        ("f" ("Flycheck" . consult-flycheck))
+        ("F" ("Flymake" . consult-flymake))
+        ("o" ("Outline" . consult-outline))
+        ("m" ("Mark" . consult-mark))
+        ("k" ("Global mark" . consult-global-mark))
+        ("i" ("Imenu" . consult-imenu))
+        ("I" ("Imenu (multi)" . consult-imenu-multi)))
   (:map search-map
-        ("f" . consult-find)
-        ("L" . consult-locate)
-        ("g" . consult-grep)
-        ("G" . consult-git-grep)
-        ("r" . consult-ripgrep)
-        ("l" . consult-line)
-        ("L" . consult-line-multi)
-        ("o" . occur)
-        ("m" . multi-occur)
-        ("k" . consult-keep-lines)
-        ("u" . consult-focus-lines))
+        ("f" ("Find" . consult-find))
+        ("L" ("Locate" . consult-locate))
+        ("g" ("Grep" . consult-grep))
+        ("G" ("Gitgrep " . consult-git-grep))
+        ("r" ("Ripgrep " . consult-ripgrep))
+        ("l" ("Line" . consult-line))
+        ("L" ("Line (multi) " . consult-line-multi))
+        ("o" ("Occur" . occur))
+        ("m" ("Multi-occur " . multi-occur))
+        ("k" ("Keep lines" . consult-keep-lines))
+        ("u" ("Focus lines" . consult-focus-lines)))
   (:map isearch-mode-map
-        ([remap isearch-edit-string] . consult-isearch-history)
-        ("M-s l" . consult-line)
-        ("M-s L" . consult-line-multi))
+        ([remap isearch-edit-string]
+         ("Isearch history" . consult-isearch-history))
+        ("M-s l" ("Line" . consult-line))
+        ("M-s L" ("Line (multi)" . consult-line-multi)))
 
   :config
   ;; Add thin lines, sorting and hide the mode line of the register preview
@@ -1917,33 +1978,32 @@ support.")
   (advice-add #'register-preview :override #'consult-register-window)
 
   :custom
-  (xref-show-xrefs-function #'consult-xref "Use Consult for xref.")
-  (xref-show-definitions-function #'consult-xref "Use Consult for xref.")
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
   (register-preview-delay 0 "Set no delay for the register preview for speed.")
-  (register-preview-function
-   #'consult-register-format
-   "Use Consult for register preview.")
-  (consult-narrow-key ">" "Specify the key used for explicit narrowing.")
-  (consult-widen-key "<" "Specify key used for explicit widening.")
+  (register-preview-function #'consult-register-format)
+  (consult-narrow-key ">")
+  (consult-widen-key "<")
   (consult-preview-key 'any "Trigger Consult previews with any key press.")
   (consult-project-root-function
    #'project-root
    "Use built-in project.el for finding the project root."))
 
 (use-package marginalia
-  :after
-  vertico
-
+  :ensure nil
   :demand t
+
+  :after
+  (:all vertico)
 
   :diminish
   marginalia-mode
 
   :bind
   (:map global-map
-        ("M-A" . marginalia-cycle))
+        ("M-A" ("Marginalia cycle" . marginalia-cycle)))
   (:map minibuffer-local-map
-        ("M-A" . marginalia-cycle))
+        ("M-A" ("Marginalia cycle" . marginalia-cycle)))
 
   :config
   (marginalia-mode +1)
@@ -1956,9 +2016,8 @@ support.")
    "Prefer richer, heavier annotations over lighter alternatives."))
 
 (use-package embark
-  :defines
-  hgs--embark-prefix-map
-  embark-file-map
+  :ensure nil
+  :defer t
 
   :bind
   (:prefix "C-c e"
@@ -1969,30 +2028,27 @@ support.")
            ;; them here.
            ;;
            ;; Contextual actions on object at point
-           ("a" . embark-act)
+           ("a" ("Act" . embark-act))
            ;; Do the default action to thing at point
-           ("d" . embark-dwim))
+           ("d" ("Dwim" . embark-dwim)))
 
   (:map global-map
    ;; Improved bindings help
-   ([remap describe-bindings] . embark-bindings))
+   ([remap describe-bindings] ("Describe bindings" . embark-bindings)))
   (:map minibuffer-local-map
         ;; Convenience bindings for inside a minibuffer. My general thoughts are
         ;; that beyond act/become which are frequent and short operations one
         ;; shouldn't need shortcuts for embark in the minibuffer.
-        ("C-;" . embark-act)
-        ("C-:" . embark-dwim))
+        ("C-;" ("Act" . embark-act))
+        ("C-:" ("Dwim" . embark-dwim)))
   (:map embark-file-map
-        ("j" . dired-jump))
+        ("j" ("Dired jump" . dired-jump)))
 
   :init
   (which-key-add-key-based-replacements
     "C-c e" "Embark")
 
   :custom
-  ;; (prefix-help-command
-  ;;  #'embark-prefix-help-command
-  ;;  "Replace the built-in prefix help command with a completing read version.")
   (embark-quit-after-action
    nil
    "Don't leave the minibuffer etc. after acting. Use prefix to quit.")
@@ -2013,20 +2069,24 @@ support.")
    "Delay before popping up collection."))
 
 (use-package flyspell-correct
+  :ensure nil
+  :defer t
+
   :after
-  flyspell
+  (:all flyspell)
 
   :bind
-  (:map flyspell-mode-map
-        ("C-c $" . flyspell-correct-at-point))
+  (:map global-map
+        ("C-c $" ("Correction-at-point" . flyspell-correct-at-point)))
 
   :custom
   (flyspell-correct-highlight t "Highlight word being corrected."))
 
 (use-package solarized-theme
-  :config
-  (load-theme 'solarized-light 'no-confirm)
+  :ensure nil
+  :demand t
 
+  :preface
   (defun hgs--solarized-tui-bg-removal (frame)
     "Disable background theming if in terminal as this causes breakage. This
 means the terminal itself must be appropriately themed. Be careful about
@@ -2038,6 +2098,9 @@ emacsclient (invalid argument stringp errors)."
   (add-hook 'hgs-frame-customization-tui-hook
             #'hgs--solarized-tui-bg-removal
             50)
+
+  :config
+  (load-theme 'solarized-light 'no-confirm)
 
   :custom
   (solarized-distinct-fringe-background t "Make the fringe stand out.")
@@ -2053,16 +2116,21 @@ emacsclient (invalid argument stringp errors)."
    "Don't change the size of org-mode headlines."))
 
 (use-package async
+  :ensure nil
+  :defer t
+
   :init
-  (require 'async-bytecomp)
   (setq async-byte-compile-log-file
         (concat hgs-emacs-state-directory "async/bytecomp.log"))
 
   :hook
-  ((after-init . async-bytecomp-package-mode)
-   (dired-mode . dired-async-mode)))
+  (after-init . async-bytecomp-package-mode)
+  (dired-mode . dired-async-mode))
 
 (use-package transient
+  :ensure nil
+  :defer t
+
   :custom
   (transient-levels-file
    (concat hgs-emacs-state-directory "transient/levels.el"))
@@ -2072,6 +2140,9 @@ emacsclient (invalid argument stringp errors)."
    (concat hgs-emacs-state-directory "transient/history.el")))
 
 (use-package pdf-tools
+  :ensure nil
+  :defer t
+
   :magic
   ("%PDF" . pdf-view-mode)
 
@@ -2085,10 +2156,13 @@ emacsclient (invalid argument stringp errors)."
   (pdf-tools-install :no-query)
 
   :custom
-  (pdf-view-display-size 'fit-width "Default to fit-to-width."))
+  (pdf-view-display-size 'fit-width))
 
 (use-package with-editor
-  :init
+  :ensure nil
+  :defer t
+
+  :preface
   (defun hgs--with-editor-export-editor ()
     "Run `with-editor-export-editor' once for each possible editor variable."
     (dolist (var '("EDITOR"
@@ -2097,42 +2171,48 @@ emacsclient (invalid argument stringp errors)."
                    "HG_EDITOR"))
       (with-editor-export-editor var)))
 
-  :commands
-  with-editor-export-editor
-
   :hook
   ((shell-mode term-exec eshell-mode vterm-mode)
    . hgs--with-editor-export-editor)
 
   :bind
   (:map global-map
-        ([remap async-shell-command] . with-editor-async-shell-command)
-        ([remap shell-command] . with-editor-shell-command)))
+        ([remap async-shell-command]
+         ("Async shell command" . with-editor-async-shell-command))
+        ([remap shell-command]
+         ("Shell command" . with-editor-shell-command))))
 
 ;; Trim whitespace on touched lines only automatically when saving
 (use-package ws-butler
+  :ensure nil
+  :defer t
+
   :diminish
   ws-butler-global-mode
   ws-butler-mode
-
-  :commands
-  ws-butler-global-mode
 
   :hook
   ((text-mode prog-mode) . ws-butler-mode)
 
   :custom
-  (ws-butler-keep-whitespace-before-point
-   nil
-   "Delete whitespace before point."))
+  (ws-butler-keep-whitespace-before-point nil))
 
 (use-package expand-region
+  :ensure nil
+  :defer t
+
   :bind
   (:map global-map
-        ("C-=" . er/expand-region)))
+        ("C-=" ("Expand region" . er/expand-region))))
 
 (use-package corfu
-  :init
+  :ensure nil
+  :defer t
+
+  :autoload
+  corfu--extra
+
+  :preface
   (defun hgs-corfu-move-to-minibuffer ()
     "Transfer corfu completion to the minibuffer."
     ;; Corfu hijacks the completion in completion-in-region/at-point capf
@@ -2149,7 +2229,7 @@ emacsclient (invalid argument stringp errors)."
 
   :bind
   (:map corfu-map
-        ("M-m" . hgs-corfu-move-to-minibuffer))
+        ("M-m" ("Transfer to minibuffer" . hgs-corfu-move-to-minibuffer)))
 
   :config
   ;; There is no point in hijacking C-p/n when M-p/n are already used
@@ -2170,68 +2250,73 @@ emacsclient (invalid argument stringp errors)."
 
   :custom
   (corfu-cycle t "Enable cycling through corfu candidate set.")
-  (corfu-auto t "Enable auto-completion.")
+  (corfu-auto t)
   (corfu-auto-delay 0.5 "Delay for auto-complete in seconds.")
   (corfu-auto-prefix 3 "Character prefix length before auto-complete occurs.")
-  (corfu-quit-no-match 'separator "Quit eagerly if no match to avoid popup
-getting in the way.")
-  (corfu-preselect-first nil "Don't preselect a candidate.")
-  (corfu-echo-documentation t "Show documentation of completion in echo area.")
-  (corfu-on-exact-match 'insert "Insert on an exact match.")
+  (corfu-quit-no-match
+   'separator
+   "Quit eagerly if no match to avoid popup getting in the way.")
+  (corfu-preselect-first nil)
+  (corfu-echo-documentation t)
+  (corfu-on-exact-match 'insert)
   (corfu-quit-at-boundary nil "Stay alive even if there is no match.")
   ;; Note: M-SPC is already hijacked under Gnome for some other purpose
   (corfu-separator ?\s "Use M-SPC as the separator.")
   (corfu-preview-current nil "Preview the currently selected candidate.")
-  (corfu-scroll-margin 2 "Show small scroll margin."))
+  (corfu-scroll-margin 2))
 
+;; This is a cool package for providing some good default CAPF backends and
+;; converting company backend to CAPF compatible backends, but at the moment
+;; we don't really need it. We load it anyway. May remove at a later date.
 (use-package cape
-  ;; This is a cool package for providing some good default CAPF backends and
-  ;; converting company backend to CAPF compatible backends, but at the moment
-  ;; we don't really need it. We load it anyway. May remove at a later date.
-  )
+  :disabled t
+  :ensure nil
+  :defer t)
 
-(when hgs-has-dynamic-module-support
-  (use-package tree-sitter
-    :diminish
-    global-tree-sitter-mode
-    tree-sitter-mode
-    tree-sitter-hl-mode
+(use-package tree-sitter
+  :ensure nil
+  :defer t
+  :when hgs-has-dynamic-module-support
 
-    :commands
-    global-tree-sitter-mode
-    tree-sitter-mode
-    tree-sitter-hl-mode
+  :diminish
+  global-tree-sitter-mode
+  tree-sitter-mode
+  tree-sitter-hl-mode
 
-    :hook
-    ;; I would like to just use prog-mode and ignore the message it outputs when
-    ;; there isn't a grammar found, but unfortunately that seems to hang
-    ;; daemonized Emacs. We instead just swallow errors via a proxy function.
-    ;; The alternative is to toggle these per language pair which is not the
-    ;; most ergonomic at scale.
-    ((prog-mode) . hgs--tree-sitter-modes)
+  :commands
+  tree-sitter-hl-mode
 
-    :init
-    (defun hgs--tree-sitter-modes (&optional arg)
-      "Proxy to `tree-sitter-mode' & `tree-sitter-hl-mode' swallowing errors."
-      (let ((debug-on-error nil))
-        (with-demoted-errors "Silenced error: %s"
-          (tree-sitter-mode arg)
-          (tree-sitter-hl-mode arg)))))
+  :hook
+  ;; I would like to just use prog-mode and ignore the message it outputs when
+  ;; there isn't a grammar found, but unfortunately that seems to hang
+  ;; daemonized Emacs. We instead just swallow errors via a proxy function.
+  ;; The alternative is to toggle these per language pair which is not the
+  ;; most ergonomic at scale.
+  ((prog-mode) . hgs--tree-sitter-modes)
 
-  (use-package tree-sitter-langs
+  :preface
+  (defun hgs--tree-sitter-modes (&optional arg)
+    "Proxy to `tree-sitter-mode' & `tree-sitter-hl-mode' swallowing errors."
+    (let ((debug-on-error nil))
+      (with-demoted-errors "Silenced error: %s"
+        (tree-sitter-mode arg)
+        (tree-sitter-hl-mode arg)))))
+
+(use-package tree-sitter-langs
+    :ensure nil
+    :defer t
+    :when hgs-has-dynamic-module-support
+
     :after
-    tree-sitter))
+    (:all tree-sitter))
 
 (use-package yasnippet
+  :ensure nil
+  :defer t
+
   :diminish
   yas-global-mode
   yas-minor-mode
-
-  :commands
-  yas-global-mode
-
-  :functions
-  yas-reload-all
 
   :mode
   (("\\.yasnippet\\'" . snippet-mode)
@@ -2241,7 +2326,7 @@ getting in the way.")
   ((prog-mode text-mode) . yas-minor-mode)
 
   :bind-keymap
-  ("C-c &" . yas-keymap)
+  ("C-c &" ("Yasnippet" . yas-keymap))
 
   :init
   (which-key-add-key-based-replacements
@@ -2258,14 +2343,18 @@ getting in the way.")
    "Where to find snippet definitions."))
 
 (use-package yasnippet-snippets
-  :after yasnippet
+  :ensure nil
+  :defer t
+
+  :after
+  (:all yasnippet)
 
   :config
   (yasnippet-snippets-initialize))
 
 (use-package eglot
-  :commands
-  eglot
+  :ensure nil
+  :defer t
 
   :hook
   ;; Mostly we can get away with using manual invocation where needed
@@ -2278,31 +2367,38 @@ getting in the way.")
         )
 
   :custom
-  (eglot-autoreconnect 3 "Only attempt reconnect to LSP server if the previous
-connection lasted at least N seconds.")
-  (eglot-connect-timeout 30 "Time given before a connection should be considered
-timed-out.")
-  (eglot-sync-connect 3 "Synchronously block UI for only up to N seconds on
-connect.")
-  (eglot-events-buffer-size 2000000 "Maximum number of characters allowed in the
-Eglot events buffer.")
-  (eglot-autoshutdown nil "Don't shutdown LSP servers automatically when there
-are no more using buffers. Prefer `eglot-shutdown'.")
-  (eglot-extend-to-xref nil "Don't transiently consider out-of-project files you
-jump to as part of the current workspace.")
-  (eglot-confirm-server-initiated-edits t "Ask for confirmation when the server
-tries to alter buffers.")
-  (eglot-ignored-server-capabilities
-   '()
-   "List of Eglot capabilities you want to turn off."))
+  (eglot-autoreconnect
+   3
+   "Only attempt reconnect to LSP server if the previous connection lasted at
+least N seconds.")
+  (eglot-connect-timeout
+   30
+   "Time given before a connection should be considered timed-out.")
+  (eglot-sync-connect
+   3
+   "Synchronously block UI for only up to N seconds on connect.")
+  (eglot-events-buffer-size
+   2000000
+   "Maximum number of characters allowed in the Eglot events buffer.")
+  (eglot-autoshutdown
+   nil
+   "Don't shutdown LSP servers automatically when there are no more using
+buffers. Prefer `eglot-shutdown'.")
+  (eglot-extend-to-xref
+   nil
+   "Don't transiently consider out-of-project files you jump to as part of the
+current workspace.")
+  (eglot-confirm-server-initiated-edits
+   t
+   "Ask for confirmation when the server tries to alter buffers.")
+  (eglot-ignored-server-capabilities '()))
 
 (use-package which-key
+  :ensure nil
+  :defer t
+
   :diminish
   which-key-mode
-
-  :commands
-  which-key-add-key-based-replacements
-  which-key-add-major-mode-key-based-replacements
 
   :hook
   ((prog-mode text-mode special-mode) . which-key-mode)
@@ -2312,84 +2408,93 @@ tries to alter buffers.")
 
   :custom
   (which-key-popup-type 'side-window "Use the minibuffer for the key display.")
-  (which-key-side-window-slot 0 "Slot of the side window to use.")
-  (which-key-side-window-location 'bottom "Place on the bottom.")
-  (which-key-sort-order 'which-key-key-order "Use the default sort order.")
+  (which-key-side-window-slot 0)
+  (which-key-side-window-location 'bottom)
+  (which-key-sort-order 'which-key-key-order)
   (which-key-idle-delay 2.0 "How long to wait before offering a guide.")
-  (which-key-max-description-length 27 "Truncate descriptions.")
+  (which-key-max-description-length 27)
   (which-key-add-column-padding 0 "Left padding for key display.")
   (which-key-show-prefix 'bottom "Display currently typed prefix at bottom."))
 
 (use-package transpose-frame
-  :commands
-  flip-frame
-  flop-frame
-  rotate-frame
-  rotate-frame-anticlockwise
+  :ensure nil
+  :defer t
 
   :bind
   (:map global-map
-        ("C-c <up>" . transpose-frame)
-        ("C-c <down>" . rotate-frame-clockwise)))
+        ("C-c <up>" ("Transpose windows" . transpose-frame))
+        ("C-c <down>" ("Rotate windows" . rotate-frame-clockwise))))
 
 (use-package rainbow-delimiters
+  :ensure nil
+  :defer t
+
   :diminish
   rainbow-delimiters-mode
 
   :hook
-  ((prog-mode) . rainbow-delimiters-mode))
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package cmake-mode
-  :mode
-  (("\\(CMakeLists\\.txt\\|\\.cmake\\)\\'" . cmake-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package yaml-mode
-  :mode
-  (("\\(\\.[Yy][Mm][Ll]\\|\\.yaml\\)\\'" . yaml-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package csv-mode
-  :mode
-  (("\\.[Cc][Ss][Vv]\\'" . csv-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package lua-mode
-  :mode
-  (("\\.lua\\'" . lua-mode))
+  :ensure nil
+  :defer t
 
   :custom
-  (lua-indent-level 2 "We prefer to indent in Lua to 2 spaces."))
+  (lua-indent-level 2))
 
 (use-package markdown-mode
+  :ensure nil
+  :defer t
+
   :mode
-  (("README\\.md\\'" . gfm-mode)
-   ("\\(\\.md\\|\\.markdown\\)\\'" . markdown-mode)))
+  ;; We assume we want GFM flavor for readmes
+  ("README\\.md\\'" . gfm-mode))
+
 
 (use-package restclient
-  :mode
-  (("\\.restclient\\'" . restclient-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package string-inflection
-  :commands
+  :ensure nil
+  :defer t
+
+  :autoload
   string-inflection-get-current-word
-  string-inflection-upcase
   string-inflection-upcase-function
   string-inflection-upcase-p
-  string-inflection-capital-underscore
   string-inflection-capital-underscore-function
   string-inflection-capital-underscore-p
-  string-inflection-underscore
   string-inflection-underscore-function
   string-inflection-underscore-p
-  string-inflection-camelcase
   string-inflection-camelcase-function
   string-inflection-camelcase-p
-  string-inflection-pascal-case
   string-inflection-pascal-case-function
   string-inflection-pascal-case-p
-  string-inflection-kebab-case
   string-inflection-kebab-case-function
   string-inflection-kebab-case-p
 
-  :init
+  :commands
+  string-inflection-upcase
+  string-inflection-capital-underscore
+  string-inflection-underscore
+  string-inflection-camelcase
+  string-inflection-pascal-case
+  string-inflection-kebab-case
+
+  :preface
   (defun hgs-restyle-dwim ()
     "Completing read enabled restyling of the specified region or current word.
 Allows for converting the given region between kebab-case,
@@ -2432,91 +2537,97 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
             (insert (funcall action selection))))))))
 
 (use-package editorconfig
+  :ensure nil
+  :defer t
+
   :diminish
   editorconfig-mode
 
   :hook
-  ((prog-mode) . editorconfig-mode))
+  (prog-mode . editorconfig-mode))
 
 (use-package wgrep
+  :ensure nil
+  :defer t
+
   :bind
   (:map grep-mode-map
-        ("C-c C-p" . wgrep-change-to-wgrep))
+        ("C-c C-p" ("Activate wgrep" . wgrep-change-to-wgrep)))
 
   :custom
   (wgrep-enable-key "\C-c\C-p" "Key to make the grep buffer `wgrep' editable.")
   (wgrep-auto-save-buffer
    nil
    "Don't save buffer automatically when `wgrep-finish-edit'.")
-
   (wgrep-change-readonly-file
    nil
    "Don't apply changes regardless of whether the buffer is read-only."))
 
-(when hgs-has-dynamic-module-support
-  (use-package vterm))
+(use-package vterm
+  :ensure nil
+  :defer t
+  :when hgs-has-dynamic-module-support)
 
 (use-package smartparens
+  :ensure nil
+  :defer t
+
   :diminish
   smartparens-mode
   smartparens-strict-mode
   smartparens-global-mode
   smartparens-global-strict-mode
 
-  :commands
-  smartparens-strict-mode
-  smartparens-global-mode
-  smartparens-global-strict-mode
+  :autoload
+  hgs-sp-wrap-pair-prompt
 
   :bind
   (:map smartparens-mode-map
-        ("C-M-k" . sp-kill-sexp)
-        ("C-M-<backspace>" . sp-backward-kill-sexp)
-        ("C-M-f" . sp-forward-sexp)
-        ("C-M-b" . sp-backward-sexp)
-        ("C-M-n" . sp-up-sexp)
-        ("C-M-d" . sp-down-sexp)
-        ("C-M-u" . sp-backward-up-sexp)
-        ("C-M-p" . sp-backward-down-sexp)
-        ("C-M-w" . sp-copy-sexp)
-        ("C-M-s" . sp-splice-sexp)
-        ("C-M-r" . sp-splice-sexp-killing-around)
-        ("C-)" . sp-forward-slurp-sexp)
-        ("C-}" . sp-forward-barf-sexp)
-        ("C-(" . sp-backward-slurp-sexp)
-        ("C-{" . sp-backward-barf-sexp)
-        ("C-M-)" . hgs-sp-wrap-pair-prompt)
-        ("C-M-(" . sp-unwrap-sexp)
-        ("M-S" . sp-split-sexp)
-        ("M-J" . sp-join-sexp)
-        ("C-M-t" . sp-transpose-sexp))
+        ("C-M-k" ("Kill sexp" . sp-kill-sexp))
+        ("C-M-<backspace>" ("Backward kill sexp" . sp-backward-kill-sexp))
+        ("C-M-f" ("Forward sexp" . sp-forward-sexp))
+        ("C-M-b" ("Backward sexp" . sp-backward-sexp))
+        ("C-M-n" ("Up sexp" . sp-up-sexp))
+        ("C-M-d" ("Down sexp" . sp-down-sexp))
+        ("C-M-u" ("Backward up sexp" . sp-backward-up-sexp))
+        ("C-M-p" ("Backward down sexp" . sp-backward-down-sexp))
+        ("C-M-w" ("Copy sexp" . sp-copy-sexp))
+        ("C-M-s" ("Splice sexp" . sp-splice-sexp))
+        ("C-M-r" ("Splice sexp (kill around)" . sp-splice-sexp-killing-around))
+        ("C-)" ("Forward slurp sexp" . sp-forward-slurp-sexp))
+        ("C-}" ("Forward barf sexp" . sp-forward-barf-sexp))
+        ("C-(" ("Backward slurp sexp" . sp-backward-slurp-sexp))
+        ("C-{" ("Backward barf sexp" . sp-backward-barf-sexp))
+        ("C-M-)" ("Wrap pair" . hgs-sp-wrap-pair-prompt))
+        ("C-M-(" ("Unwrap sexp" . sp-unwrap-sexp))
+        ("M-S" ("Split sexp" . sp-split-sexp))
+        ("M-J" ("Join sexp" . sp-join-sexp))
+        ("C-M-t" ("Transpose sexp" . sp-transpose-sexp)))
 
-  :init
+  :config
   (require 'smartparens-config)
   (defun hgs-sp-wrap-pair-prompt (arg)
     "Prompt for a character `ARG' to wrap the selection with as a pair of
 delimiters."
     (interactive "sEnter a pair character: \n")
-    (declare-function sp-wrap-with-pair "smartparens")
     (sp-wrap-with-pair arg))
 
   :hook
-  ((prog-mode . smartparens-mode)))
+  (prog-mode . smartparens-mode))
 
 (use-package dashboard
-  :demand t
-
+  :ensure nil
+  :defer t
   ;; Don't load dashboard if we are launching Emacs with a file argument
-  :if
-  (< (length command-line-args) 2)
+  :when (< (length command-line-args) 2)
 
   :diminish
   dashboard-mode
 
   :hook
-  ((dashboard-mode . page-break-lines-mode))
+  (dashboard-mode . page-break-lines-mode)
 
-  :config
+  :init
   (dashboard-setup-startup-hook)
 
   :custom
@@ -2556,46 +2667,42 @@ text banners, or a path to an image or text file.")
    "Show the dashboard as the initial buffer even for the Emacs client."))
 
 (use-package reformatter
-  :functions
-  ;; Autoload this package when other modes try to define formatters
-  reformatter-define)
+  :ensure nil
+  :defer t)
 
 (use-package undo-fu
-  :defines
-  hgs--undo-prefix-map
+  :ensure nil
+  :defer t
 
   :bind
   (:prefix "C-c u"
            :prefix-map hgs--undo-prefix-map
            :prefix-docstring "Undo commands"
-           ("u" . undo-fu-only-undo)
-           ("r" . undo-fu-only-redo)
-           ("R" . undo-fu-only-redo-all)
-           ("c" . undo-fu-disable-checkpoint))
+           ("u" ("Undo" . undo-fu-only-undo))
+           ("r" ("Redo" . undo-fu-only-redo))
+           ("R" ("Redo all" . undo-fu-only-redo-all))
+           ("c" ("Disable Checkpoint" . undo-fu-disable-checkpoint)))
   (:map global-map
-        ([remap undo] . undo-fu-only-undo)
-        ([remap undo-redo] . undo-fu-only-redo))
+        ([remap undo] ("Undo" . undo-fu-only-undo))
+        ([remap undo-redo] ("Redo" . undo-fu-only-redo)))
 
   :init
   (which-key-add-key-based-replacements
     "C-c u" "Undo")
 
   :custom
-  (undo-fu-allow-undo-in-region
-   nil "Don't allow undo-in-region.")
+  (undo-fu-allow-undo-in-region nil)
   (undo-fu-ignore-keyboard-quit
-   nil "Use C-g for non-linear traversal behavior."))
+   nil
+   "Use C-g for non-linear traversal behavior."))
 
 (use-package undo-fu-session
+  :ensure nil
+  :defer t
+
   :diminish
   global-undo-fu-session-mode
   undo-fu-session-mode
-
-  :commands
-  global-undo-fu-session-mode
-  undo-fu-session-save
-  undo-fu-session-recover
-  undo-fu-session-compression-update
 
   :hook
   ((prog-mode text-mode) . undo-fu-session-mode)
@@ -2604,227 +2711,111 @@ text banners, or a path to an image or text file.")
   (undo-fu-session-incompatible-files
    '("/COMMIT_EDITMSG\\'" "git-rebase-todo\\'")
    "Regexes for files for which to not persist undo state.")
-  (undo-fu-session-incompatible-major-modes
-   nil "List of major modes for which to not persist undo state.")
-  (undo-fu-session-linear nil "Persist a non-linear undo history.")
-  (undo-fu-session-compression 'gz "Use gzip to compress session info.")
-  (undo-fu-session-file-limit
-   nil "Don't limit the number of persisted state files.")
+  (undo-fu-session-incompatible-major-modes nil)
+  (undo-fu-session-linear nil)
+  (undo-fu-session-compression 'gz)
+  (undo-fu-session-file-limit nil)
   (undo-fu-session-directory
-   (concat hgs-emacs-state-directory "undo-fu/session")
-   "Put persisted undo state in the state directory."))
+   (concat hgs-emacs-state-directory "undo-fu/session")))
 
 (use-package vundo
+  :ensure nil
+  :defer t
+
   :bind
   (:map hgs--undo-prefix-map
-        ("v" . vundo)))
+        ("v" ("Vundo" . vundo))))
 
 (use-package project
-  :demand t
+  :ensure nil
+  :defer t
+
+  :autoload
+  project-root
 
   :config
   (make-directory (file-name-directory project-list-file) t)
 
   :custom
   (project-list-file
-   (concat hgs-emacs-state-directory "project/list.el")
-   "Where to cache known projects.")
-  (project-switch-use-entire-map t "Use entire `project-prefix-map' as a basis
-for project switch command dispatch."))
+   (concat hgs-emacs-state-directory "project/list.el"))
+  (project-switch-use-entire-map
+   t
+   "Use entire `project-prefix-map' as a basis for project switch command
+dispatch."))
 
 (use-package embark-consult
-  :after
-  embark
-  consult
-
+  :ensure nil
   ;; This package is needed by default to integrate embark actions with consult
   ;; commands properly (for example, consult-buffer's items won't have
   ;; appropriate actions without it). The hook/command prevents loading this
   ;; immediately, so we must demand it.
   :demand t
 
+  :after
+  (:all embark consult)
+
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package json-mode
-  :mode
-  (("\\.json\\'" . json-mode)))
+  :ensure nil
+  :defer t)
 
 (use-package flycheck
+  :ensure nil
+  :defer t
+
+  :diminish
+  flycheck-mode
+
   :bind-keymap
   ("C-c !" . flycheck-keymap-prefix)
 
-  :hook
-  ((prog-mode) . flycheck-mode)
-
   :init
   (which-key-add-key-based-replacements
-    "C-c !" "Flycheck"))
+    "C-c !" "Flycheck")
+
+  :hook
+  (prog-mode . flycheck-mode))
 
 (use-package magit
-  :after
-  transient
-  with-editor
+  :ensure nil
+  :defer t
 
-  :commands
-  magit-blame
-  magit-stage
-  magit-unstage
-  magit-pull
-  magit-push
-  magit-clone
-  magit-reset
-  magit-fetch
-  magit-reflog
-  magit-commit
-  magit-revert
-  magit-stash
+  :after
+  (:all transient with-editor)
 
   :bind
   (:map global-map
-        ("C-x g" . magit-status)
-        ("C-x M-g" . magit-dispatch))
+        ("C-x g" ("Magit status" . magit-status))
+        ("C-x M-g" ("Magit dispatch" . magit-dispatch)))
 
   :custom
-  (magit-bind-magit-project-status t "Add magit project status to the project.el
-switch list."))
+  (magit-bind-magit-project-status
+   t
+   "Add magit project status to the project.el switch list."))
 
 (use-package consult-flycheck
+  :ensure nil
+  :defer t
+
   :after
-  consult
-  flycheck
+  (:all consult flycheck)
 
   :bind
   (:map flycheck-command-map
-        ("!" . consult-flycheck)))
-
-(use-package treemacs
-  :commands
-  treemacs-git-mode
-  treemacs-fringe-indicator-mode
-
-  :hook
-  ((treemacs-mode) . treemacs-follow-mode)
-  ((treemacs-mode) . treemacs-filewatch-mode)
-  ((treemacs-mode) . hgs--treemacs-fringe-indicator-mode)
-  ((treemacs-mode) . hgs--treemacs-git-mode)
-
-  :bind
-  (:prefix "C-c t"
-           :prefix-map hgs--treemacs-prefix-map
-           :prefix-docstring "Treemacs commands"
-           ("t" . treemacs)
-           ("g" . treemacs-select-window)
-           ("1" . treemacs-delete-other-windows)
-           ("B" . treemacs-bookmark)
-           ("f" . treemacs-find-file)
-           ("T" . treemacs-find-tag))
-
-  :init
-  (defun hgs--treemacs-fringe-indicator-mode ()
-    (treemacs-fringe-indicator-mode 'always))
-  (defun hgs--treemacs-git-mode ()
-    (unless (null (executable-find "git"))
-      (if (null treemacs-python-executable)
-          (treemacs-git-mode 'simple)
-        (treemacs-git-mode 'deferred))))
-
-  ;; Force treemacs toggling to *not* focus the treemacs window
-  (define-advice treemacs
-      (:around (orig-fn &rest args) treemacs-no-select)
-    (save-selected-window
-      (apply orig-fn args)))
-
-  (which-key-add-key-based-replacements
-    "C-c t" "Treemacs")
-
-  :config
-  ;;(treemacs-resize-icons 44) ; Doubles icon size for Hi-DPI
-
-  :custom
-  (treemacs-persist-file
-   (concat hgs-emacs-cache-directory "treemacs/persist.org")
-   "Place Treemacs persistence file in the cache.")
-  (treemacs-last-error-persist-file
-   (concat hgs-emacs-cache-directory "persist-last-error.org"))
-  (treemacs-sorting 'alphabetic-asc "Sort entries by alphabetical ordering.")
-  (treemacs-position 'left "Put the Treemacs window on the left.")
-  (treemacs-display-in-side-window
-   t
-   "Put the Treemacs window in a side window.")
-  (treemacs-width 35 "Width of the Treemacs window as a percentage.")
-  (treemacs-is-never-other-window nil "Should be selectable via other window.")
-  (treemacs-no-delete-other-windows
-   t
-   "Don't delete when running delete other windows.")
-  (treemacs-eldoc-display t "Show eldoc.")
-  (treemacs-show-hidden-files t "Show hidden files in Treemacs.")
-  (treemacs-follow-after-init t "Don't follow after initialization.")
-  (treemacs-directory-name-transformer
-   #'identity
-   "Function to use for transforming directory names.")
-  (treemacs-file-event-delay 5000 "Delay between monitoring for file events.")
-  (treemacs-file-follow-delay 0.2 "Delay between following files.")
-  (treemacs-tag-follow-delay 1.5 "Delay between following tags.")
-  (treemacs-deferred-git-apply-delay
-   0.5
-   "Delay before running git for updates.")
-  (treemacs-max-git-entries 5000 "Cap out the number of Git entries.")
-  (treemacs-goto-tag-strategy
-   'refetch-index
-   "Strategy to use for jumping to tag.")
-  (treemacs-indentation 2 "Set Treemacs indentation amount.")
-  (treemacs-indentation-string " " "String to use for Treemacs indentation.")
-  (treemacs-missing-project-action 'ask "Prompt when missing project.")
-  (treemacs-file-extension-regex
-   treemacs-last-period-regex-value
-   "Regex to use to match file extension.")
-  (treemacs-read-string-input 'from-child-frame "Use child frame for input.")
-  (treemacs-show-cursor nil "Don't show the cursor in the Treemacs window.")
-  (treemacs-silent-filewatch nil "Watch files loudly.")
-  (treemacs-silent-refresh nil "Refresh Treemacs loudly.")
-  (treemacs-space-between-root-nodes t "Add space between root nodes.")
-  (treemacs-user-mode-line-format nil "Don't format.")
-  (treemacs-user-header-line-format nil "Don't format.")
-  (treemacs-workspace-switch-cleanup nil "Don't cleanup on workspace switch")
-  (treemacs-tag-follow-cleanup t "Cleanup when following a tag.")
-  (treemacs-project-follow-cleanup
-   nil
-   "Don't cleanup when following project switch")
-  (treemacs-recenter-distance 0.1 "Amount to recenter.")
-  (treemacs-recenter-after-file-follow nil "Don't recenter.")
-  (treemacs-recenter-after-tag-follow nil "Don't recenter.")
-  (treemacs-recenter-after-project-jump 'always "Always recenter.")
-  (treemacs-recenter-after-project-expand 'on-distance "Sometimes recenter.")
-  (treemacs-move-forward-on-expand
-   nil
-   "Don't move selection forward on expansion.")
-  (treemacs-no-png-images nil "Use PNG images if available."))
-
-(use-package treemacs-magit
-  :after
-  treemacs
-  magit)
-
-(use-package treemacs-all-the-icons
-  :after
-  treemacs
-  all-the-icons)
-
-(use-package treemacs-icons-dired
-  :after
-  treemacs
-  dired
-
-  :hook
-  ((dired-mode) . treemacs-icons-dired-mode))
+        ("!" ("Flycheck" . consult-flycheck))))
 
 (use-package docker
+  :ensure nil
+  :defer t
+
   :bind
   (:map global-map
-        ("C-c D" . docker))
+        ("C-c D" ("Docker" . docker)))
 
-  :init
+  :config
   (defun hgs-toggle-docker-as-root ()
     "Toggle whether to run Docker as root on/off."
     (interactive)
@@ -2834,29 +2825,24 @@ switch list."))
       (setq docker-run-as-root nil))))
 
 (use-package doom-modeline
-  :demand t
+  :ensure nil
+  :defer t
 
-  ;; N.B Having all-the-icons marked as a dependency causes this to refuse to
-  ;; properly setup hooks
-  ;;
   ;; :after
-  ;; all-the-icons
+  ;; (:all all-the-icons)
 
-  :init
+  :preface
   (defun hgs--enable-doom-modeline (&optional frame)
     (message "Enabling doom modeline!")
     (doom-modeline-mode +1))
 
-  ;; We utilize frame creation hooks for force enabling the doom modeline
-  ;; package
   :hook
-  ((hgs-frame-customization) . hgs--enable-doom-modeline))
-
-(use-package erc-hl-nicks
-  :after
-  erc)
+  (hgs-frame-customization . hgs--enable-doom-modeline))
 
 (use-package message
+  :ensure nil
+  :defer t
+
   :custom
   (message-fill-column 72 "Use sensible wrapping for plain-text emails.")
   (message-send-mail-function
@@ -2864,16 +2850,17 @@ switch list."))
    "Query for mail send function on first use (NOTE: Only queries if
 `smtpmail-send-it' would require configuration).")
   (message-sendmail-envelope-from
-   'header "Derive envelope from via outgoing mail headers for sendmail.")
-  (message-directory
-   (concat hgs-data-directory "mail") "Base directory for all core mail paths.")
+   'header
+   "Derive envelope from via outgoing mail headers for sendmail.")
+  (message-directory (concat hgs-data-directory "mail"))
   (message-auto-save-directory
-   (concat hgs-emacs-state-directory "message/drafts")
-   "Where to place draft messages")
-  (message-default-mail-headers
-   "Cc: \n" "Add CC header to new mail by default."))
+   (concat hgs-emacs-state-directory "message/drafts"))
+  (message-default-mail-headers "Cc: \n"))
 
 (use-package smtpmail
+  :ensure nil
+  :defer t
+
   :custom
   (smtpmail-local-domain
    (if (>= emacs-major-version 25)
@@ -2883,32 +2870,37 @@ switch list."))
 hostname after emacs 25."))
 
 (use-package mail-source
+  :ensure nil
+  :defer t
+
   :custom
   (mail-source-directory
    (concat hgs-data-directory "mail")
    "We don't use this, but point it at a sensible mail directory anyway."))
 
 (use-package sendmail
+  :ensure nil
+  :defer t
+
   :custom
   (mail-default-directory
-   (concat hgs-emacs-state-directory "sendmail/auto-save")
-   "Put mail auto-saves in the state directory")
+   (concat hgs-emacs-state-directory "sendmail/auto-save"))
   (mail-specify-envelope-from t "Specify envelope from to the specified MUA.")
   (mail-envelope-from
-   'header "Derive envelope from via outgoing mail headers."))
+   'header
+   "Derive envelope from via outgoing mail headers."))
 
 ;; Mail templating
 (use-package message-templ
-  :defines
-  message-templ-alist
-  message-templ-config-alist
+  :ensure nil
+  :defer t
 
-  :functions
+  :autoload
   message-templ-apply
 
   :bind
   (:map message-mode-map
-        ("C-c s" . message-templ-select))
+        ("C-c s" ("Select template" . message-templ-select)))
 
   :custom
 ;;   Example of Multiple Account Handling:
@@ -2924,14 +2916,17 @@ hostname after emacs 25."))
 ;;      ("X-Message-SMTP-Method" . "smtp smtp.server.com 587 me@email.com")))
 ;;   "Alist for defining named mail templates.")
   (message-templ-alist
-   '() "Define empty defaults for mail templates.")
+   '()
+   "Define empty defaults for mail templates.")
   (message-templ-config-alist
-   '() "Define empty defaults for automatically applying templates to mail."))
+   '()
+   "Define empty defaults for automatically applying templates to mail."))
 
 (use-package notmuch
-  :init
-  (require 'cl-lib)
-  (require 'rx)
+  :ensure nil
+  :defer t
+
+  :preface
   (defun hgs--notmuch-list-profiles-by-filesystem (&optional config-directory)
     "Infers list of profiles using directories available in `CONFIG-DIRECTORY'.
 If no `CONFIG-DIRECTORY' is provided, a reasonable default is
@@ -2980,10 +2975,16 @@ structured Notmuch configuration directory."
     :type 'function
     :group 'personal)
 
+  :bind
+  (:map notmuch-hello-mode-map
+        ("C-c M-p" ("Change profile" . hgs-notmuch-change-profile)))
+  (:map notmuch-show-part-map
+        ("d" ("Show as patch" . hgs--notmuch-show-view-as-patch)))
+
+  :config
   (defun hgs--notmuch-show-view-as-patch ()
     "View the the current message as a patch via `DIFF-MODE'."
     (interactive)
-    (require 'notmuch-lib)
     (let* ((id (notmuch-show-get-message-id))
            (msg (notmuch-show-get-message-properties))
            (part (notmuch-show-get-part-properties))
@@ -3003,17 +3004,9 @@ structured Notmuch configuration directory."
         (add-to-list 'minor-mode-overriding-map-alist new-ro-bind))
       (goto-char (point-min))))
 
-  :bind
-  (:map notmuch-hello-mode-map
-        ("C-c M-p" . hgs-notmuch-change-profile))
-  (:map notmuch-show-part-map
-        ("d" . hgs--notmuch-show-view-as-patch))
-
-  :config
   (defun hgs-notmuch-change-profile (&optional)
     "Select from available Notmuch profiles to use."
     (interactive)
-    (declare-function hgs-notmuch-list-profiles "core-config")
     (let ((profile-env-var "NOTMUCH_PROFILE")
           (new-profile
            (completing-read "Select Notmuch profile: "
@@ -3026,13 +3019,10 @@ structured Notmuch configuration directory."
    (concat hgs-emacs-config-directory "notmuch/init")
    "The Notmuch elisp init variable must not have a suffix, but the real file
 should.")
-  (notmuch-address-command
-   'internal "Use `notmuch address' for address completion.")
+  (notmuch-address-command 'internal)
   (notmuch-address-save-filename
-   (concat hgs-emacs-cache-directory "notmuch/addresses")
-   "Cache file for notmuch completed addresses.")
-  (notmuch-crypto-process-mime
-   t "Read & verify encrypted/signed mime messages.")
+   (concat hgs-emacs-cache-directory "notmuch/addresses"))
+  (notmuch-crypto-process-mime t)
   (notmuch-saved-searches
    '((:name "inbox"
             :query "tag:inbox"
@@ -3054,19 +3044,16 @@ should.")
             :key "m")
      (:name "all mail"
             :query "not (tag:draft or tag:sent or tag:trash or tag:spam)"
-            :key "a"))
-   "Saved searches accessible via jump table."))
+            :key "a"))))
 
 ;; Simple tabulated list UI package for different types of daemons on a linux
 ;; system
 (use-package daemons
-  :commands
-  daemons
+  :ensure nil
+  :defer t
 
   :custom
   (daemons-always-sudo nil "Don't always sudo on daemon commands")
-  ;; This is a poor interface really. We have to change the variable to enter
-  ;; system mode
   (daemons-systemd-is-user t "Run systemd commands in user mode"))
 
 (provide 'core-config)

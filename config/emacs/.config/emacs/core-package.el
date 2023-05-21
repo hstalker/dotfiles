@@ -413,26 +413,6 @@
        :host github
        :repo "minad/consult-flycheck"))
     (straight-use-package
-     '(treemacs
-       :type git
-       :host github
-       :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
-     '(treemacs-magit
-       :type git
-       :host github
-       :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
-     '(treemacs-all-the-icons
-       :type git
-       :host github
-       :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
-     '(treemacs-icons-dired
-       :type git
-       :host github
-       :repo "Alexander-Miller/treemacs"))
-    (straight-use-package
      '(docker
        :type git
        :host github

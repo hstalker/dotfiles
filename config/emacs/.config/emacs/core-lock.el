@@ -87,7 +87,6 @@
  ("transient" . "0ae0de43590b5b6984a83f9e044e7c426455ac6e")
  ("transpose-frame" . "94c87794d53883a2358d13da264ad8dab9a52daa")
  ("tree-sitter-langs" . "ffe9ab0c8ec9e37e70e31d296df3b85bcfc73c5e")
- ("treemacs" . "a20d49ed62fa64a4164a9a3f25c102ec0a338367")
  ("undo-fu" . "0e22308de8337a9291ddd589edae167d458fbe77")
  ("undo-fu-session" . "7b3fd0647dd1fbd02101eec61440e6d44953bcd9")
  ("use-package" . "77945e002f11440eae72d8730d3de218163d551e")
