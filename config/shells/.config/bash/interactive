@@ -6,36 +6,67 @@ require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 ###############################################################################
 # Setup environment variables
 
-# Colors and PS1 setup - for now this is largely shared between shells
-# Tramp and other dumb terminals require a more ordinary prompt
-if [ "$TERM" = "dumb" ]; then
-    PS1="$ "
-else
-  if [ $(id -u) -eq 0 ]; then
-    # Special root PS1 colors
-    color_shell="$(text_fg_color 10)"
-    color_path="$(text_fg_color 10)"
-    color_git="$(text_fg_color 10)"
-    color_separator="$(text_fg_color cyan)"
-    color_reset="$(text_reset)"
-  else
-    # PS1 for other users
-    color_shell="$(text_fg_color 10)"
-    color_path="$(text_fg_color red)"
-    color_git="$(text_fg_color blue)"
-    color_separator="$(text_fg_color cyan)"
-    color_reset="$(text_reset)"
-  fi
+# Colors and PS1 setup - for now this is largely shared between shells.
+# Bash sets up the PS variables by running this function prior to prompting.
+function __prompt_command () {
+  local last_exit_code="$?"
 
-  # We escape the lengths of the colors via \[\] here rather than the color
-  # definitions above, as Bash seems to struggle if we don't
-  PS1="\[$(text_reset)\]\[${color_shell}\][\$(whoami)@\$(hostname):bash]"
-  PS1+="\[${color_path}\]<\$(basename \"\${PWD}\")/>" # Path
-  PS1+="\[${color_git}\]\$(get_vcs_branch)" # VCS branch
-  PS1+="\[${color_separator}\]λ " # Separator
-  PS1+="\[${color_reset}\]" # Color back to normal
-  unset color_shell color_path color_git color_separator color_reset
-fi
+  # Tramp and other dumb terminals require a more simple prompt
+  if [ "$TERM" = "dumb" ]; then
+    PS1="$ "
+    PS2='> '
+    PS3='#? '
+    PS4='+ '
+  else
+    if [ $(id -u) -eq 0 ]; then
+      # Root prompt colors
+      local fg_shell="$(text_fg_color 10)"
+      local fg_path="$(text_fg_color 10)"
+      local fg_git="$(text_fg_color 10)"
+      local fg_exit="$(text_fg_color 10)"
+      local fg_jobs="$(text_fg_color 10)"
+      local fg_depth="$(text_fg_color 10)"
+      local fg_separator="$(text_fg_color cyan)"
+    else
+      local fg_shell="$(text_fg_color 10)"
+      local fg_path="$(text_fg_color red)"
+      local fg_git="$(text_fg_color blue)"
+      local fg_exit="$(text_fg_color blue)"
+      local fg_jobs="$(text_fg_color blue)"
+      local fg_depth="$(text_fg_color blue)"
+      local fg_separator="$(text_fg_color cyan)"
+    fi
+    local color_reset="$(text_reset)"
+
+    local working_directory="$(basename "${PWD}")/"
+    local vcs_branch="$(get_vcs_branch)"
+
+    # We escape the lengths of the colors via \[\] here rather than the color
+    # definitions above, as Bash seems to struggle if we don't.
+
+    # User, hostname and shell-type
+    PS1="\[${color_reset}\]\[${fg_shell}\][\u@\h:\s]"
+    # Clipped working directory
+    PS1+="\[${fg_path}\]<${working_directory}>"
+    # VCS branch
+    PS1+="\[${fg_git}\]${vcs_branch} "
+    # Last exit code
+    PS1+="\[${fg_exit}\]{EXIT: ${last_exit_code}} "
+    # Running jobs
+    PS1+="\[${fg_jobs}\]{JOBS: \j} "
+    # Shell depth
+    PS1+="\[${fg_depth}\]{DEPTH: ${SHLVL}} "
+    # Final separator - we place on a new-line to more clearly delineate
+    # between inputs
+    PS1+="\n\[${fg_separator}\]λ "
+    PS1+="\[${color_reset}\]"
+
+    PS2="${fg_separator}> ${color_reset}"
+    PS3="${fg_separator}#? ${color_reset}"
+    PS4="${fg_separator}+ ${color_reset}"
+  fi
+}
+PROMPT_COMMAND="__prompt_command"
 
 # Place the history in state
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/bash/history"
