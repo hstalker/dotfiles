@@ -1718,18 +1718,11 @@ to point."))
 
 (use-package all-the-icons
   :ensure nil
-  :demand t
+  :demand t)
 
-  :preface
-  (defun hgs--setup-all-the-icons ()
-    "Try to automatically install the fonts if they appear missing."
-    (when (and (not (member "all-the-icons" (font-family-list)))
-               (not (daemonp))
-               (window-system))
-      (all-the-icons-install-fonts t)))
-
-  :config
-  (hgs--setup-all-the-icons))
+(use-package nerd-icons
+  :ensure nil
+  :demand t)
 
 (use-package org-bullets
   :ensure nil
@@ -2114,6 +2107,12 @@ emacsclient (invalid argument stringp errors)."
   (solarized-scale-org-headlines
    nil
    "Don't change the size of org-mode headlines."))
+
+;; Handy package for colourizing following the code's inherent tree structure.
+;; Extremely useful for structured content
+(use-package prism
+  :ensure nil
+  :defer t)
 
 (use-package async
   :ensure nil
@@ -2828,8 +2827,8 @@ dispatch."))
   :ensure nil
   :defer t
 
-  ;; :after
-  ;; (:all all-the-icons)
+  :after
+  (:all nerd-icons)
 
   :preface
   (defun hgs--enable-doom-modeline (&optional frame)

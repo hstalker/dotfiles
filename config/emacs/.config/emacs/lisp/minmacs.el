@@ -27,6 +27,10 @@ wrappers."
      :type git
      :local-repo "nongnu-elpa"
      :repo "https://git.savannah.gnu.org/git/emacs/nongnu.git"
+     ;; Non-GNU ELPA has some insane behavior wrt branching where using the
+     ;; default causes massive Git repo downloads. Doing this forces minimal
+     ;; data to be fetched.
+     :depth (full single-branch)
      :no-build t)
     (gnu-elpa-mirror
      :type git

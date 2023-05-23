@@ -193,6 +193,11 @@
        :host github
        :repo "domtronn/all-the-icons.el"))
     (straight-use-package
+     '(nerd-icons
+       :type git
+       :host github
+       :repo "rainstormstudio/nerd-icons.el"))
+    (straight-use-package
      '(reformatter
        :type git
        :host github
@@ -252,6 +257,11 @@
        :type git
        :host github
        :repo "bbatsov/solarized-emacs"))
+    (straight-use-package
+     '(prism
+       :type git
+       :host github
+       :repo "alphapapa/prism.el"))
     (straight-use-package
      '(async
        :type git
