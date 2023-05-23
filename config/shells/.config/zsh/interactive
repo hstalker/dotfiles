@@ -9,6 +9,9 @@ require_source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/interactive"
 # Tramp and other dumb terminals require a more ordinary prompt
 if [ "$TERM" = "dumb" ]; then
     PS1="$ "
+    PS2='> '
+    PS3='#? '
+    PS4='+ '
 else
   autoload -U colors && colors
   setopt prompt_subst
@@ -24,10 +27,13 @@ else
       echo "${vcs_info_msg_0_}%{$reset_color%}"
     fi
   }
-  PROMPT='[%n@%m:zsh]' # [$HOST@$USER:zsh]
-  PROMPT+='%{$fg[red]%}<%1~/>%{$reset_color%}' # CWD depth 1
+  PROMPT='%{$fg[green]%}[%n@%m:zsh]%{$reset_color%}' # [$HOST@$USER:zsh]
+  PROMPT+='%{$fg[red]%}<%1/>%{$reset_color%}' # CWD depth 1
   PROMPT+='$(vcs_info_wrapper)' # Print VCS info
   PROMPT+='%{$fg[cyan]%}λ %{$reset_color%}' # Prompt separator
+  PS2='%{$fg[cyan]%}> %{$reset_color%}'
+  PS3='%{$fg[cyan]%}#? %{$reset_color%}'
+  PS4='%{$fg[cyan]%}+ %{$reset_color%}'
 fi
 
 zmodload zsh/zle

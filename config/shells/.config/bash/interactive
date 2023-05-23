@@ -60,7 +60,6 @@ function __prompt_command () {
     # between inputs
     PS1+="\n\[${fg_separator}\]λ "
     PS1+="\[${color_reset}\]"
-
     PS2="${fg_separator}> ${color_reset}"
     PS3="${fg_separator}#? ${color_reset}"
     PS4="${fg_separator}+ ${color_reset}"
