@@ -934,7 +934,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 `eshell-prompt-function' must be set to this to be activated."
     (require 'subr-x)
     (require 'vc-git)
-    (let ((path (file-name-nondirectory (eshell/pwd))))
+    (let ((path (file-name-nondirectory (expand-file-name (eshell/pwd)))))
       (concat
        (format (propertize "[%s:%s]")
                (propertize user-login-name 'face '(:inherit eshell-prompt))
@@ -945,7 +945,10 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
                                (car (vc-git-branches)))))
          (format (propertize "(%s)" 'face '(:foreground "blue"))
                  branch))
-       (propertize "λ" 'face '(:foreground "teal"))
+       (propertize (if (zerop (user-uid))
+                       "#"
+                     "λ")
+                   'face '(:foreground "teal"))
        " ")))
 
   :custom
@@ -961,7 +964,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   (eshell-history-size 5000)
   (eshell-plain-echo-behavior t "Make `echo' imitate shell echo.")
   (eshell-prompt-function #'hgs--eshell-prompt-function)
-  (eshell-prompt-regexp ".+^λ " "Tell Emacs how to find prompts in the buffer.")
+  (eshell-prompt-regexp "^.+\\(#\\|λ\\) " "Tell Emacs how to find prompts in the buffer.")
   (eshell-scroll-to-bottom-on-input 'this)
   (eshell-scroll-to-bottom-on-output nil))
 
