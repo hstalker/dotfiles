@@ -1467,7 +1467,7 @@ information.")
    (concat hgs-org-directory "archive/%s::datetree/")
    "Place archivals into an organized datetree in an archive sub-directory.")
   (org-refile-targets
-   '((nil : maxlevel . 9)
+   '((nil :maxlevel . 9)
      (org-agenda-files :maxlevel . 9))
    "Allow us to refile to all Org files in the agenda and current buffer to an
 arbitrary depth.")
