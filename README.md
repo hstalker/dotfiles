@@ -27,31 +27,8 @@ The aim is to:
 * Be modular. Configuration for individual applications should be as separate
   as possible, and one application should still work (to some extent) without
   another piece of configuration.
-* Follow XDG layout where possible, even if that requires forcing applications
-  to do so via hackery.
-* Prefer commonly available tools where possible. We have no pretense of
-  supporting non-Linux platforms, but at the very least we should try.
-  Modularity should help.
-* Be highly customizable at a per-machine level. This means providing
-  consistent and simple override points such as many potentially broken aspects
-  in the base layer can be turned off, and extra environment specific
-  functionality can be shoehorned in, as reasonably possible (Things which are
-  fundamentally broken should be fixed in the base layer, but local overrides
-  should allow for stop-gap measures).
-* Be reproducible. Wherever possible, and whenever external packages/plugins
-  are needed, we must make it reproducible across both time and platform. This
-  should be done via mechanisms such as package pinning to commit etc.
-* Allow theming to be somewhat separate from application configuration (i.e.
-  allow theming to be drop-in and reasonably globally consistent).
-
-Unfortunately I require the ability to stow or symlink configuration files on
-various Linux distros, so my dotfiles themselves are kept in a form making that
-easy. If the requirement of supporting other distros
-(and shells for that matter) could be dropped, it is likely that this could be
-made considerably simpler, alas the world isn't so simple.
-
-## Future Goals
-* None currently
+* Follow XDG layout where possible.
+* Be as simple as possible without impeding the modularity.
 
 ## Prerequisites
 * Git (to clone this repo somewhere local).
@@ -142,17 +119,21 @@ structure will look like:
 
 * `$TARGET/` - Usually `$HOME`
   * `.*` - Unfortunately loads of tools still don't support XDG standards
-  * `.local/` - Recommended place to put custom scripts & `make install`
-    results
-    * `{bin,lib,include,etc}/`
-    * `share/` - Where non-ephemeral data should be placed
-  * `.config/` - Where static configuration scripts should be put
+  * `.cache/` - Ephemeral cache files that can be regenerated
+  * `.config/` - Static configuration scripts
     * `$APPLICATION/`
-      * `.{env,login,interactive,logout}`
       * `$CONFIG_FILES`
-  * `.cache/` - Where files that can be regenerated are placed (ephemeral data)
-    * `$APPLICATION/`
-      * `$CACHE_FILES`
+    * `environment.d/` - Specify environment variables
+      * `NN-XXXX.conf` - Loaded in alphanumeric order by systemd & shells
+    * `shell/`
+      * `modules` - Custom per-app shell configuration (aliases etc.)
+          * `{env,login,interactive,logout}/`
+            * `NN-XXXX.sh` - Loaded in alphanumeric order by shells
+  * `.local/` - Recommended per-user install prefix
+    results
+    * `{bin,lib,include, ...}/`
+    * `share/` - Persistent, portable user data
+    * `state/` - Semi-persistent, non-portable application state data
 
 ## Theming
 We attempt to keep a global theme set via theme customization using a themes
@@ -333,53 +314,41 @@ Emacs should setup default plugins via git and built-in web capabilities, and
 then configure itself when first run.
 
 #### Overview
-The Emacs configuration is split into two layers: A core layer and an optional
-set of mirroring override points.
-
 The current load order of these scripts is as follows:
-* `$HOME/.emacs` (On older systems - deprecated - forwards to below)
 * `$XDG_CONFIG_HOME/emacs/early-init.el` (On newer systems)
 * `$XDG_CONFIG_HOME/emacs/init.el`
-* `$XDG_CONFIG_HOME/emacs/core-package.el` and
-  `$XDG_CONFIG_HOME/emacs/core-lock.el` for package versions.
-* `$XDG_CONFIG_HOME/emacs/custom-package.el` (If available) and
-  `$XDG_CONFIG_HOME/emacs/custom-lock.el` for package versions.
-* `$XDG_CONFIG_HOME/emacs/core-config.el`
-* `$XDG_CONFIG_HOME/emacs/custom-config.el` (If available)
-* `$XDG_CONFIG_HOME/emacs/custom-customization.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/init-local.el` (If available)
+* `$XDG_CONFIG_HOME/emacs/customization.el` (If available)
+
+Work is in progress to modularize the configuration functionality further.
 
 #### General Configuration
 Per-install configuration overrides should be placed in
-`$XDG_CONFIG_HOME/emacs/custom-config.el`. This is where you should place all
-machine-local customizations that are *not* package declarations (this means
-use-package blocks for said packages *is* fair game here).
+`$XDG_CONFIG_HOME/emacs/init-local.el`. This is where you should place all
+machine-local customizations. If you need to fix functionality for multiple
+install targets, prefer to make the core upstream configuration more flexible
+rather than add to this file; it should be as small as possible.
 
 #### Package Configuration
-Local machine package additions and overrides (not general configuration)
-should be placed in `$XDG_CONFIG_HOME/emacs/custom-package.el`. The allowed
-operations are:
+We currently use straight to get Git-based package management with automatic
+lock-file support. Elpaca will be under evaluation once they add support for
+lock-files.
 * `(straight-use-package '(PACKAGE-NAME ...RECIPE...)`
 
 It should be preferred that all packages are managed via explicit recipes as
 opposed to using straight's automatic features in order to be fully
-reproducible. This should also be done for transitive dependencies. Pinning
-should be fully managed via straight's versioning functions (e.g.
-`straight-fetch-all`, `straight-freeze-versions` and `straight-thaw-versions`.
+reproducible. Pinning should be fully managed via straight's versioning
+functions (e.g. `straight-fetch-all`, `straight-freeze-versions` and
+`straight-thaw-versions`.
 
-All custom package specifications should be done under the `'custom` straight
-profile (i.e. `straight-current-profile` should be set to `'custom`).
-
-Local machine configuration additions (including configuration for packages
-declared in custom-package.el) should be placed in
-`$XDG_CONFIG_HOME/emacs/custom-config.el`. The provided operations are:
+Configuration is done via `use-package` or Emacs built-ins depending on what
+makes sense.
 * `(use-package PACKAGE-NAME ...CONFIGURATION-BODY...)`, where this follows
-  typical third-party use-package usage.
+  typical use-package usage.
 
-With `use-package`, we prefer to be as explicit as possible, and to design under
-the assumption that any package can be lazily loaded (which may not happen in
-practice due to inter-package dependencies, but the `use-package` blocks should
-be written with that in mind). We also prefer hooks + buffer-local modes to
-global modes in almost all cases.
+With `use-package`, we prefer to be as explicit about load order as possible.
+One of `:demand` or `:defer` should always be specified. We always `:ensure
+nil`.
 
 We provide three core hooks taking the frame being created for customizing frame
 appearance:
@@ -389,7 +358,7 @@ appearance:
  * `hgs-frame-customization-tui-hook`, which is run only for terminal Emacs.
 
 Typically our core emacs functions for configuration are prefixed by either
-`hgs-` or `minmacs-`.
+`hgs-`.
 
 ---
 

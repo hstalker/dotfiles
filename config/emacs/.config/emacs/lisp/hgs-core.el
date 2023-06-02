@@ -13,7 +13,8 @@
   :version "26.1")
 
 (defconst hgs-has-dynamic-module-support
-  (and (functionp 'module-load) (not (null module-file-suffix))))
+  (and (functionp 'module-load)
+       (not (null module-file-suffix))))
 
 (defconst hgs-is-mac (eq system-type 'darwin))
 (defconst hgs-is-linux (eq system-type 'gnu/linux))
@@ -110,31 +111,38 @@
   :type 'directory
   :group 'personal)
 
-(defcustom hgs-frame-customization-hook '()
-  "Hook called when customizing the frame appearance of any Emacs. Takes
-the frame being created as an argument."
+(defcustom hgs-frame-customization-hook
+  '()
+  "Customizes the frame appearance of any Emacs.
+These hook function take the frame being created as an argument."
   :type 'hook
   :group 'personal)
 
-(defcustom hgs-frame-customization-tui-hook '()
-  "Hook called when customizing the frame appearance of terminal Emacs. Takes
-the frame being created as an argument."
+(defcustom hgs-frame-customization-tui-hook
+  '()
+  "Customizes the frame appearance of terminal Emacs.
+These hook function take the frame being created as an argument."
   :type 'hook
   :group 'personal)
 
-(defcustom hgs-frame-customization-gui-hook '()
-  "Hook called when customizing the frame appearance of graphical Emacs. Takes
-the frame being created as an argument."
+(defcustom hgs-frame-customization-gui-hook
+  '()
+  "Customizes the frame appearance of graphical Emacs.
+These hook function take the frame being created as an argument."
   :type 'hook
   :group 'personal)
 
+(defmacro load-if-exists (file-path &optional nomessage nosuffix must-suffix)
+  "Load file at `FILE-PATH' if it exists.
+`NOMESSAGE', `NOSUFFIX', and `MUST-SUFFIX' are transparently
+passed through to the underlying 'load' call."
+  `(load ,file-path 'noerror ,nomessage ,nosuffix ,must-suffix))
 
 (defun hgs-fix-tls ()
-  "Make TLS settings sensible.
-
-Emacs is basically a giant insecure lisp REPL. We do it here,
-because we want this setup before we do *anything* else
-significant - especially loading packages."
+  "Fix up TLS settings to be more secure.
+Emacs is basically a giant insecure Lisp REPL. Better security
+cannot hurt. Ideally this should be run before we do *anything*
+else significant - especially downloading packages."
   (when (gnutls-available-p)
     (require 'gnutls)
     (customize-set-variable 'gnutls-verify-error t
@@ -150,7 +158,7 @@ significant - especially loading packages."
                ;; Use TLS 1.3 if GnuTLS is both available & high enough version
                (if supports-tls1.3 ":+VERS-TLS1.3" nil)
                ":+VERS-TLS1.2"))
-    "Set a relatively secure default priority list of cipher algorithms."))
+     "Set a relatively secure default priority list of cipher algorithms."))
   ;; Non-GnuTLS path - Note that `tls' is deprecated, so this may no longer work
   ;; in future versions
   (when (require 'tls nil 'noerror)
@@ -172,8 +180,8 @@ enabled.")))
 
 ;; Run frame customization hooks all in one place
 (defun hgs--new-frame-setup (&optional frame)
-  "Configure the given frame. Should be attached to
-`after-make-frame-functions' hook."
+  "Configure the given `FRAME' using user-configured hooks.
+Should be attached to 'after-make-frame-functions' hook."
   (let ((frame-setup-progress
          (make-progress-reporter "Configuring new frame"))
         (this-frame
@@ -191,33 +199,18 @@ enabled.")))
     (progress-reporter-done frame-setup-progress)))
 
 (defun hgs-enable-new-frame-setup ()
-  ;; Setting up a function that runs for all new frames in all contexts (useful
-  ;; or custom styling) is an utter mess in Emacs, and is both poorly
-  ;; understood and documented.
-  ;; N.B. There is still a minor bug here that
-  ;; causes the hook to be run twice upon initial frame
+  "Set up hooks for 'hgs--new-frame-setup' that run for all new frames.
+Frame configuration is an utter mess in Emacs, and is both poorly
+understood and documented. NOTE: There is still a minor bug here
+that causes the hook to be run twice upon initial frame."
+  ;; Needed for configuring 2nd frame onward
+  (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
   (if (daemonp)
-      (progn
-        ;; Needed for configuring 2nd frame onwards
-        (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
-        (when (version<= "27.0" emacs-version)
-          ;; Needed for configuring initial client frame
-          (add-hook 'server-after-make-frame-hook #'hgs--new-frame-setup)))
-    (progn
-      ;; Needed for configuring 2nd frame onwards
-      (add-hook 'after-make-frame-functions #'hgs--new-frame-setup)
-      ;; Needed for configuring initial frame
-      (add-hook 'window-setup-hook #'hgs--new-frame-setup))))
-
-(defun hgs-fix-init-paths ()
-  ;; Change the built-in init directories for old emacs versions using ~/.emacs
-  (setq user-init-file load-file-name)
-  (setq user-emacs-directory hgs-emacs-config-directory)
-  ;; Stop emacs from littering our $HOME
-  (if (< emacs-major-version 27)
-      (let ((dir (concat hgs-user-directory ".emacs.d")))
-        (when (file-accessible-directory-p dir)
-          (delete-directory dir 'recursive)))))
+      (when (version<= "27.0" emacs-version)
+        ;; Needed for configuring initial client frame
+        (add-hook 'server-after-make-frame-hook #'hgs--new-frame-setup))
+    ;; Needed for configuring initial frame
+    (add-hook 'window-setup-hook #'hgs--new-frame-setup)))
 
 (provide 'hgs-core)
 
