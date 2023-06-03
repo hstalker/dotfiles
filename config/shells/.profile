@@ -26,6 +26,7 @@ else
   trap '. "${XDG_CONFIG_HOME:-$HOME/.config}/sh/logout"' EXIT
   # Set this to show future sourced files that we are a login shell (not a way
   # to tell this under sh normally)
+  # shellcheck disable=SC2034
   IS_LOGIN_SHELL=1
 fi
 

@@ -26,11 +26,6 @@ silence_error() {
 # Check for whether we have the baseline tools for this script to even work
 # installed.
 _check_for_base_tools() {
-  if [ $# -ne 0 ]; then
-    echo "USAGE: _check_for_base_tools"
-    return 255
-  fi
-
   # We don't want to do this *every* time, just once
   if [ -z "${_HAS_BASE_TOOLS}" ]; then
     for TOOL in tput grep find echo sed dirname; do
@@ -64,28 +59,28 @@ indirect_expand() {
 # Usage: echo "$(_text_set_color COLOR-NAME [TPUT-SUBCOMMAND])"
 _text_set_color() {
   case "$1" in
-    bla*|black)
+    black)
       _TEXT_COLOR_VALUE=0
       ;;
-    r*|red)
+    red)
       _TEXT_COLOR_VALUE=1
       ;;
-    g*|green)
+    green)
       _TEXT_COLOR_VALUE=2
       ;;
-    y*|yellow)
+    yellow)
       _TEXT_COLOR_VALUE=3
       ;;
-    blu*|blue)
+    blue)
       _TEXT_COLOR_VALUE=4
       ;;
-    m*|magenta)
+    magenta)
       _TEXT_COLOR_VALUE=5
       ;;
-    c*|cyan)
+    cyan)
       _TEXT_COLOR_VALUE=6
       ;;
-    w*|white)
+    white)
       _TEXT_COLOR_VALUE=7
       ;;
     *)
@@ -94,7 +89,7 @@ _text_set_color() {
       ;;
   esac
   if [ -n "${_TEXT_COLOR_VALUE}" ]; then
-    printf "$(tput "${2:-setaf}" ${_TEXT_COLOR_VALUE})"
+    printf '%s' "$(tput "${2:-setaf}" "${_TEXT_COLOR_VALUE}")"
   fi
 
   return 0
@@ -117,43 +112,43 @@ text_bg_color() {
 # Emits ANSI escape for toggling underline for text.
 # Usage: echo "$(text_underline_on)I'm underlined$(text_underline_off)I'm not"
 text_underline_on() {
-  printf "$(tput smul)"
+  printf '%s' "$(tput smul)"
   return 0
 }
 text_underline_off() {
-  printf "$(tput rmul)"
+  printf '%s' "$(tput rmul)"
   return 0
 }
 
 # Emits ANSI escape for toggling standout for text.
 # Usage: echo "$(text_standout_on)I standout$(text_standout_off)I don't"
 text_standout_on() {
-  printf "$(tput smso)"
+  printf '%s' "$(tput smso)"
   return 0
 }
 text_standout_off() {
-  printf "$(tput rmso)"
+  printf '%s' "$(tput rmso)"
   return 0
 }
 
 # Emits ANSI escape for turning on bold mode for text.
 # Usage: echo "$(text_bold)I'm bold"
 text_bold() {
-  printf "$(tput bold)"
+  printf '%s' "$(tput bold)"
   return 0
 }
 
 # Emits ANSI escape for turning on half-bright mode for text.
 # Usage: echo "$(text_dim)I'm dim"
 text_dim() {
-  printf "$(tput dim)"
+  printf '%s' "$(tput dim)"
   return 0
 }
 
 # Resets all attributes applied to text following it in terminal.
 # Usage: echo "$(text_fg_color red)SOMETEXT$(text_reset)"
 text_reset() {
-  printf "$(tput sgr0)"
+  printf '%s' "$(tput sgr0)"
   return 0
 }
 
@@ -166,7 +161,7 @@ _report_message() {
   fi
 
   # Change colour, print message and then reset the color.
-  printf "$(text_fg_color "$1")[$2]: $3$(text_reset)\n"
+  printf '%s[%s]: %s\n' "$(text_fg_color "$1")" "$2" "$3$(text_reset)"
   return 0
 }
 
@@ -219,7 +214,7 @@ error_and_die() {
     *i*)
       ;;
     *)
-      exit ${2:-1}
+      exit "${2:-1}"
       ;;
   esac
 
@@ -335,6 +330,7 @@ try_source() {
   fi
 
   if [ -r "$1" ] && [ ! -d "$1" ]; then
+    # shellcheck disable=SC1090
     . "$1"
   fi
 
@@ -350,6 +346,7 @@ require_source() {
   fi
 
   if [ -r "$1" ]; then
+    # shellcheck disable=1090
     . "$1"
     return 0
   else
@@ -416,7 +413,7 @@ load_user_systemd_environment_d() {
         # The systemd environment generator uses a slightly different syntax to
         # POSIX bourne shells here (it isn't actually a subset!), so we need to
         # replace $$ with \$. There may be other areas of differences.
-        eval "$(cat "${_ENV_SCRIPT}" | sed 's/\$\$/\\\$/g')"
+        eval "$(sed 's/\$\$/\\\$/g' <"${_ENV_SCRIPT}")"
         pop_set_state
       fi
     done
@@ -458,6 +455,8 @@ inject_user_systemd_environment() (
     systemctl --user set-environment "$1"
   else
     report_status "Injecting variable all known variables into Systemd..."
+    # Unfortunately there's not really a good POSIX compliant way to do this
+    # shellcheck disable=SC3045
     env -0 | while IFS='=' read -r -d '' ENV_VAR_NAME ENV_VAR_VALUE; do
       if ! echo "${ENV_VAR_NAME}" | grep -Eq "^_.+$"; then
         report_status "Injecting '${ENV_VAR_NAME}' as value \
@@ -560,13 +559,13 @@ assert_file_has_line() (
   [ -r "$1" ] || \
     report_error "File '$1' is not readable!" && return 2
 
-  if ! cat "$1" | grep -Eq "$2"; then
+  if ! grep -Eq "$2" <"$1"; then
     # The file doesn't have a line matching that regex
     if [ -z "$3" ]; then
       return 1
     else
       report_status "Adding missing line '$3' to end of file '1'..."
-      echo "$2" >> $1 || \
+      echo "$2" >> "$1" || \
         report_error "Unable to add missing line '$3' to file! '$1'" && \
         return 3
     fi

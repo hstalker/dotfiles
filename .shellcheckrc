@@ -1,0 +1,2 @@
+# Allow dynamic sourcing
+disable=SC1090

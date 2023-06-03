@@ -5,21 +5,11 @@ alias g='git'
 # Functions to remove all tracked folders and directories from a local git
 # repo's directory
 git_clean_tracked_files() {
-  if [ $# != 0 ]; then
-    report_error "USAGE: git_clean_tracked_files"
-    return 255
-  fi
-
   git ls-files -z | xargs -0 rm
 
   return 0
 }
 git_clean_tracked_dir() {
-  if [ $# != 0 ]; then
-    report_error "USAGE: git_clean_tracked_dir"
-    return 255
-  fi
-
   git ls-tree --name-only -d -r -z HEAD \
     | sort -rz \
     | xargs -0 rmdir

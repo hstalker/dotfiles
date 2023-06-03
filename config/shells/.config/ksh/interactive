@@ -14,7 +14,8 @@ if [ "$TERM" = "dumb" ]; then
     PS3='#? '
     PS4='+ '
 else
-  if [ $(id -u) -eq 0 ]; then
+  color_reset="$(text_reset)"
+  if [ "$(id -u)" -eq 0 ]; then
     # Special root PS1 colors
     fg_shell="$(text_fg_color 10)"
     fg_path="$(text_fg_color 10)"
@@ -27,8 +28,7 @@ else
     fg_git="$(text_fg_color blue)"
     fg_separator="$(text_fg_color cyan)"
   fi
-  color_reset="$(text_reset)"
-  # Add a convenient shell name identifier
+
   PS1="${color_reset}${fg_shell}[\$(whoami)@\$(hostname):ksh]"
   PS1+="${fg_path}<\$(basename \"\${PWD}\")/>" # Path
   PS1+="${fg_git}\$(get_vcs_branch)" # VCS branch
@@ -37,7 +37,6 @@ else
   PS2="${fg_separator}> ${color_reset}"
   PS3="${fg_separator}#? ${color_reset}"
   PS4="${fg_separator}+ ${color_reset}"
-  unset fg_shell fg_path fg_git fg_separator color_reset
 fi
 
 # Place the history in state

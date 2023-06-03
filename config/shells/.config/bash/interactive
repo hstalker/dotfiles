@@ -18,28 +18,40 @@ function __prompt_command () {
     PS3='#? '
     PS4='+ '
   else
-    if [ $(id -u) -eq 0 ]; then
-      # Root prompt colors
-      local fg_shell="$(text_fg_color 10)"
-      local fg_path="$(text_fg_color 10)"
-      local fg_git="$(text_fg_color 10)"
-      local fg_exit="$(text_fg_color 10)"
-      local fg_jobs="$(text_fg_color 10)"
-      local fg_depth="$(text_fg_color 10)"
-      local fg_separator="$(text_fg_color cyan)"
-    else
-      local fg_shell="$(text_fg_color 10)"
-      local fg_path="$(text_fg_color red)"
-      local fg_git="$(text_fg_color blue)"
-      local fg_exit="$(text_fg_color blue)"
-      local fg_jobs="$(text_fg_color blue)"
-      local fg_depth="$(text_fg_color blue)"
-      local fg_separator="$(text_fg_color cyan)"
-    fi
-    local color_reset="$(text_reset)"
+    local fg_shell
+    local fg_path
+    local fg_git
+    local fg_exit
+    local fg_jobs
+    local fg_depth
+    local fg_separator
+    local color_reset
 
-    local working_directory="$(basename "${PWD}")/"
-    local vcs_branch="$(get_vcs_branch)"
+    local working_directory
+    local vcs_branch
+
+    if [ "$(id -u)" -eq 0 ]; then
+      # Root prompt colors
+      fg_shell="$(text_fg_color 10)"
+      fg_path="$(text_fg_color 10)"
+      fg_git="$(text_fg_color 10)"
+      fg_exit="$(text_fg_color 10)"
+      fg_jobs="$(text_fg_color 10)"
+      fg_depth="$(text_fg_color 10)"
+      fg_separator="$(text_fg_color cyan)"
+    else
+      fg_shell="$(text_fg_color 10)"
+      fg_path="$(text_fg_color red)"
+      fg_git="$(text_fg_color blue)"
+      fg_exit="$(text_fg_color blue)"
+      fg_jobs="$(text_fg_color blue)"
+      fg_depth="$(text_fg_color blue)"
+      fg_separator="$(text_fg_color cyan)"
+    fi
+    color_reset="$(text_reset)"
+
+    working_directory="$(basename "${PWD}")/"
+    vcs_branch="$(get_vcs_branch)"
 
     # We escape the lengths of the colors via \[\] here rather than the color
     # definitions above, as Bash seems to struggle if we don't.

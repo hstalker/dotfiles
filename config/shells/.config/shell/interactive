@@ -55,11 +55,9 @@ alias chgrp='chgrp --preserve-root'
 alias q='exit'
 alias a='alias'
 alias h='history'
-alias hs='history | grep $1'
 alias j='jobs'
-alias psg='ps aux | grep -i $1'
 treeless () {
-  tree -C -I .git -a $1 | less -r
+  tree -C -I .git -a "$1" | less -r
 }
 
 # Tar aliases, because who remembers the encantations?
@@ -79,8 +77,8 @@ get_vcs_branch() {
   if [ -n "$(command -v svn)" ] && [ -n "$(svn info 2>/dev/null)" ]; then
     svn_branch="$(svn info | \
       grep '^URL:' | \
-      egrep -o '(tags|branches)/[^/]+|trunk' | \
-      egrep -o '[^/]+$') 2>/dev/null"
+      grep -E -o '(tags|branches)/[^/]+|trunk' | \
+      grep -E -o '[^/]+$') 2>/dev/null"
   fi
   if [ -n "$(command -v git)" ]; then
     git_branch="$(git rev-parse --symbolic-full-name --abbrev-ref HEAD \

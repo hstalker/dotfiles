@@ -2,15 +2,10 @@
 
 # Setup directory colors
 load_dircolors_config() {
-  if [ $# != 0 ]; then
-    report_error "USAGE: load_dircolors_config"
-    return 255
-  fi
-
   if [ -x /usr/bin/dircolors ]; then
     if [ -r "${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors" ]; then
       eval \
-        "$(dircolors -b ${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors)"
+        "$(dircolors -b "${XDG_CONFIG_HOME:-$HOME/.config}/dircolors/dircolors")"
     else
       eval "$(dircolors -b)"
     fi
