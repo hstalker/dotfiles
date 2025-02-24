@@ -371,8 +371,9 @@
      :host github
      :repo "emacs-dashboard/emacs-dashboard"))
   (straight-use-package
-   '(org-contrib
-     :includes (org)))
+   '(org))
+  (straight-use-package
+   '(org-contrib))
   (straight-use-package
    '(org-mime
      :type git
