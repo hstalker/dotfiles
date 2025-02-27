@@ -1,55 +1,96 @@
 [user]
     email = 1683065+hstalker@users.noreply.github.com
     name = Hector Stalker
-[credential]
-    helper = cache
 [alias]
     a = add
-    s = status
-    l = log
-    sl = shortlog
-    ci = commit
-    co = checkout
     br = branch
-    ps = push
-    pl = pull --ff-only
-    f = fetch
+    cached = diff --cached
+    ci = commit
+    cl = clone
+    co = checkout
+    collapse = "!f() { git reset $(git commit-tree HEAD^{tree} -m \"${1:-Squash all prior history}\"); }; f"
+    cp = cherry-pick
     df = diff
     dt = difftool
-    rp = rev-parse
-    rl = rev-list
-    cl = clone
-    me = merge
-    rb = rebase
-    cp = cherry-pick
-    fap = fetch --all --prune
-    sur = submodule update --init --recursive
-    unstage = reset HEAD --
-    last = log -1 HEAD
-    cached = diff --cached
+    f = fetch
     graph = log --graph --color --pretty=format:"%C(yellow)%H%C(green)%d%C(reset)%n%x20%cd%n%x20%cn%C(blue)%x20(%ce)%x20%C(cyan)%C(reset)%n%x20%s%n"
-    squash-all = "!f() { git reset $(git commit-tree HEAD^{tree} -m \"${1:-Squash all prior history}\"); }; f"
+    l = log
+    last = log -1 HEAD
+    me = merge
+    pl = pull
+    ps = push
+    rb = rebase
+    re = reset
+    rl = rev-list
+    rp = rev-parse
+    rs = restore
+    s = status
+    sl = shortlog
+    su = submodule update --init --recursive
+    tg = tag
+    unstage = reset HEAD --
 [init]
     defaultBranch = master
+[branch]
+    sort = -committerdate
 [color]
     ui = auto
+[column]
+    ui = auto
+[commit]
+    verbose = true
+[core]
+    fsmonitor = false
+    untrackedCache = false
 [diff]
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = false
+    renames = true
     tool = vimdiff
 [difftool]
     prompt = false
+[fetch]
+    all = true
+    prune = true
+    pruneTags = true
+[help]
+    autocorrect = prompt
+[merge]
+    # include before fragment in diffs, requires git >= 2.3
+    conflictstyle = zdiff3
+[protocol "file"]
+    allow = always
+[pull]
+    rebase = true
 [push]
+    autoSetupRemote = true
+    default = simple
     followTags = true
 [gpg]
     program = gpg
 [github]
     user = hstalker
-[protocol "file"]
-    allow = always
+[grep]
+    patternType = extended
+[feature]
+    experimental = true
 [filter "lfs"]
     required = true
     clean = git-lfs clean -- %f
-    smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
+    smudge = git-lfs smudge -- %f
+[rebase]
+    autoSquash = true
+    autoStash = true
+    updateRefs = true
+[rerere]
+    enabled = false
+    autoupdate = false
+[tag]
+    sort = version:refname
+
+# per-host overrides
 [include]
     path = ~/.config/git/custom.config
 
