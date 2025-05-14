@@ -18,6 +18,7 @@ PACKAGES ?= shells \
 	docker \
 	vagrant \
 	emscripten \
+  fzf \
 	gnupg \
 	pass \
 	openssl \

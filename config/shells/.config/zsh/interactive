@@ -88,20 +88,28 @@ bindkey -e
 # Place the history in state
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
 # For setting history length
-SAVEHIST=10000
-HISTSIZE=$SAVEHIST
-HISTFILESIZE=$HISTSIZE
+SAVEHIST=1000000 # Count allowed in the file
+HISTSIZE=$SAVEHIST # Count stored in memory cache
+HISTFILESIZE=$HISTSIZE # In practice identical to SAVEHIST, who cares otherwise
 # Append to the history file rather than overwriting it
 setopt APPEND_HISTORY
 # Share across all zsh sessions
 setopt SHARE_HISTORY
-# Don't store duplicates
+# Store history rows in `:start:elapsed;command` format
+setopt EXTENDED_HISTORY
+# Don't store recent duplicates
 setopt HIST_IGNORE_DUPS
+# Don't store *any* duplicates
+setopt HIST_IGNORE_ALL_DUPS
+# Don't serialize *any* duplicates
+setopt HIST_SAVE_NO_DUPS
 # Remove the duplicates before others
 setopt HIST_EXPIRE_DUPS_FIRST
 # Ignore duplicates when searching history
 setopt HIST_FIND_NO_DUPS
-# Don't store blank blines
+# Don't store entries that are whitespace
+setopt HIST_IGNORE_SPACE
+# Don't store blank lines
 setopt HIST_REDUCE_BLANKS
 # Add commands as they are typed
 setopt INC_APPEND_HISTORY

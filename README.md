@@ -54,6 +54,7 @@ Currently includes some configuration for the following pieces of software:
   * Aspell - Spelling aid
   * Docker - Containerization
   * Direnv - Environment variable daemon
+  * Fzf - Fuzzy file search, particularly useful in the terminal
   * Git - Distributed VCS
   * GnuPG - Signing and encryption tools
   * Less - Pager that's better than the basic `more` pager
