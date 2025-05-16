@@ -698,16 +698,20 @@ nil, 'prepend or 'append."
    ;; (REGULAR-EXPRESSION-STRING
    ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
    ;;  OPTIONS...)
-   `(("^\\*\\([Hh]elp\\|[Cc]ustom\\|[Ff]aces\\).*"
-      (display-buffer-reuse-mode-window)
+   `((,(rx "*" (or (regex "[Cc]ompilation")
+                   (regex "[Hh]elp")
+                   (regex "[Cc]ustom")
+                   (regex "[Ff]aces")
+                   (regex "[Mm]essages")) "*")
+      (display-buffer-reuse-window
+       display-buffer-reuse-mode-window
+       display-buffer-pop-up-window)
       (inhibit-same-window . t))
-     ("^\\*\\([Cc]ompilation\\|[Cc]ompile-[Ll]og\\|[Ww]arnings\\).*"
-      (display-buffer-reuse-mode-window display-buffer-in-previous-window)
-      (inhibit-same-window . t))
-     ("^\\*[Mm]essages.*"
-      (display-buffer-reuse-mode-window)
-      (inhibit-same-window . t))
-     ("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+   `(,(rx "*" (or (regex "[Cc]ompile-[Ll]og")
+                  (regex "[Ww]arnings")) "*")
+     (display-buffer-no-window)
+     (allow-no-window . t))
+     (,(rx "*Embark Collect (" (or "Live" "Completions") ")*")
       ()
       (window-parameters . (mode-line-format . none))))
    "Custom overrides for window placement of specific buffers.")
@@ -2684,11 +2688,36 @@ since it'll break GUI emacsclient."
   global-treesit-auto-mode
 
   :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode)
 
   :custom
-  (treesit-auto-install nil "Don't auto-install grammars."))
+  (treesit-auto-install 'prompt "Ask to install grammars."))
 
+(use-package c-ts-mode
+  :ensure nil
+  :defer t
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (or (treesit-language-available-p 'c)
+                 (treesit-language-available-p 'cpp)))
+
+  :init
+  (defun hgs--c++-ts-indent-style ()
+    "Override a built-in style with custom tree-sitter formatting rules."
+    `(;; Custom rules
+      ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+
+      ;; Base rule-set
+      ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+
+  :custom
+  (c-ts-mode-indent-offset
+   2
+   "Set the baseline offset (often overridden by the editorconfig package).")
+  (c-ts-mode-indent-style
+   #'hgs--c++-ts-indent-style
+   "Use my custom formatting style."))
 
 (use-package yasnippet
   :ensure nil
@@ -2729,7 +2758,7 @@ since it'll break GUI emacsclient."
   :hook
   ;; Mostly we can get away with using manual invocation where needed
   ;; per-session
-  ((c-mode c++-mode python-mode) . eglot-ensure)
+  ((c-mode c-ts-mode c++-mode c++-ts-mode python-mode) . eglot-ensure)
 
   :bind
   (:map eglot-mode-map
