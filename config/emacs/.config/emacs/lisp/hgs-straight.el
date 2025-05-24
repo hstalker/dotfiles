@@ -48,8 +48,10 @@ effect.")
 (defvar straight-built-in-pseudo-packages
   '(emacs python nadvice seq let-alist)
   "Packages which straight should treat as built-in packages and ignore.")
-(defvar straight-recipes-gnu-elpa-user-mirror t
+(defvar straight-recipes-gnu-elpa-use-mirror t
   "If we are using elpa, then make sure to use a Git mirror instead.")
+(defvar straight-recipes-emacsmirror-use-mirror t
+  "If we are using emacsmirror, then make sure to use a Git mirror instead.")
 
 (defvar use-package-compute-statistics t
   "Track how many packages are loaded and their state of initialization.")
@@ -89,6 +91,15 @@ effect.")
          :branch ,straight-repository-branch
          :repo ,repo
          :no-byte-compile t)))
+
+    ;; GNU Savannah (the default) gets DDoSed near constantly, so we prefer a Github mirror
+    (custom-set-variables
+     '(straight-recipe-overrides '((nil
+                                    (nongnu-elpa :type git
+                                                 :repo "https://github.com/emacsmirror/nongnu_elpa"
+                                                 :depth (full single-branch)
+                                                 :local-repo "nongnu-elpa"
+                                                 :build nil)))))
 
     (let ((straight-current-profile 'core))
       (mapc #'(lambda (pkg)

@@ -239,7 +239,10 @@
    '(ws-butler
      :type git
      :host github
-     :repo "lewang/ws-butler"))
+     :repo "emacsmirror/nongnu_elpa"
+     :branch "elpa/ws-butler"
+     :depth (full single-branch)
+     :local-repo "ws-butler"))
   (straight-use-package
    '(treesit-auto
      :type git
