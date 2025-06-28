@@ -7,6 +7,7 @@
 # itself is transient, even if the data is persistent. This makes even more
 # sense if you consider that our system does not exhibit sole ownership over the
 # referenced data set.
+# Config is sourced from $XDG_CONFIG_HOME/rclone.
 #
 # Much fine-tuning can be done on the exact mount options used for caching etc.
 # We aim to provide a light document friendly configuration. It is not suitably
@@ -17,19 +18,18 @@ Description=rclone: Remote FUSE filesystem for cloud remote %i
 Documentation=man:rclone(1)
 After=network-online.target
 Wants=network-online.target
-# Sanity checks over input/output paths
-AssertPathExists=${XDG_RUNTIME_DIR}
-AssertPathExists=${XDG_CONFIG_HOME}/rclone/rclone.conf
+# Sanity check config and mount paths
+AssertPathExists=%E/rclone/rclone.conf
+AssertPathExists=%t
 
 [Service]
 Type=notify
-# We want to guarantee any paths we create or files we mirror are only
-# user-accessible
+# Guarantee any paths we create or files we mirror are only user-accessible
 UMask=0077
-Environment=RCLONE_REMOTE_NAME=%i
-ExecStartPre=/usr/bin/mkdir -p "${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}"
+Environment=RCLONE_MNT="%t/rclone/%i"
+ExecStartPre=/usr/bin/mkdir -p "${RCLONE_MNT}"
 ExecStart=/usr/bin/rclone mount \
-  --config "${XDG_CONFIG_HOME}/rclone/rclone.conf" \
+  --config "%E/rclone/rclone.conf" \
   --umask 077 \
   --dir-perms 0700 \
   --file-perms 0600 \
@@ -44,9 +44,9 @@ ExecStart=/usr/bin/rclone mount \
   --vfs-read-chunk-size 128M \
   --vfs-read-chunk-size-limit off \
   --log-level INFO \
-  "${RCLONE_REMOTE_NAME}:/" "${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}"
-ExecStop=/bin/fusermount -u ${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}
-ExecStopPost=/usr/bin/rmdir ${XDG_RUNTIME_DIR}/rclone/${RCLONE_REMOTE_NAME}
+  "%i:" "${RCLONE_MNT}"
+ExecStop=/bin/fusermount -u "${RCLONE_MNT}"
+ExecStopPost=/usr/bin/rmdir "${RCLONE_MNT}"
 Restart=on-failure
 RestartSec=180s
 
