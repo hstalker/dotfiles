@@ -1,0 +1,8 @@
+# -*- mode:snippet -*-
+# group: preprocessor
+# name: #include <...>
+# key: incs
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region nil))
+# --
+#include <${1}>

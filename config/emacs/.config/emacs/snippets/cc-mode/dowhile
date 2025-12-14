@@ -1,0 +1,11 @@
+# -*- mode:snippet -*-
+# group: control
+# name: do { ... } while(...)
+# key: dowhile
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region t))
+# --
+do
+{
+  ${0}
+} while (${1})

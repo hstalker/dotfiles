@@ -1,0 +1,8 @@
+# -*- mode:snippet -*-
+# group: preprocessor
+# name: #pragma once
+# key: ponce
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region nil))
+# --
+#pragma once

@@ -1,0 +1,8 @@
+# -*- mode:snippet -*-
+# group: miscellaneous
+# name: Current Date-time (ISO 8601)
+# key: dt
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region nil))
+# --
+`(format-time-string "%Y-%m-%dT%H:%M:%S%:z")`

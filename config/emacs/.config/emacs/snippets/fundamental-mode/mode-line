@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# group: emacs
+# name: Mode line
+# key: -*-
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region nil))
+# --
+`comment-start` -*- mode: ${1:MODE;} -*-

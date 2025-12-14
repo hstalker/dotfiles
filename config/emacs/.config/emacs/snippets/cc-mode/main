@@ -1,0 +1,13 @@
+# -*- mode:snippet -*-
+# group: standard
+# name: int main(...)
+# key: main
+# type: snippet
+# expand-env: ((yas-indent-line 'auto) (yas-wrap-around-region t))
+# --
+int main(int argc, char* argv[])
+{
+  ${0}
+
+  return 0;
+}
