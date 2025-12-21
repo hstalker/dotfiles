@@ -3,7 +3,7 @@ set nocompatible
 " Was vim compiled with unicode support?
 if has('multi_byte')
   " How your terminal encodes your input (from locale)
-  if &termencoding == ""
+  if exists('+termencoding') && empty(&termencoding)
     let &termencoding = &encoding
   endif
   " The encoding used in vim's internal representation.
