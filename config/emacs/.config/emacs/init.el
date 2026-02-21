@@ -408,18 +408,6 @@
      :host github
      :repo "leathekd/erc-hl-nicks"))
   (straight-use-package
-   '(message-templ
-     :type git
-     :host nil
-     :repo "https://git.tethera.net/message-templ.git"
-     :files ("message-templ.el")))
-  (straight-use-package
-   '(notmuch
-     :type git
-     :host nil
-     :repo "https://git.notmuchmail.org/git/notmuch"
-     :files ("emacs/*.el" "emacs/*.svg")))
-  (straight-use-package
    '(daemons
      :type git
      :host github
@@ -2178,7 +2166,7 @@ to point."))
   :custom
   (org-mime-library 'mml))
 
-;; NOTE: 'exec-path-from-shell' along with 'erc' & 'message-templ' are some of
+;; NOTE: 'exec-path-from-shell' along with 'erc' are some of
 ;; the most expensive startup cost packages we use
 (use-package exec-path-from-shell
   :ensure nil
@@ -3256,162 +3244,6 @@ hostname after emacs 25."))
   (mail-envelope-from
    'header
    "Derive envelope from via outgoing mail headers."))
-
-;; Mail templating
-(use-package message-templ
-  :ensure nil
-  :defer t
-
-  :autoload
-  message-templ-apply
-
-  :bind
-  (:map message-mode-map
-        ("C-c s" ("Select template" . message-templ-select)))
-
-  :custom
-  ;;   Example of Multiple Account Handling:
-  ;;   (message-templ-config-alist
-  ;;    '(("^From:.*me@email.com.*"
-  ;;       (lambda ()
-  ;;         (message-templ-apply "me-smtp-header")))
-  ;;      "Alist for automatically applying templates on mail based on a regexp.")
-  ;;  (message-templ-alist
-  ;;   '(("me-smtp-header"
-  ;;      ;; Add the following headers
-  ;;      ("From" . "My Name <me@email.com>")
-  ;;      ("X-Message-SMTP-Method" . "smtp smtp.server.com 587 me@email.com")))
-  ;;   "Alist for defining named mail templates.")
-  (message-templ-alist
-   '()
-   "Define empty defaults for mail templates.")
-  (message-templ-config-alist
-   '()
-   "Define empty defaults for automatically applying templates to mail."))
-
-(use-package notmuch
-  :ensure nil
-  :defer t
-
-  :preface
-  (defun hgs--notmuch-list-profiles-by-filesystem (&optional config-directory)
-    "Infers list of profiles using directories available in `CONFIG-DIRECTORY'.
-If no `CONFIG-DIRECTORY' is provided, a reasonable default is
-used. `CONFIG-DIRECTORY' is expected to point to your XDG
-structured Notmuch configuration directory."
-    (let* ((notmuch-config-directory
-            (or config-directory
-                (concat hgs-user-directory ".config/notmuch")))
-           (special-directory-regex
-            "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)")
-           (additional-exclusions-regex
-            '("default")))
-      (cl-flet* ((make-exclusion
-                  (lambda (path)
-                    (cl-some
-                     (lambda (x)
-                       (not
-                        (string-match-p (rx bol (regex x) eol) path)))
-                     additional-exclusions-regex)))
-                 (to-profile-name
-                  (lambda (path)
-                    (file-name-base (directory-file-name path))))
-                 (make-exclusions
-                  (lambda (paths)
-                    (seq-filter #'make-exclusion paths)))
-                 (to-profile-names
-                  (lambda (paths)
-                    (seq-map #'to-profile-name paths)))
-                 (only-directories
-                  (lambda (paths)
-                    (seq-filter (lambda (path)
-                                  (file-directory-p path))
-                                paths))))
-
-        (make-exclusions
-         (to-profile-names
-          (only-directories
-           (directory-files notmuch-config-directory
-                            'full
-                            special-directory-regex
-                            'nosort)))))))
-
-  (defcustom hgs-notmuch-list-profiles
-    #'hgs--notmuch-list-profiles-by-filesystem
-    "Function used for generating a list of available Notmuch profiles."
-    :type 'function
-    :group 'personal)
-
-  :bind
-  (:map notmuch-hello-mode-map
-        ("C-c M-p" ("Change profile" . hgs-notmuch-change-profile)))
-  (:map notmuch-show-part-map
-        ("d" ("Show as patch" . hgs--notmuch-show-view-as-patch)))
-
-  :config
-  (defun hgs--notmuch-show-view-as-patch ()
-    "View the the current message as a patch via `DIFF-MODE'."
-    (interactive)
-    (let* ((id (notmuch-show-get-message-id))
-           (msg (notmuch-show-get-message-properties))
-           (part (notmuch-show-get-part-properties))
-           (subject (concat "Subject: " (notmuch-show-get-subject) "\n"))
-           (diff-default-read-only t)
-           (buf (get-buffer-create (concat "*notmuch-patch-" id "*")))
-           (map (make-sparse-keymap)))
-      (define-key map "q" 'notmuch-bury-or-kill-this-buffer)
-      (switch-to-buffer buf)
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (insert subject)
-        (insert (notmuch-get-bodypart-text msg part nil)))
-      (set-buffer-modified-p nil)
-      (diff-mode)
-      (let ((new-ro-bind (cons 'buffer-read-only map)))
-        (add-to-list 'minor-mode-overriding-map-alist new-ro-bind))
-      (goto-char (point-min))))
-
-  (defun hgs-notmuch-change-profile (&optional)
-    "Select from available Notmuch profiles to use."
-    (interactive)
-    (let ((profile-env-var "NOTMUCH_PROFILE")
-          (new-profile
-           (completing-read "Select Notmuch profile: "
-                            (funcall hgs-notmuch-list-profiles)
-                            nil nil)))
-      (setenv profile-env-var new-profile)))
-
-  :custom
-  (notmuch-init-file
-   (concat hgs-emacs-config-directory "notmuch/init")
-   "The Notmuch elisp init variable must not have a suffix, but the real file
-should.")
-  (notmuch-address-command 'internal)
-  (notmuch-address-save-filename
-   (concat hgs-emacs-cache-directory "notmuch/addresses"))
-  (notmuch-crypto-process-mime t)
-  (notmuch-saved-searches
-   '((:name "inbox"
-            :query "tag:inbox"
-            :key "i")
-     (:name "unread"
-            :query "tag:unread"
-            :key "u")
-     (:name "flagged"
-            :query "tag:flagged"
-            :key "f")
-     (:name "sent"
-            :query "tag:sent"
-            :key "t")
-     (:name "drafts"
-            :query "tag:draft"
-            :key "d")
-     (:name "mail list"
-            :query "tag:mail-list"
-            :key "m")
-     (:name "all mail"
-            :query "not (tag:draft or tag:sent or tag:trash or tag:spam)"
-            :key "a"))))
 
 ;; Simple tabulated list UI package for different types of daemons on a linux
 ;; system

@@ -56,6 +56,9 @@ effect.")
 (defvar use-package-compute-statistics t
   "Track how many packages are loaded and their state of initialization.")
 
+(defvar use-package-verbose t
+  "Log verbose messages as packages are loaded configured.")
+
 (defun hgs-straight-bootstrap ()
   "Bootstrap necessary package management libraries."
   (let ((bootstrap-progress
