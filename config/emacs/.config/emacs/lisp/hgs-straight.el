@@ -13,7 +13,7 @@
 ;; Configure Straight
 (defvar straight-base-dir hgs-emacs-data-directory)
 (defvar straight-repository-branch
-  "master"
+  "main"
   "Use master instead of develop for stability.")
 (defvar straight-vc-git-default-protocol
   ;; We should eventually consider moving to ssh
@@ -29,11 +29,8 @@
   nil
   "We don't want use-package integration by default.")
 (defvar straight-fix-flycheck
-  t
-  "Install a workaround for a problem with flycheck.")
-(defvar straight-fix-org
-  t
-  "Install a workaround for a problem with org.")
+  nil
+  "Don't install a workaround for a problem with flycheck.")
 (defvar straight-profiles
   `((core . ,(concat hgs-emacs-config-directory "lock.el")))
   "Alist of `'(PROFILE-NAME . LOCK-FILE-NAME)'.
