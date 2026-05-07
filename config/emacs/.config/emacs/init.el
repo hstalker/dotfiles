@@ -3108,10 +3108,7 @@ dispatch."))
   :demand t
 
   :after
-  (:all embark consult)
-
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  (:all embark consult))
 
 (use-package json-mode
   :ensure nil
