@@ -5,6 +5,5 @@
 
 ###############################################################################
 
-# Load shared shell specific login modules
-load_per_application_modules login shell
-
+# Load shared shell specific logout modules
+load_per_application_modules logout shell
