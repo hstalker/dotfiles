@@ -48,6 +48,7 @@ Currently includes some configuration for the following pieces of software:
   * Sh - Common everywhere (Unix-likes)
   * Zsh - Preferred daily driver
 * Terminals
+  * Ghostty - Modern, fast, featureful terminal
   * URxvt - Lightweight, but lacks good support for a lot of features
   * XTerm - Ubiquitous, but also lacking in some features
 * Dev tooling

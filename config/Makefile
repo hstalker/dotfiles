@@ -48,6 +48,7 @@ PACKAGES ?= shells \
 	mozc \
 	nvidia \
 	vscode \
+	ghostty \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
 	$(TARGET_DIR)/.local/bin \
