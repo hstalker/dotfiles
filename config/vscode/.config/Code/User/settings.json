@@ -1,0 +1,82 @@
+{
+  // general settings
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "on",
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": true,
+  "editor.cursorStyle": "block",
+  "editor.cursorBlinking": "smooth",
+  "editor.fontFamily": "Fira Code, monospace",
+  "editor.fontLigatures": false,
+  "editor.find.seedSearchStringFromSelection": "never",
+  "workbench.colorTheme": "Solarized Light",
+  "workbench.iconTheme": "vscode-icons",
+  "terminal.integrated.shell.linux": "/usr/bin/zsh",
+  "terminal.integrated.fontFamily": "Fira Code, monospace",
+  "terminal.integrated.minimumContrastRatio": 3,
+  "files.autoSave": "afterDelay",
+  "files.trimTrailingWhitespace": true,
+  "extensions.ignoreRecommendations": false,
+  "files.associations": {
+    "BUILD": "bazel",
+    "WORKSPACE": "bazel",
+    "*.bazel": "bazel",
+    "*.toml": "toml",
+    "*.md": "markdown",
+    "*.rst": "restructuredtext"
+  },
+  "telemetry.telemetryLevel": "off",
+  "workbench.enableExperiments": false,
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1,
+    "tuttieee.emacs-mcx": 1
+  }
+
+  // Spelling
+  "cSpell.enable": true,
+  "cSpell.language": "en",
+
+  // Keybinding extensions
+  "vim.disableExtension": false,
+  "vim.leader": "<Space>",
+  "vim.insertModeKeyBindings": [
+    {
+      "before": ["k", "j"],
+      "after": ["<Esc>"]
+    }
+  ]
+  "vim.normalModeKeyBindingsNonRecursive": []
+
+  // HTML/CSS/JS/TS
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+
+  // C/C++
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.default.cppStandard": "c++23",
+  "C_Cpp.default.cStandard": "c17",
+
+  // Rust
+  "rust-analyzer.cargo.autoreload": true,
+  "rust-analyzer.checkOnSave.command": "clippy",
+
+  // Java
+  "java.configuration.checkProjectSettingsExclusions": false,
+
+  // Python
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "ruff",
+  "python.languageServer": "Pylance",
+  "python.linting.enabled": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.mypyEnabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.linting.ruffEnabled": true,
+
+  // Shell
+  "shellcheck.enable": true,
+  "shellformat.enable": true
+}

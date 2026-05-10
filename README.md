@@ -41,6 +41,7 @@ Currently includes some configuration for the following pieces of software:
 * Editors
   * Emacs - Preferred highly customized IDE experience
   * Vim - Lightweight simple text editing experience
+  * VSCode - Medium-weight IDE popular experience
 * Shells (These are merged into a single "package" with shared configuration)
   * Bash - Common on Linux
   * Ksh - Common on BSDs and old Unices

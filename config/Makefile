@@ -47,6 +47,7 @@ PACKAGES ?= shells \
 	dircolors \
 	mozc \
 	nvidia \
+	vscode \
 	themes/halogen
 USEFUL_DIRS ?= $(TARGET_DIR)/.cache \
 	$(TARGET_DIR)/.local/bin \
