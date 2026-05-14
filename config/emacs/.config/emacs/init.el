@@ -682,7 +682,7 @@ nil, 'prepend or 'append."
    ;; learning to not care where things are as long as *Help* doesn't replace
    ;; you current buffer ;).
    ;;
-   ;; Note: Be very careful about this structure. Breaking it breaks Emacs'
+   ;; Note: Be very careful about this structure. Breaking it breaks Emacs
    ;; multiplexing.
    ;;
    ;; General Structure:
@@ -690,19 +690,19 @@ nil, 'prepend or 'append."
    ;;  ORDERED-LIST-OF-WINDOW-SELECTION-FUNCTIONS
    ;;  OPTIONS...)
    `((,(rx "*" (or (regex "[Cc]ompilation")
-                   (regex "[Hh]elp")
                    (regex "[Cc]ustom")
                    (regex "[Ff]aces")
-                   (regex "[Mm]essages")) "*")
+                   (regex "[Hh]elp")) "*")
       (display-buffer-reuse-window
        display-buffer-reuse-mode-window
        display-buffer-pop-up-window)
-      (inhibit-same-window . t))
-   `(,(rx "*" (or (regex "[Cc]ompile-[Ll]og")
-                  (regex "[Ww]arnings")) "*")
-     (display-buffer-no-window)
-     (allow-no-window . t))
-     (,(rx "*Embark Collect (" (or "Live" "Completions") ")*")
+      ())
+     (,(rx "*" (or (regex "[Cc]ompile-[Ll]og")
+                   (regex "[Mm]essages")
+                   (regex "[Ww]arnings")) "*")
+      (display-buffer-no-window)
+      (allow-no-window . t))
+     (,(rx "*[Ee]mbark [Cc]ollect (" (or "[Ll]ive" "[Cc]ompletions") ")*")
       ()
       (window-parameters . (mode-line-format . none))))
    "Custom overrides for window placement of specific buffers.")
