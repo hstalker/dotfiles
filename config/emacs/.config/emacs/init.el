@@ -232,9 +232,9 @@
      :repo "magit/transient"))
   (straight-use-package
    '(with-editor
-     :type git
-     :host github
-     :repo "magit/with-editor"))
+      :type git
+      :host github
+      :repo "magit/with-editor"))
   (straight-use-package
    '(ws-butler
      :type git
@@ -509,20 +509,20 @@ This won't work as expected under daemon mode."
     (cl-flet* ((get-font-family (lambda (font) (car font)))
                (get-font-size (lambda (font) (cdr font)))
                (set-font-override
-                (lambda (font-type char-set &optional add)
-                  "Override a specific region of code-points with the given font.
+                 (lambda (font-type char-set &optional add)
+                   "Override a specific region of code-points with the given font.
 
 `FONT-TYPE' should be '(NAME . SIZE), and `CHAR-SET' should be
 either a character set from `list-character-sets' or a script
 symbol from `script-representative-chars'. `ADD' can be either
 nil, 'prepend or 'append."
-                  (set-fontset-font t    ; Default font-set
-                                    char-set
-                                    (font-spec :family (get-font-family font-type)
-                                               :size (get-font-size font-type)
-                                               :slant 'normal
-                                               :weight 'normal)
-                                    frame add))))
+                   (set-fontset-font t    ; Default font-set
+                                     char-set
+                                     (font-spec :family (get-font-family font-type)
+                                                :size (get-font-size font-type)
+                                                :slant 'normal
+                                                :weight 'normal)
+                                     frame add))))
       (let ((latin-font '("DejaVu Sans Mono" . 12))
             ;; These unicode fonts can be a bit small relatively speaking
             (unicode-font '("Noto Sans Mono" . 14))
