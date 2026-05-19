@@ -9,7 +9,8 @@ endif
 SOURCE_DIR ?= $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TARGET_DIR ?= $(HOME)
 PACKAGES ?= shells \
-	xapplications \
+	xterm \
+	urxvt \
 	vim \
 	emacs \
 	ack \
@@ -17,7 +18,6 @@ PACKAGES ?= shells \
 	direnv \
 	docker \
 	vagrant \
-	emscripten \
   fzf \
 	gnupg \
 	pass \
@@ -34,6 +34,7 @@ PACKAGES ?= shells \
 	tmux \
 	subversion \
 	git \
+	gdb \
 	readline \
 	python \
 	ruby \

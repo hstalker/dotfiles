@@ -61,12 +61,13 @@ Currently includes some configuration for the following pieces of software:
   * GnuPG - Signing and encryption tools
   * Less - Pager that's better than the basic `more` pager
   * Readline - Input configuration for common terminal utilities
+  * GDB - GNU Debugger
   * Subversion - Centralized VCS
   * Terminfo - Terminal information querying tools
   * Tmux - Terminal multiplexer
   * Vagrant - Virtualization
   * WGet - Fetch files over the internet
-  * Xorg utilities - Sets up XDG compatible paths for X software
+  * X11 utilities - Sets up XDG compatible paths for X software
 * User & desktop applications
   * MPV - Media player that knocks the socks off of the competition
   * WINE - Windows emulation layer
@@ -77,6 +78,7 @@ Currently includes some configuration for the following pieces of software:
   * None as of yet. I tend to just use Gnome because I'm lazy.
 * Language tooling
   * .NET
+    * .NET - dotnet CLI, etc.
     * NuGet - Package management
   * C/C++
     * CCache - Caching compilation by-products
@@ -90,7 +92,6 @@ Currently includes some configuration for the following pieces of software:
     * NPM - Package management
     * Node - Javascript framework/environment
   * Python
-    * IPython - Interpreter
     * Jupyter - Jupyter notebooks
   * Ruby
     * Bundle - Package management
@@ -102,7 +103,7 @@ Currently includes some configuration for the following pieces of software:
 * Misc.
   * GTK - Gnome GUI toolkit
   * KDE- KDE (and Qt) configuration
-  * Nvidia - configuration and fixes for nvidia drivers/devices
+  * Nvidia/CUDA - configuration and fixes for nvidia drivers/devices
 
 And also offers the following themes for all desired software:
 * Halogen - Mishmash of my own making. Warm colors. Primarily light solarized
@@ -418,7 +419,7 @@ files in this repository.
 Currently the way the theme-provided `.Xresources` loads application
 configuration/theming files requires them to always be present on the system.
 As such, all X applications are non-modular and must be installed together
-(see: `xapplications/`. It may be possible to work around this using a more
+(see: `xorg/`. It may be possible to work around this using a more
 complex preprocessor with xrdb (e.g.  m4).
 
 ## Extension

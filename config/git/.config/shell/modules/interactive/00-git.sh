@@ -9,7 +9,7 @@ git_clean_tracked_files() {
 
   return 0
 }
-git_clean_tracked_dir() {
+git_clean_tracked_dirs() {
   git ls-tree --name-only -d -r -z HEAD \
     | sort -rz \
     | xargs -0 rmdir
@@ -22,7 +22,7 @@ git_clean_tracked() {
     return 255
   fi
 
-  git_clean_tracked_files; git_clean_tracked_dir
+  git_clean_tracked_files; git_clean_tracked_dirs
 
   return 0
 }
