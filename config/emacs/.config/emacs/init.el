@@ -151,6 +151,16 @@
      :host github
      :repo "rainstormstudio/nerd-icons.el"))
   (straight-use-package
+   '(nerd-icons-completion
+     :type git
+     :host github
+     :repo "rainstormstudio/nerd-icons-completion"))
+  (straight-use-package
+   '(nerd-icons-corfu
+     :type git
+     :host github
+     :repo "LuigiPiucco/nerd-icons-corfu"))
+  (straight-use-package
    '(reformatter
      :type git
      :host github
@@ -2129,6 +2139,32 @@ to point."))
 (use-package nerd-icons
   :ensure nil
   :demand t)
+
+(use-package nerd-icons-completion
+  :ensure nil
+  :demand t
+
+  :diminish
+  nerd-icons-completion-mode
+
+  :config
+  (nerd-icons-completion-mode)
+  (with-eval-after-load 'marginalia
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup)))
+
+(use-package nerd-icons-corfu
+  :ensure nil
+  :defer t
+
+  :after
+  (:all corfu)
+
+  :hook
+  (global-corfu-mode . nerd-icons-completion-mode)
+  (corfu-mode . nerd-icons-completion-mode)
+
+  :config
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package org-bullets
   :ensure nil

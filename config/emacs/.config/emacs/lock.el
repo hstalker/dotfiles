@@ -48,6 +48,8 @@
  ("markdown-mode" . "1f72cefa6a4b759f90e335e4908725a721b17ad9")
  ("melpa" . "a7b39c6a0a2dd033d36bd42f0b470b30a67eacae")
  ("meson-mode" . "0449c649daaa9322e1c439c1540d8c290501d455")
+ ("nerd-icons-completion" . "45b585d972192a3eaeb239e15e55de7f46f8920a")
+ ("nerd-icons-corfu" . "f821e953b1a3dc9b381bc53486aabf366bf11cb1")
  ("nerd-icons.el" . "d33d12f5dcb6bf2fb23c3f75df5de85beb4afd95")
  ("nongnu-elpa" . "9a138bb309154f4595bd11b6e12cd2d56d99dc49")
  ("orderless" . "09c90d93efce4fdac52edfe8b22591b773f3e607")
