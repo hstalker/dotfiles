@@ -790,7 +790,10 @@ predictable."))
   :ensure nil
   :defer t
 
-  :preface
+  :autoload
+  hgs--filter-compilation-buffer
+
+  :config
   ;; Hopefully fixes the compilation colorization
   (defun hgs--filter-compilation-buffer ()
     "Allows color escape codes to work better inside the compilation buffer for
@@ -807,7 +810,6 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
         (replace-match "\\1\n\\2")))
     (read-only-mode))
 
-  :config
   (add-hook 'compilation-filter-hook #'hgs--filter-compilation-buffer)
   ;; Make setting compile command safe via local variables
   (put 'compile-command 'safe-local-variable #'stringp)
@@ -825,6 +827,9 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :ensure nil
   :defer t
 
+  :autoload
+  hgs--pulse-current-line
+
   :preface
   (defcustom hgs--line-pulse-commands
     '(scroll-up-command
@@ -835,22 +840,21 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
     :type '(repeat symbol)
     :group 'personal)
 
-  (defun hgs--pulse-current-line (&rest _)
-    "Pulse the current line."
-    (pulse-momentary-highlight-one-line (point)))
-
+  :init
   (defun hgs--add-pulse-advice ()
     "Enable Emacs pulsing the current line on certain jump navigation events."
     (dolist (command hgs--line-pulse-commands)
       (advice-add command :after #'hgs--pulse-current-line)))
-
   (defun hgs--remove-pulse-advice ()
     "Disable Emacs pulsing the current line on certain jump navigation events."
     (dolist (command hgs--line-pulse-commands)
       (advice-remove command :after #'hgs--pulse-current-line)))
-
-  :init
   (hgs--add-pulse-advice)
+
+  :config
+  (defun hgs--pulse-current-line (&rest _)
+    "Pulse the current line."
+    (pulse-momentary-highlight-one-line (point)))
 
   :custom
   (pulse-delay 0.03 "Delay between pulse iterations (seconds).")
@@ -1174,7 +1178,13 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :ensure nil
   :defer t
 
-  :preface
+  :commands
+  hgs-kill-dired-buffers
+
+  :functions
+  hgs--dired-up-directory-clean
+
+  :config
   ;; Dired tends to clutter the buffer list quite heavily.
   (defun hgs-kill-dired-buffers ()
     "Kill all open Dired buffers."
@@ -1376,8 +1386,9 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
 
   :autoload
   eshell/pwd
+  hgs--eshell-prompt-function
 
-  :preface
+  :config
   (defun hgs--eshell-prompt-function ()
     "Function that determines the eshell prompt to display.
 `eshell-prompt-function' must be set to this to be activated."
@@ -1439,16 +1450,16 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :ensure nil
   :defer t
 
-  :preface
+  :hook
+  (find-file . hgs--epa-inhibit-backups)
+
+  :config
   (defun hgs--epa-inhibit-backups ()
     "Inhibit backups when operating on encrypted files."
     (when (and buffer-file-name
                (string-match epa-file-name-regexp buffer-file-name))
       (message "Backup inhibited for this file `%s'." buffer-file-name)
       (setq-local backup-inhibited t)))
-
-  :hook
-  (find-file . hgs--epa-inhibit-backups)
 
   :custom
   (epa-file-inhibit-auto-save t))
@@ -1496,10 +1507,6 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
     :group 'personal
     :type 'regexp)
 
-  (defun hgs--erc-disable-whitespace-mode ()
-    "Disables whitespace mode in erc buffers, as it causes issues."
-    (whitespace-mode -1))
-
   :hook
   (erc-mode . hgs--erc-disable-whitespace-mode)
   ;; Default to readonly when joining a channel to prevent fat fingering by
@@ -1507,6 +1514,10 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   (erc-join . read-only-mode)
 
   :config
+  (defun hgs--erc-disable-whitespace-mode ()
+    "Disables whitespace mode in erc buffers, as it causes issues."
+    (whitespace-mode -1))
+
   (add-to-list 'erc-modules 'notifications) ;; Enable notifications
   (add-to-list 'erc-modules 'spelling) ;; Enable spelling corrections
   (erc-update-modules)
@@ -1663,6 +1674,10 @@ buffers).")
   :after
   (:all erc)
 
+  :autoload
+  hgs--erc-compute-log-channels-directory
+  hgs--erc-generate-log-file-name
+
   :preface
   (defcustom hgs-erc-log-channels-directory
     (file-name-as-directory (concat hgs-emacs-state-directory "erc/logs"))
@@ -1679,6 +1694,7 @@ files."
                    (const :tag "Ask" 'ask))
     :group 'personal)
 
+  :config
   (defun hgs--erc-compute-log-channels-directory (_buffer
                                                   target nick server
                                                   _port)
@@ -2087,7 +2103,7 @@ arbitrary depth.")
   :diminish
   dimmer-mode
 
-  :preface
+  :config
   ;; Apply some fixes when/if these packages load to prevent dimmer from
   ;; interfering with their visibility.
   (defmacro hgs--apply-dimmer-fix (package-name)
@@ -2095,7 +2111,6 @@ arbitrary depth.")
       `(with-eval-after-load ,package-name-str
          (funcall (intern (format "dimmer-configure-%s" ,package-name-str))))))
 
-  :config
   (dolist (pkg '(magit selectrum which-key org posframe gnus helm company-box))
     (hgs--apply-dimmer-fix pkg))
 
@@ -2113,6 +2128,9 @@ flashing on mouse navigation."))
   :ensure nil
   :defer t
 
+  :functions
+  hgs--avy-action-embark
+
   :bind
   (:map global-map
         ("C-'" . avy-goto-char-timer))
@@ -2120,7 +2138,7 @@ flashing on mouse navigation."))
         ("C-'". avy-isearch))
 
   :config
-  (defun avy-action-embark (pt)
+  (defun hgs--avy-action-embark (pt)
     "Run `embark-act' on avy filtered candidates."
     (unwind-protect
         (save-excursion
@@ -2130,7 +2148,7 @@ flashing on mouse navigation."))
        (cdr (ring-ref avy-ring 0))))
     t)
 
-  (setf (alist-get ?\; avy-dispatch-alist) #'avy-action-embark)
+  (setf (alist-get ?\; avy-dispatch-alist) #'hgs--avy-action-embark)
 
   :custom
   (avy-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l) "Use home row for Avy prompts.")
@@ -2234,14 +2252,16 @@ to point."))
   :ensure nil
   :demand t
 
-  :preface
+  :functions
+  hgs--initialize-exec-path-from-shell
+
+  :config
   (defun hgs--initialize-exec-path-from-shell ()
     "Perform a fetch when run in contexts without inherited environment."
     (when (or (daemonp)
               (display-graphic-p))
       (exec-path-from-shell-initialize)))
 
-  :config
   (hgs--initialize-exec-path-from-shell)
 
   :custom
@@ -2346,7 +2366,10 @@ to point."))
   :diminish
   vertico-mode
 
-  :preface
+  :autoload
+  hgs--vertico-completion-in-region
+
+  :config
   (defun hgs--vertico-completion-in-region (&rest args)
     "Use `consult-completion-in-region' if Vertico and Consult are available.
 Otherwise use the default `completion--in-region' function."
@@ -2355,7 +2378,6 @@ Otherwise use the default `completion--in-region' function."
              #'completion--in-region)
            args))
 
-  :config
   (vertico-mode +1)
 
   :custom
@@ -2548,7 +2570,16 @@ support.")
   :ensure nil
   :demand t
 
-  :preface
+  :autoload
+  hgs--solarized-tui-bg-removal
+
+  :init
+  ;; Add this at a high depth so that it runs last
+  (add-hook 'hgs-frame-customization-tui-hook
+            #'hgs--solarized-tui-bg-removal
+            50)
+
+  :config
   (defun hgs--solarized-tui-bg-removal (frame)
     "Disable background theming if `FRAME' in terminal as this causes breakage.
 This means the terminal itself must be appropriately themed. Be
@@ -2556,12 +2587,6 @@ careful about not doing this if we are in daemon mode though,
 since it'll break GUI emacsclient."
     (modify-frame-parameters frame '((background-color . nil))))
 
-  ;; Add this at a high depth so that it runs last
-  (add-hook 'hgs-frame-customization-tui-hook
-            #'hgs--solarized-tui-bg-removal
-            50)
-
-  :config
   (load-theme 'solarized-light 'no-confirm)
 
   :custom
@@ -2630,15 +2655,6 @@ since it'll break GUI emacsclient."
   :ensure nil
   :defer t
 
-  :preface
-  (defun hgs--with-editor-export-editor ()
-    "Run `with-editor-export-editor' once for each possible editor variable."
-    (dolist (var '("EDITOR"
-                   "VISUAL"
-                   "GIT_EDITOR"
-                   "HG_EDITOR"))
-      (with-editor-export-editor var)))
-
   :hook
   ((shell-mode term-exec eshell-mode vterm-mode)
    . hgs--with-editor-export-editor)
@@ -2648,7 +2664,16 @@ since it'll break GUI emacsclient."
         ([remap async-shell-command]
          ("Async shell command" . with-editor-async-shell-command))
         ([remap shell-command]
-         ("Shell command" . with-editor-shell-command))))
+         ("Shell command" . with-editor-shell-command)))
+
+  :config
+  (defun hgs--with-editor-export-editor ()
+    "Run `with-editor-export-editor' once for each possible editor variable."
+    (dolist (var '("EDITOR"
+                   "VISUAL"
+                   "GIT_EDITOR"
+                   "HG_EDITOR"))
+      (with-editor-export-editor var))))
 
 ;; Trim whitespace on touched lines only automatically when saving
 (use-package ws-butler
@@ -2761,6 +2786,9 @@ enabled."))
   :autoload
   hgs--cape-dabbrev-dict-keyword
 
+  :functions
+  hgs--cape-ignore-elisp-keywords
+
   :hook
   (emacs-lisp-mode . hgs--cape-setup-elisp)
 
@@ -2827,7 +2855,10 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
              (or (treesit-language-available-p 'c)
                  (treesit-language-available-p 'cpp)))
 
-  :init
+  :autoload
+  hgs--c++-ts-indent-style
+
+  :config
   (defun hgs--c++-ts-indent-style ()
     "Override a built-in style with custom tree-sitter formatting rules."
     `(;; Custom rules
@@ -2995,7 +3026,7 @@ current workspace.")
   :ensure nil
   :defer t
 
-  :autoload
+  :commands
   string-inflection-get-current-word
   string-inflection-upcase-function
   string-inflection-capital-underscore-function
@@ -3003,8 +3034,9 @@ current workspace.")
   string-inflection-camelcase-function
   string-inflection-pascal-case-function
   string-inflection-kebab-case-function
+  hgs-restyle-dwim
 
-  :preface
+  :config
   (defun hgs-restyle-dwim ()
     "Completing read enabled restyling of the specified region or current word.
 Allows for converting the given region between kebab-case,
@@ -3297,6 +3329,9 @@ dispatch."))
   :ensure nil
   :defer t
 
+  :commands
+  hgs-toggle-docker-as-root
+
   :bind
   (:map global-map
         ("C-c D" ("Docker" . docker)))
@@ -3317,13 +3352,13 @@ dispatch."))
   :after
   (:all nerd-icons)
 
-  :preface
+  :hook
+  (hgs-frame-customization . hgs--enable-doom-modeline)
+
+  :config
   (defun hgs--enable-doom-modeline (&optional frame)
     (message "Enabling doom modeline!")
-    (doom-modeline-mode +1))
-
-  :hook
-  (hgs-frame-customization . hgs--enable-doom-modeline))
+    (doom-modeline-mode +1)))
 
 (use-package message
   :ensure nil
