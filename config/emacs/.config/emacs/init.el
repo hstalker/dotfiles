@@ -2756,7 +2756,50 @@ enabled."))
 
 (use-package cape
   :ensure nil
-  :defer t)
+  :defer t
+
+  :autoload
+  hgs--cape-dabbrev-dict-keyword
+
+  :hook
+  (emacs-lisp-mode . hgs--cape-setup-elisp)
+
+  :init
+  (add-hook 'completion-at-point-functions #'hgs--cape-dabbrev-dict-keyword)
+
+  :config
+  (defun hgs--cape-dabbrev-dict-keyword ()
+    "Cape super of dabbrev/dict/keyword together. Useful default."
+    (cape-capf-sort
+     (cape-capf-super
+      #'cape-dabbrev #'cape-dict #'cape-keyword)))
+
+  (defun hgs--cape-ignore-elisp-keywords (candidate)
+    "Return `t' iff not a keyword OR input does not begin with `:'."
+    (or (not (keywordp candidate))
+        (eq (char-after (car completion-in-region--data)) ?:)))
+
+  (defun hgs--cape-setup-elisp ()
+    "Customize default elisp capfs.
+Combines dabbrev/elisp completion followed by dict/file fallback."
+    (setq-local cape-dabbrev-min-length 3
+                completion-at-point-functions
+                `(,(cape-capf-super
+                    (cape-capf-predicate #'elisp-completion-at-point
+                                         #'hgs--cape-ignore-elisp-keywords)
+                    #'cape-dabbrev)
+                  ,(cape-capf-super #'cape-dict #'cape-file))))
+
+  ;; force eglot completion to not cache results from server
+  ;; as this has performance implications we don't do this by default
+  ;; (with-eval-after-load 'eglot
+  ;;   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
+
+  (when (version< emacs-version "31")
+    (advice-add 'dabbrev-capf :around #'cape-wrap-silent))
+  (when (version< emacs-version "29")
+    (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)))
+
 
 ;; Automatically use tree-sitter modes if available
 (use-package treesit-auto
