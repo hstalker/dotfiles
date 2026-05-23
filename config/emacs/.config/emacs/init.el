@@ -191,6 +191,11 @@
      :host github
      :repo "minad/corfu"))
   (straight-use-package
+   '(corfu-terminal
+     :type git
+     :host codeberg
+     :repo "akib/emacs-corfu-terminal"))
+  (straight-use-package
    '(cape
      :type git
      :host github
@@ -735,10 +740,26 @@ predictable."))
   :defer t
 
   :bind
-  ;; Allows us to use a narrowing framework for capf completions, which in my
-  ;; opinion is better UX than company-mode.
   (:map global-map
-        ("C-c ;" ("Completion-at-point" . completion-at-point))))
+        ("C-c ;" ("Completion-at-point" . completion-at-point)))
+
+  :custom
+  (completion-cycle-threshold nil "Require popup for *all* completions."))
+
+(use-package indent
+  :ensure nil
+  :defer t
+
+  :custom
+  (tab-always-indent 'complete "Indent first, and then try to
+`completion-at-point."))
+
+(use-package text-mode
+  :ensure nil
+  :defer t
+
+  :custom
+  (text-mode-ispell-word-completion nil "Disable default capf for ispell."))
 
 (use-package gamegrid
   :ensure nil
@@ -921,7 +942,12 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :hook
   ((prog-mode text-mode) . line-number-mode)
   ((prog-mode text-mode) . column-number-mode)
-  ((text-mode) . turn-on-auto-fill))
+  ((text-mode) . turn-on-auto-fill)
+
+  :custom
+  (read-extended-command-predicate
+   #'command-completion-default-include-p
+   "Hide commands from M-x that don't apply to the current mode."))
 
 ;; Slow & old
 (use-package linum
@@ -2643,27 +2669,22 @@ since it'll break GUI emacsclient."
   :ensure nil
   :defer t
 
-  :autoload
-  corfu--extra
+  :diminish
+  global-corfu-mode
+  corfu-mode
 
-  :preface
-  (defun hgs-corfu-move-to-minibuffer ()
-    "Transfer corfu completion to the minibuffer."
-    ;; Corfu hijacks the completion in completion-in-region/at-point capf
-    ;; entrypoints, so using this is a way to go from corfu to minibuffer for
-    ;; consult. It may be preferable in the future to remove corfu in favor of
-    ;; minibuffer completion only.
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'hgs--vertico-completion-in-region completion-in-region--data)))
+  :autoload
+  hgs--corfu-move-to-minibuffer
+  hgs--corfu-minibuffer
 
   :hook
-  (prog-mode . corfu-mode)
+  ((prog-mode shell-mode eshell-mode) . corfu-mode)
+  ((global-corfu-mode corfu-mode) . corfu-popupinfo-mode)
+  ((global-corfu-mode corfu-mode) . corfu-indexed-mode)
 
   :bind
   (:map corfu-map
-        ("M-m" ("Transfer to minibuffer" . hgs-corfu-move-to-minibuffer)))
+        ("M-m" ("Complete via minibuffer" . hgs--corfu-move-to-minibuffer)))
 
   :config
   ;; There is no point in hijacking C-p/n when M-p/n are already used
@@ -2682,6 +2703,21 @@ since it'll break GUI emacsclient."
   (unbind-key [remap scroll-up-command] corfu-map)
   (unbind-key [remap scroll-down-command] corfu-map)
 
+  (defun hgs--corfu-move-to-minibuffer ()
+    (interactive)
+    (pcase completion-in-region--data
+      (`(,beg ,end ,table ,pred, extras)
+       (let ((completion-extra-properties extras)
+             completion-cycle-threshold completion-cycling)
+         (consult-completion-in-region beg end table pred)))))
+
+  (defun hgs--corfu-minibuffer ()
+    (not (or (bound-and-true-p mct--active)
+             (bound-and-true-p vertico--input)
+             (eq (current-local-map) read-passwd-map))))
+
+  (add-to-list 'corfu-continue-commands #'hgs--corfu-move-to-minibuffer)
+
   :custom
   (corfu-cycle t "Enable cycling through corfu candidate set.")
   (corfu-auto t)
@@ -2696,8 +2732,27 @@ since it'll break GUI emacsclient."
   (corfu-quit-at-boundary nil "Stay alive even if there is no match.")
   ;; Note: M-SPC is already hijacked under Gnome for some other purpose
   (corfu-separator ?\s "Use M-SPC as the separator.")
-  (corfu-preview-current nil "Preview the currently selected candidate.")
-  (corfu-scroll-margin 2))
+  (corfu-preview-current t "Preview the currently selected candidate.")
+  (corfu-preselect-first nil "Don't preselect candidates.")
+  (corfu-scroll-margin 4)
+  (global-corfu-minibuffer #'hgs--corfu-minibuffer "`global-corfu-mode' should
+automatically provide completions in minibuffer if mct/vertico are not
+enabled."))
+
+(use-package corfu-terminal
+  :ensure nil
+  :defer t
+  :unless (and (version< emacs-version "31")
+               (display-graphic-p))
+
+  :after
+  (:all corfu)
+
+  :diminish
+  corfu-terminal-mode
+
+  :hook
+  ((global-corfu-mode corfu-mode) . corfu-terminal-mode))
 
 (use-package cape
   :ensure nil
