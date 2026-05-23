@@ -2039,10 +2039,13 @@ arbitrary depth.")
   :custom
   (org-indent-indentation-per-level 2))
 
+;; `go-ts-mode'/`go-mod-ts-mode' are available, but go-mode still provides
+;; better integration
 (use-package go-mode
   :ensure nil
   :defer t)
 
+;; `rust-ts-mode' is available, but rustic still provides better integration
 (use-package rustic-mode
   :ensure nil
   :defer t
@@ -2058,6 +2061,12 @@ arbitrary depth.")
 (use-package dockerfile-mode
   :ensure nil
   :defer t
+
+  ;; prefer `dockerfile-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'dockerfile)
+             (version< emacs-version "29.1"))
 
   :config
   ;; Allow the use to put a file-local variable specifying the image name.
@@ -2084,15 +2093,23 @@ arbitrary depth.")
   :defer t
 
   :after
-  (:all json-mode)
+  (:any json-mode json-ts-mode)
 
   :bind
+  (:map json-ts-mode-map
+        ("C-c C-j" ("JQ (Interactive)" . jq-interactively)))
   (:map json-mode-map
         ("C-c C-j" ("JQ (Interactive)" . jq-interactively))))
 
 (use-package toml-mode
   :ensure nil
-  :defer t)
+  :defer t
+
+  ;; prefer `toml-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'toml)
+             (version< emacs-version "29.1")))
 
 ;; Dim non-focused windows for clarity. This seems to cause massive terminal
 ;; slow-down when changing active window, so I might eventually remove it.
@@ -2992,11 +3009,23 @@ current workspace.")
 
 (use-package cmake-mode
   :ensure nil
-  :defer t)
+  :defer t
+
+  ;; prefer `cmake-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'cmake)
+             (version< emacs-version "29.1")))
 
 (use-package yaml-mode
   :ensure nil
-  :defer t)
+  :defer t
+
+  ;; prefer `yaml-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'yaml)
+             (version< emacs-version "29.1")))
 
 (use-package csv-mode
   :ensure nil
@@ -3005,6 +3034,12 @@ current workspace.")
 (use-package lua-mode
   :ensure nil
   :defer t
+
+  ;; prefer `lua-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'lua)
+             (version< emacs-version "30.1"))
 
   :custom
   (lua-indent-level 2))
@@ -3278,7 +3313,13 @@ dispatch."))
 
 (use-package json-mode
   :ensure nil
-  :defer t)
+  :defer t
+
+  ;; prefer `json-ts-mode'
+  :when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (treesit-language-available-p 'json)
+             (version< emacs-version "29.1")))
 
 (use-package flycheck
   :ensure nil
