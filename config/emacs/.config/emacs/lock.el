@@ -1,5 +1,4 @@
 (("Emacs-wgrep" . "49f09ab9b706d2312cab1199e1eeb1bcd3f27f6f")
- ("auth-source-pass" . "a4a7b4c5baf31fdfd4235f590f356de144a8b2ab")
  ("avy" . "933d1f36cca0f71e4acb5fac707e9ae26c536264")
  ("cape" . "c99911b08831c26179145686b4beffa96f1f8a68")
  ("cmake-mode" . "25340a7d12c2a4b7f514a3792f3e89af32c55dfa")

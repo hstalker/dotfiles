@@ -406,11 +406,6 @@
      :host github
      :repo "seagle0128/doom-modeline"))
   (straight-use-package
-   '(auth-source-pass
-     :type git
-     :host github
-     :repo "DamienCassou/auth-source-pass"))
-  (straight-use-package
    '(password-store
      :type git
      :host github
