@@ -269,6 +269,7 @@
      :host github
      :repo "joaotavora/yasnippet"))
   (straight-use-package
+   ;; Built-in from Emacs 30
    '(which-key
      :type git
      :host github
@@ -299,6 +300,7 @@
      :host github
      :repo "emacsmirror/csv-mode"))
   (straight-use-package
+   ;; Built-in `lua-ts-mode' mode from Emacs 30
    '(lua-mode
      :type git
      :host github
@@ -319,6 +321,7 @@
      :host github
      :repo "akicho8/string-inflection"))
   (straight-use-package
+   ;; Built-in from Emacs 30
    '(editor-config
      :type git
      :host github
@@ -3327,6 +3330,9 @@ dispatch."))
 
   :diminish
   flycheck-mode
+
+  ;; flymake has gotten quite close in parity with flycheck in recent Emacs
+  ;; versions but it's still expected by a lot of packages and not quite there
 
   :init
   (which-key-add-key-based-replacements
