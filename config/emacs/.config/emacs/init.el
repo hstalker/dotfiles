@@ -666,6 +666,10 @@ nil, 'prepend or 'append."
   (minibuffer-depth-indicate-mode +1)
 
   :custom
+  (undo-limit (* 1024 1024 32))
+  (undo-strong-limit (* 1024 1024 48))
+  (undo-outer-limit (* 1024 1024 128))
+  (undo-no-redo nil)
   (require-final-newline t)
   (completion-ignore-case t)
   (read-file-name-completion-ignore-case t)
@@ -3252,7 +3256,8 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
   (undo-fu-allow-undo-in-region nil)
   (undo-fu-ignore-keyboard-quit
    nil
-   "Use C-g for non-linear traversal behavior."))
+   "Use C-g for non-linear traversal behavior.")
+  (undo-fu-trim t))
 
 (use-package undo-fu-session
   :ensure nil
