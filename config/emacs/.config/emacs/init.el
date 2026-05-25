@@ -2961,7 +2961,11 @@ current workspace.")
   (eglot-confirm-server-initiated-edits
    t
    "Ask for confirmation when the server tries to alter buffers.")
-  (eglot-ignored-server-capabilities '()))
+  (eglot-ignored-server-capabilities '())
+  (eglot-code-action-indicator
+   (if (display-graphic-p) "💡" "*")
+   "Default indicator of 💡 often causes issues with terminal emulator rendering
+when displayed in the margin."))
 
 (use-package which-key
   :ensure nil
