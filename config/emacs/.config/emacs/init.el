@@ -1410,7 +1410,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
        (propertize (if (zerop (user-uid))
                        "#"
                      "λ")
-                   'face '(:foreground "teal"))
+                   'face '(:foreground "cyan"))
        " ")))
 
   :custom
