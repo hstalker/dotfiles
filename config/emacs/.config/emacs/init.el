@@ -1883,25 +1883,35 @@ information.")
   (python-indent-offset 2)
   (python-indent-guess-indent-offset t))
 
-;; C/C++
+;; Legacy C/C++ modes
 (use-package cc-mode
   :ensure nil
   :defer t
 
-  :preface
-  (defcustom hgs-clang-format-command
-    ;; (PROGRAM ARGS...)
-    '("clang-format")
-    "Command to run clang formatting."
-    :type 'list
-    :group 'personal)
+  :hook
+  (c-mode-common . hgs--c-base-mode-setup)
+  (c-mode . hgs--c-mode-setup)
+  (c++-mode . hgs--c++-mode-setup)
+  (objc-mode . hgs--objc-mode-setup)
 
   :config
-  (reformatter-define clang-format
-    :program (car hgs-clang-format-command)
-    :args (cdr hgs-clang-format-command)
-    :group 'cpp
-    :lighter " CF"))
+  ;; map modes to explicit base-styles
+  (setf (alist-get 'c-mode c-default-style) "linux")
+  (setf (alist-get 'c++-mode c-default-style) "bsd")
+
+  (defun hgs--c-base-mode-setup ()
+    "Shared configuration to execute when loading `cc-mode' modes."
+    (message "Loaded legacy `cc-mode'! Consider switching to `*-ts-mode's.")
+    (setq-local c-basic-offset 4))
+  (defun hgs--c-mode-setup ()
+    "Configuration to execute when loading `c-mode'."
+    t)
+  (defun hgs--c++-mode-setup ()
+    "Configuration to execute when loading `c++-mode'."
+    (setq-local c-basic-offset 2))
+  (defun hgs--objc-mode-setup ()
+    "Configuration to execute when loading `objc-mode'."
+    t))
 
 (use-package org
   :ensure nil
@@ -2866,6 +2876,7 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
   :custom
   (treesit-auto-install 'prompt "Ask to install grammars."))
 
+;; Modern C/C++ modes
 (use-package c-ts-mode
   :ensure nil
   :defer t
@@ -2874,8 +2885,10 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
              (or (treesit-language-available-p 'c)
                  (treesit-language-available-p 'cpp)))
 
-  :autoload
-  hgs--c++-ts-indent-style
+  :hook
+  (c-ts-base-mode . hgs--c-ts-base-mode-setup)
+  (c-ts-mode . hgs--c-ts-mode-setup)
+  (c++-ts-mode . hgs--c++-ts-mode-setup)
 
   :config
   (defun hgs--c++-ts-indent-style ()
@@ -2886,13 +2899,17 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
       ;; Base rule-set
       ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
 
-  :custom
-  (c-ts-mode-indent-offset
-   2
-   "Set the baseline offset (often overridden by the editorconfig package).")
-  (c-ts-mode-indent-style
-   #'hgs--c++-ts-indent-style
-   "Use my custom formatting style."))
+  (defun hgs--c-ts-base-mode-setup ()
+    "Shared configuration to execute when loading `c-ts-mode' modes."
+    t)
+  (defun hgs--c-ts-mode-setup ()
+    "Configuration to execute when loading `c-ts-mode'."
+    (setq-local c-ts-mode-indent-offset 4)
+    (setq-local c-ts-mode-indent-style 'linux))
+  (defun hgs--c++-ts-mode-setup ()
+    "Configuration to execute when loading `c++-ts-mode'."
+    (setq-local c-ts-mode-indent-offset 2) ;; usually overridden by editorconfig
+    (setq-local c-ts-mode-indent-style #'hgs--c++-ts-indent-style)))
 
 (use-package yasnippet
   :ensure nil
@@ -2931,9 +2948,8 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
   :defer t
 
   :hook
-  ;; Mostly we can get away with using manual invocation where needed
-  ;; per-session
-  ((c-mode c-ts-mode c++-mode c++-ts-mode python-mode) . eglot-ensure)
+  ((c-mode c-ts-mode c++-mode c++-ts-mode) . eglot-ensure)
+  ((python-mode python-ts-mode) . eglot-ensure)
 
   :bind
   (:map eglot-mode-map
@@ -3230,7 +3246,28 @@ snake_case, Snake_Case, camelCase, PascalCase, and UPPER_CASE."
 
 (use-package reformatter
   :ensure nil
-  :defer t)
+  :defer t
+
+  :commands
+  ;; since we share across `cc-mode's & `c-ts-mode's, put C/C++ reformatter here
+  clang-format-buffer
+  clang-format-region
+  clang-format-on-save-mode
+
+  :preface
+  (defcustom hgs-clang-format-command
+    ;; (PROGRAM ARGS...)
+    '("clang-format")
+    "Command to run clang formatting."
+    :type 'list
+    :group 'personal)
+
+  :config
+  (reformatter-define clang-format
+    :program (car hgs-clang-format-command)
+    :args (cdr hgs-clang-format-command)
+    :group 'cpp
+    :lighter " CF"))
 
 (use-package undo-fu
   :ensure nil
