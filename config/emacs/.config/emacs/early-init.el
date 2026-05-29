@@ -62,9 +62,23 @@
 (declare-function package--ensure-init-file "package")
 (advice-add #'package--ensure-init-file :override #'ignore)
 
+;; Avoid displaying too much stuff after startup
+(customize-set-variable 'inhibit-startup-message t)
+(customize-set-variable 'inhibit-startup-echo-area-message nil)
+(customize-set-variable 'inhibit-default-init t)
+(customize-set-variable 'initial-scratch-message nil)
+
+;; Avoid causing resizing the frame during startup
+(customize-set-variable 'frame-inhibit-implied-resize t)
+(customize-set-variable 'frame-resize-pixelwise t)
+
+;; Prevents redundant reloading of fonts during redisplay
+(setq inhibit-compacting-font-caches t)
+
 ;; Hide GUI emacs remnants early
-(push '(menu-bar-lines . nil) default-frame-alist)
-(push '(tool-bar-lines . nil) default-frame-alist)
+(push '(tab-bar-lines . 0) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars . nil) default-frame-alist)
 (push '(horizontal-scroll-bars . nil) default-frame-alist)
 
@@ -74,6 +88,10 @@
 ;; GTK Emacs will react to gconf settings for things like fonts by default. This
 ;; turns that off.
 (define-key special-event-map [config-changed-event] 'ignore)
+
+;; Improves latency with child-frames
+(when (fboundp 'pgtk-wait-for-event-timeout)
+  (setq pgtk-wait-for-event-timeout 0.001))
 
 ;; Unneeded
 ;; (provide 'early-init)

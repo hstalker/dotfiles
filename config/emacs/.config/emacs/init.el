@@ -637,6 +637,10 @@ nil, 'prepend or 'append."
   (set-selection-coding-system 'utf-8)
   (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 
+  ;; Don't do fontification for redisplay when input is still pending
+  ;; This is good for high input-rate tasks and rapid user-typing
+  (setq redisplay-skip-fontification-on-input t)
+
   ;; Better support handling processes with large amounts of data like LSP
   (setq read-process-output-max (* 1024 1024))
 
