@@ -691,6 +691,7 @@ nil, 'prepend or 'append."
   (inhibit-startup-echo-area-message nil)
   (inhibit-default-init t)
   (initial-scratch-message nil)
+  (use-short-answers t)
   (auto-save-list-file-prefix
    (concat hgs-emacs-state-directory "auto-save/sessions/"))
   (sentence-end-double-space nil)
@@ -767,6 +768,13 @@ predictable."))
 
   :custom
   (text-mode-ispell-word-completion nil "Disable default capf for ispell."))
+
+(use-package ffap
+  :ensure nil
+  :defer t
+
+  :custom
+  (ffap-machine-p-known 'accept "Prevent ffap from pinging hosts."))
 
 (use-package gamegrid
   :ensure nil
@@ -1890,6 +1898,12 @@ information.")
 (use-package custom
   :ensure nil
   :defer t
+
+  :config
+  (defun hgs--disable-custom-themes (theme &optional no-confirm no-enable)
+    "Forcibly disable enabled theme to prevent conflicts when swapping themes."
+    (mapc 'disable-theme custom-enabled-themes))
+  (advice-add #'load-theme :before #'hgs--disable-custom-themes)
 
   :custom
   (custom-theme-directory (concat hgs-emacs-config-directory "themes")))
