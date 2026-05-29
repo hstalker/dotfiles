@@ -694,6 +694,7 @@ nil, 'prepend or 'append."
   (bidi-paragraph-direction 'left-to-right)
   (ring-bell-function #'ignore)
   (history-delete-duplicates t)
+  (scroll-conservatively 0 "Always recenter cursor if it moves off screen.")
   (display-buffer-alist
    ;; Don't bother truly attempting to tame Emacs windowing. True freedom is
    ;; learning to not care where things are as long as *Help* doesn't replace
@@ -899,6 +900,23 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :hook
   ;; Enable xterm mouse mode by default if running in the terminal
   ((prog-mode text-mode special-mode) . xterm-mouse-mode))
+
+(use-package mwheel
+  :ensure nil
+  :defer t
+
+  :custom
+  (mouse-wheel-progressive-speed nil)
+  (mouse-wheel-follow-mouse t))
+
+(use-package pixel-scroll
+  :ensure nil
+  :demand t
+  :disabled t ;; not a big fan of how positioning goes off-kilter
+
+  :config
+  (pixel-scroll-mode)
+  (pixel-scroll-precision-mode))
 
 (use-package delsel
   :ensure nil
