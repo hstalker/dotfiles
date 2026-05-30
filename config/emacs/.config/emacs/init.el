@@ -2992,6 +2992,11 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
         ;; None as of yet
         )
 
+  :config
+  ;; Prevent eglot from configuring these built-in components, Possible options:
+  ;; flymake, imenu, xref, eldoc, yasnippet, etc
+  (setq eglot-stay-out-of '(flymake)) ;; we use flycheck (for now)
+
   :custom
   (eglot-autoreconnect
    3
