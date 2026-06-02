@@ -1938,13 +1938,13 @@ information.")
   (defun hgs--c-base-mode-setup ()
     "Shared configuration to execute when loading `cc-mode' modes."
     (message "Loaded legacy `cc-mode'! Consider switching to `*-ts-mode's.")
-    (setq-local c-basic-offset 4))
+    (customize-set-variable 'c-basic-offset 4))
   (defun hgs--c-mode-setup ()
     "Configuration to execute when loading `c-mode'."
     t)
   (defun hgs--c++-mode-setup ()
     "Configuration to execute when loading `c++-mode'."
-    (setq-local c-basic-offset 2))
+    (customize-set-variable 'c-basic-offset 2))
   (defun hgs--objc-mode-setup ()
     "Configuration to execute when loading `objc-mode'."
     t))
@@ -2940,12 +2940,14 @@ Combines dabbrev/elisp completion followed by dict/file fallback."
     t)
   (defun hgs--c-ts-mode-setup ()
     "Configuration to execute when loading `c-ts-mode'."
-    (setq-local c-ts-mode-indent-offset 4)
-    (setq-local c-ts-mode-indent-style 'linux))
+    ;; `c-ts-mode-indent-style' uses a custom setter, so will not apply unless
+    ;; we use custom, and they are buffer-localized via the mode
+    (customize-set-variable 'c-ts-mode-indent-offset 4)
+    (customize-set-variable 'c-ts-mode-indent-style 'linux))
   (defun hgs--c++-ts-mode-setup ()
     "Configuration to execute when loading `c++-ts-mode'."
-    (setq-local c-ts-mode-indent-offset 2) ;; usually overridden by editorconfig
-    (setq-local c-ts-mode-indent-style #'hgs--c++-ts-indent-style)))
+    (customize-set-variable 'c-ts-mode-indent-offset 2) ;; usually overridden by editorconfig
+    (customize-set-variable 'c-ts-mode-indent-style #'hgs--c++-ts-indent-style)))
 
 (use-package yasnippet
   :ensure nil
