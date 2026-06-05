@@ -918,7 +918,7 @@ a small performance hit, and forcibly hardwrap lines if they get too long."
   :defer t
 
   :custom
-  (mouse-wheel-progressive-speed nil)
+  (mouse-wheel-progressive-speed t)
   (mouse-wheel-follow-mouse t))
 
 (use-package pixel-scroll
